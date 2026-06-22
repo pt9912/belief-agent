@@ -3,6 +3,7 @@
 | ID | Titel | Status | Bezug |
 |---|---|---|---|
 | [0001](0001-hexagonal-llm-port.md) | Hexagonale Architektur — LLM als austauschbarer Port, Entscheidungslogik im Kern | Proposed | `LH-FA-LLM-001` |
+| [0002](0002-implementierungssprache-jvm-java.md) | Implementierungssprache und Plattform — Java auf der JVM (Micronaut nur am Rand) | Proposed | `LH-RB-04` |
 
 ## Konventionen
 
