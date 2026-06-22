@@ -77,6 +77,9 @@ Kern importiert kein Adapter-Paket), `make coverage-gate` (Welle 1+).
 - Änderungen an Planning-Dokumenten müssen die Lifecycle-Regeln beachten
   (open → next → in-progress → done; reine `git mv`-Commits siehe
   [`AGENTS.md`](../AGENTS.md) §3.3).
+- Abdeckung sichtbar machen: `make doc-trace` rendert die Requirements
+  Traceability Matrix (Anforderung → ADRs/Slices, Waisen) — Report, kein
+  Gate (`--json`/`--yaml` via `TRACE_FLAGS`).
 
 ## Safety and scope boundaries
 
