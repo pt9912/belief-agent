@@ -15,10 +15,11 @@ Strukturregeln (ID-Schemata, Verzeichniskonvention, Adaptionen ggü.
 Baseline, Modus-Deklarationen pro Sub-Area, Zusatzklassen für
 Sensors-Bindung) leben in [`harness/conventions.md`](harness/conventions.md).
 
-Das **Betriebsregelwerk der adoptierten Baseline in Agenten-Kurzform** liegt
-als Release-Asset bereit:
-<https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/agents-regelwerk.md>
-— einmal pro Session lesen, bevor der Workflow (§6) startet. Derivativ: bei
+Das **Betriebsregelwerk der adoptierten Baseline** liegt als ZIP-Bundle
+(Regelwerk pro Modul, self-navigierbar) als Release-Asset bereit:
+<https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/lab-regelwerk.zip>
+— pro Session das aufgaben-relevante Modul lesen, bevor der Workflow (§6)
+startet. Derivativ: bei
 Konflikt gelten die kanonischen Quellen; adoptierter Stand in
 [`harness/conventions.md`](harness/conventions.md) §Baseline.
 

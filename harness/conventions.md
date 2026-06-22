@@ -25,10 +25,10 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
 ## Adoptierte Konventions-Quellen
 
 - **Extern (Lehrmaterial):** <https://github.com/pt9912/ai-harness-course/tree/v1.3.0/kurs/de>
-- **Extern (Agenten-Regelwerk):**
-  <https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/agents-regelwerk.md>
-  — adoptierter Stand: Release-Tag `v1.3.0` (self-contained, interne
-  Verweise auf den Tag gepinnt).
+- **Extern (Agenten-Regelwerk, ZIP pro Modul):**
+  <https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/lab-regelwerk.zip>
+  — adoptierter Stand: Release-Tag `v1.3.0` (self-navigierbares Bundle,
+  interne Verweise auf den Tag gepinnt).
 - **In-Repo (verkörperte Form):** die wiederkehrenden Templates
   (`docs/plan/adr/NNNN-titel.template.md`, `docs/plan/planning/slice.template.md`,
   `docs/plan/planning/welle.template.md`, `docs/plan/carveouts/carveout.template.md`,

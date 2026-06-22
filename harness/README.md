@@ -44,7 +44,7 @@ schärfen, **niemals** das Lastenheft. Die konkrete Rangwahl ist in
 | [`docs/plan/planning/`](../docs/plan/planning/) | Slice-Pläne und Roadmap |
 | [`AGENTS.md`](../AGENTS.md) | Hard Rules, Source Precedence, Workflow |
 | [`conventions.md`](conventions.md) | repo-lokale Strukturregeln, Adaptions-Block (`MR-*`), Modus-Deklarationen |
-| [Agenten-Regelwerk v1.3.0](https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/agents-regelwerk.md) | adoptiertes Betriebsregelwerk in Agenten-Kurzform; derivativ, Stand siehe [`conventions.md`](conventions.md) §Baseline |
+| [Agenten-Regelwerk v1.3.0 (ZIP)](https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/lab-regelwerk.zip) | adoptiertes Betriebsregelwerk, Regelwerk pro Modul; derivativ, Stand siehe [`conventions.md`](conventions.md) §Baseline |
 
 ## Sensors (Feedback-Gates)
 
