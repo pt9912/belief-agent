@@ -1,0 +1,155 @@
+# Harness-Konventionen — belief-agent
+
+## Purpose
+
+Diese Datei deklariert die *repo-lokalen* Strukturregeln von `belief-agent`
+gegenüber der adoptierten Harnesskonvention (Baseline). Sie ist der
+Default-Ort für:
+
+- **Adaptionen** ggü. der Baseline (mit Begründung und Auflösungs-Trigger).
+- **ID-Schema-Deklaration** — welches Präfix-Schema dieses Repo nutzt.
+- **Zusatzklassen-Deklarationen** für repo-spezifische Bindung-Klassen in
+  der Sensors-Tabelle, die über die vier kanonischen hinausgehen.
+- **Modus-Deklarationen** pro Sub-Area (Greenfield / Brownfield / Hybrid).
+
+Bei Konflikt zwischen dieser Datei und einer kanonischen Quelle gilt die
+kanonische Quelle (Source Precedence). Diese Datei ist konformitäts-
+bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
+
+## Baseline
+
+- **Konvention:** AI-Harness-Kurs (`pt9912/ai-harness-course`)
+- **Stand:** v1.3.0 (Regelwerk- und Template-Set)
+- **Datum der Adoption:** 2026-06-22
+
+## Adoptierte Konventions-Quellen
+
+- **Extern (Lehrmaterial):** <https://github.com/pt9912/ai-harness-course/tree/v1.3.0/kurs/de>
+- **Extern (Agenten-Regelwerk):**
+  <https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/agents-regelwerk.md>
+  — adoptierter Stand: Release-Tag `v1.3.0` (self-contained, interne
+  Verweise auf den Tag gepinnt).
+- **In-Repo (verkörperte Form):** die wiederkehrenden Templates
+  (`docs/plan/adr/NNNN-titel.template.md`, `docs/plan/planning/slice.template.md`,
+  `docs/plan/planning/welle.template.md`, `docs/plan/carveouts/carveout.template.md`,
+  `docs/reviews/review-report.template.md`) sowie die Gate-Baseline
+  (`.d-check.yml`, `d-check.mk`, `Makefile`).
+
+## Adaptions-Block
+
+### MR-000 — Baseline-Aussage
+
+- **Datum:** 2026-06-22
+- **Geltungsbereich:** gesamtes Repo
+- **Adaption:** *keine inhaltlichen Adaptionen ggü. Baseline-Default für
+  Verzeichniskonvention, Lifecycle-Regeln (`open` → `next` → `in-progress`
+  → `done`), Carveout-Disziplin und die ADR-/Carveout-/Slice-/MR-ID-Schemata
+  (`ADR-<NNNN>`, `CO-<NNN>`, `slice-<NNN>`, `MR-<NNN>`).* Abweichungen vom
+  Lastenheft-Default-Präfix und von der Source Precedence sind als eigene
+  `MR-<NNN>` unten dokumentiert.
+- **Begründung:** Initial-Setzung. Spätere Adaptionen werden als
+  `MR-<NNN>` nachgetragen.
+- **Auflösungs-Trigger:** permanent.
+
+### MR-001 — Source Precedence mit eigener Spezifikations-Schicht
+
+- **Datum:** 2026-06-22
+- **Geltungsbereich:** `harness/README.md` §Source precedence
+- **Adaption:** Die Source-Precedence-Tabelle führt `spec/spezifikation.md`
+  als eigenen **Rang 2** zwischen Lastenheft (Rang 1) und Architektur
+  (Rang 3). Der Kurs-Default setzt zwei Spec-Ränge; dieses Repo nutzt drei.
+- **Begründung:** `belief-agent` nutzt die Spec-Stratifizierung explizit mit
+  drei Spec-Dateien. Damit die ADR-Schärfungs-Regel ("ADR darf
+  Spezifikation schärfen, nicht Lastenheft") strukturell sichtbar ist, muss
+  die Spezifikation als eigener Rang erscheinen.
+- **Auflösungs-Trigger:** permanent.
+
+### MR-002 — Constraint-/Non-Goal-/Open-Point-Familien zusätzlich zu FA/QA
+
+- **Datum:** 2026-06-22
+- **Geltungsbereich:** `spec/lastenheft.md`, alle Referenzen auf
+  Lastenheft-IDs.
+- **Adaption:** Das Lastenheft folgt dem kanonischen Schema
+  `LH-FA-<BEREICH>-<NNN>` (funktionale Anforderungen; Bereiche `BEL`, `OBS`,
+  `ACT`, `POL`, `VOI`, `ESK`, `AUD`, `LLM`) und `LH-QA-<NN>`
+  (Qualitätsanforderungen) — damit RTM (`--trace`), `ids`-Auto-Ableitung und
+  `suggest-config` nativ greifen. **Zusätzlich** führt es drei Familien, die
+  der Baseline-Template-Default nicht kennt: `LH-RB-<NN>`
+  (Randbedingungen/Annahmen), `LH-OUT-<NN>` (Nicht-Ziele), `LH-OP-<NN>`
+  (offene Punkte). Diese tragen **keine** FA/QA-Gestalt und sind damit
+  bewusst nicht RTM-relevant (Constraints/Abgrenzungen/TODOs, keine
+  slice-belegbaren Anforderungen). Verfeinerungen einzelner FA-IDs in der
+  Spezifikation tragen `LH-FA-<BEREICH>-<NNN>.<Buchstabe>`; Architektur-/
+  Spezifikations-Struktur-IDs nutzen `ARC-<NN>` bzw. `SPEC-<NN>`.
+- **Begründung:** FA/QA-Ausrichtung folgt dem Kurs-Standard und macht den
+  RTM-/Konfigurations-Werkzeugkasten von d-check nutzbar. Die drei
+  Zusatzfamilien halten Randbedingungen, Nicht-Ziele und offene Punkte als
+  stabile, anker-bare IDs, ohne sie als Anforderungen zu zählen.
+- **Auflösungs-Trigger:** permanent.
+
+### MR-003 — Repo-Klasse Safety/Control
+
+- **Datum:** 2026-06-22
+- **Geltungsbereich:** gesamtes Repo (Hard Rules in `AGENTS.md`,
+  Safety-Sektion in `harness/README.md`).
+- **Adaption:** `belief-agent` wird als **Safety/Control**-Repo geführt,
+  nicht als reines Referenz/Tooling-Repo. Die Sicherheitsfunktion ist
+  nicht Hardware, sondern das **Konfidenz-Gate**: irreversible
+  (extern-wirksame) Aktionen sind nur nach harter Schwelle *und*
+  menschlicher Freigabe zulässig (`LH-FA-POL-004`, `LH-FA-POL-005`, `LH-OUT-04`).
+  Hard Rules werden entsprechend scharf gesetzt (Gate nicht umgehbar,
+  fail-safe-Default, kein extern-wirksames Handeln bei hoher
+  Resthypothese).
+- **Begründung:** Der gesamte Zweck des Frameworks ist das Absichern
+  irreversibler Aktionen durch Konfidenz. Eine Referenz-Klasse würde die
+  Hard Rules zu weich setzen; die fachliche Domäne ist sicherheitsgerichtet.
+- **Auflösungs-Trigger:** permanent.
+
+### MR-004 — d-check-Gate auf aktueller Version, Config generiert
+
+- **Datum:** 2026-06-22
+- **Geltungsbereich:** `.d-check.yml`, `d-check.mk`.
+- **Adaption:** Statt des im Template gepinnten d-check `v0.8.0` wird die
+  aktuelle Version **`v0.23.0`** adoptiert (Digest-Pin in `d-check.mk`).
+  Die `.d-check.yml` wird mit `d-check --suggest-config ai-harness`
+  (repo-bewusst) generiert statt von Hand. Das `ids`-Modul nutzt für die
+  Lastenheft-Anforderungen die kanonische Regex `LH-(FA-[A-Z]+|QA)-\d+`
+  (RTM-/suggest-config-kompatibel, `MR-002`); `link-policy: prose`
+  (Inline-Code-IDs bleiben befreit, Prosa-IDs sind linkpflichtig). Die
+  Constraint-/Non-Goal-/Open-Point-IDs (`LH-RB`/`LH-OUT`/`LH-OP`) tragen
+  bewusst keine Linkpflicht.
+- **Begründung:** Die aktuelle d-check-Version bringt eigene Generatoren
+  (`--print-config`, `--print-mk`, `--suggest-config ai-harness`) und das
+  offline-Gate (`--network none`) mit; die Config soll werkzeug-generiert
+  und damit driftarm bleiben. Die LH-Regex-Anpassung folgt zwingend aus
+  `MR-002`.
+- **Auflösungs-Trigger:** Re-Pin bei d-check-Upgrade (neuer Digest in
+  `d-check.mk`); ansonsten permanent.
+
+## Zusatzklassen-Deklaration für Sensors-Bindung
+
+Über die vier kanonischen Bindung-Klassen (ADR, Carveout, Schwelle,
+Reproduzierbarkeit) hinaus nutzt dieses Repo:
+
+| Klasse | Form | Bedeutung | Beispiel |
+|---|---|---|---|
+| Anforderungs-Bindung | `LH-FA-<BEREICH>-<NNN>` / `LH-QA-<NN>` | Gate prüft eine bestimmte Lastenheft-Anforderung direkt | `LH-FA-BEL-002` für ein Normierungs-Gate (Σp = 1) |
+| Modell-Version-Bindung | `Modell <name>@<version>` | Replay-/Eval-Gate hängt an einer fixierten LLM-Port-Modellversion | `LH-FA-LLM`-Evals gegen Golden Set |
+
+## Modus-Deklaration pro Sub-Area
+
+| Sub-Area (Pfad / Modul) | Modus | Begründung | Graduation-Bedingung / Folge-Slice |
+|---|---|---|---|
+| `*` (Default für gesamtes Repo) | Greenfield | Frisches Repo ohne Bestandscode; Doku führt, Code folgt. | n/a (GF) |
+| `spec/`, `harness/`, `docs/plan/` (Konventionen, Spec, Architektur, ADR, Planung) | Greenfield | Beim Bootstrap zuerst angelegte Doku-Sub-Areas; alle vier Doku-führt. | n/a (GF) |
+
+> Künftige Code-Sub-Areas (Belief-Kern, Evidenz/Update, Aktionen/Gates,
+> VoI, Eskalation, Audit/Event-Log, LLM-Port) werden bei ihrer Anlage als
+> GF geführt, solange die Spec sie vor dem Code beschreibt. Ein Wechsel
+> nach BF (z. B. übernommener Bestandscode) bekäme eine eigene
+> Modus-Aussage mit Graduation-Plan.
+
+## Glossar (optional)
+
+Repo-spezifische Begriffe stehen vollständig im Lastenheft (`spec/lastenheft.md`
+§4); hier keine Wiederholung.

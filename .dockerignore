@@ -1,0 +1,37 @@
+# .dockerignore — hält den Build-Kontext klein und reproduzierbar.
+# Vorbereitend für den Docker-Harness (Kurs Modul 14); verfeinern, sobald
+# ein Dockerfile und die Code-Toolchain via Sprach-ADR (LH-RB-04) stehen.
+
+# VCS & CI
+.git
+.gitignore
+.gitattributes
+.github
+
+# Lokale / Editor-Artefakte
+.claude
+.idea
+.vscode
+*.iml
+
+# Harness-Doku (nicht Teil eines Build-/Runtime-Images)
+docs
+spec
+harness
+*.md
+
+# Doc-Gate-Konfiguration (läuft separat, nicht im Image-Build)
+.d-check.yml
+d-check.mk
+
+# Build-Ausgaben (im Container neu erzeugt)
+target
+build
+out
+bin
+.gradle
+
+# Temp
+.tmp
+fix.patch
+*.log

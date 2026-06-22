@@ -1,0 +1,35 @@
+# --- Harness / Werkzeuge ---
+# Lokale Claude-Code-Einstellungen (maschinenlokal, nicht teilen)
+.claude/settings.local.json
+# Temporäre d-check-Reparatur-Patches (--repair > fix.patch)
+fix.patch
+# Scratch / d-check-Ignore-Wurzel
+.tmp/
+
+# --- JVM / Java (Zielplattform laut LH-RB-04) ---
+# Build-Ausgaben
+target/
+build/
+out/
+bin/
+*.class
+# Gradle (Wrapper-Dateien gradlew/gradle/wrapper/ werden committet)
+.gradle/
+# Maven
+.mvn/timing.properties
+# Java-Fehlerprotokolle
+hs_err_pid*
+replay_pid*
+
+# --- IDE / Editor ---
+.idea/
+*.iml
+.vscode/
+.settings/
+.project
+.classpath
+
+# --- OS / Diverses ---
+.DS_Store
+Thumbs.db
+*.log

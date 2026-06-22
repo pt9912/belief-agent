@@ -1,0 +1,55 @@
+# .d-check.yml — generiert mit `d-check --suggest-config ai-harness --id-prefix LH`
+# (repo-bewusst, Baseline v1.3.0) und getunt gemäß harness/conventions.md:
+#   MR-002: kanonisches FA/QA-Schema; LH-ids-Regex LH-(FA-<BEREICH>|QA)
+#          (RTM-/suggest-config-kompatibel).
+#   MR-004: link-policy always -> prose (Inline-Code-IDs bleiben befreit).
+# Beratend erzeugt, geprüft und verengt.
+
+scan:
+  roots: [spec, docs, harness]
+  # Wiederkehrende Vorlagen bleiben co-located im Repo; ihre Platzhalter
+  # (#<anker>, NNNN, <state>) dürfen den Gate nicht röten (Templates-README).
+  ignore: ["**/*.template.md", ".tmp/**"]
+
+modules: [links, anchors, ids, matrix, codepaths]
+
+ids:
+  scope:
+    roots: [spec]
+  patterns:
+    - regex: 'ADR-\d{4}'
+      target: docs/plan/adr/
+      link-policy: prose
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+    - regex: 'MR-\d{3}'
+      target: harness/conventions.md
+      link-policy: prose
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+    - regex: 'LH-(FA-[A-Z]+|QA)-\d+'
+      target: spec/lastenheft.md
+      link-policy: prose
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+    - regex: 'slice-\d{3}'
+      target: docs/plan/planning/
+      link-policy: prose
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+    # Carveouts: target setzen, sobald der erste CO-NNN existiert
+    # - regex: 'CO-\d{3}'
+    #   target: docs/plan/carveouts/
+    #   link-policy: prose
+    #   exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+
+matrix:
+  classes:
+    - {name: spec-straten, paths: [spec/lastenheft.md, spec/spezifikation.md, spec/architecture.md]}
+    - {name: adr, paths: ["docs/plan/adr/[0-9]*.md"]}
+    - {name: slice, paths: ["docs/plan/planning/**/slice-*.md"]}
+  rules:
+    - {from: spec-straten, to: adr, allow: false}
+    - {from: spec-straten, to: slice, allow: false}
+  status:
+    forbidden: [superseded, deprecated]
+  exclude-sections: [Historie, "7. Historie", Geschichte]
+
+codepaths:
+  exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
