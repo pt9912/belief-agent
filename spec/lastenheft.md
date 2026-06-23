@@ -4,8 +4,8 @@
 |------|------|
 | **Titel** | Lastenheft `belief-agent` |
 | **Projekt** | belief-agent |
-| **Version** | 0.3 (Entwurf) |
-| **Datum** | 2026-06-22 |
+| **Version** | 0.4 (Entwurf) |
+| **Datum** | 2026-06-23 |
 | **Status** | in Abstimmung |
 | **Art** | Lastenheft — ausschließlich Anforderungen (das *Was*, nicht das *Wie*) |
 
@@ -53,6 +53,7 @@ Nicht-Ziele sind in Abschnitt 9 als Anforderungen festgehalten.
 | **Erfolgswahrscheinlichkeit** | P(Aktion erreicht Ziel \| aktueller Belief) — die für Gates maßgebliche Größe. |
 | **Konfidenz-Gate** | Vorab-Prüfung, die eine Aktion freigibt, ablehnt oder eskaliert. |
 | **Value of Information (VoI)** | Erwarteter Erkenntnisgewinn einer Beobachtung; Grundlage der Auswahl der nächsten Beobachtung. |
+| **Günstige Beobachtung** | Eine Beobachtung mit geringen Kosten (Zeit/Aufwand/Risiko) relativ zu ihrem erwarteten Informationsgewinn. |
 | **Eskalation** | Geordnete Übergabe an einen Menschen, wenn der Agent ohne ausreichende Konfidenz bleibt. |
 
 ## 5. Schlüsselwörter und Kennungsschema
@@ -100,8 +101,8 @@ unbekannt") mit eigener Wahrscheinlichkeitsmasse enthalten.
 #### LH-FA-BEL-004 — Zurückweisung ungültiger Belief States
 
 **Prio:** Muss. Ein Belief State ohne Resthypothese oder ohne Normierung muss als ungültig
-zurückgewiesen werden. *Abnahme:* Es darf kein gültiger Belief State ohne Resthypothese existieren
-können.
+zurückgewiesen werden. *Abnahme:* Es darf kein gültiger Belief State ohne Resthypothese und keiner
+ohne Normierung (Summe = 1 innerhalb der Toleranz, vgl. LH-FA-BEL-002) existieren können.
 
 #### LH-FA-BEL-005 — Re-Hypothesenbildung bei hoher Resthypothese
 
@@ -193,13 +194,16 @@ gegen die Wahrscheinlichkeit der Diagnose- bzw. Top-Hypothese.
 #### LH-FA-POL-003 — Schwellen je Wirkungsklasse
 
 **Prio:** Muss. Die geforderte Mindest-Konfidenz muss von der Wirkungsklasse abhängen: nur-lesend
-ohne Schwelle; arbeitsbereich-lokal niedrige Schwelle; repository-wirksam mittlere Schwelle;
-extern-wirksam harte Schwelle.
+ohne wirksame Schwelle (das Gate wird gemäß LH-FA-POL-001 und LH-FA-POL-006 dennoch durchlaufen und
+gibt ohne Konfidenzbedingung frei, wird also nicht übersprungen); arbeitsbereich-lokal niedrige
+Schwelle; repository-wirksam mittlere Schwelle; extern-wirksam harte Schwelle.
 
 #### LH-FA-POL-004 — Menschliche Freigabe für extern-wirksame Aktionen
 
 **Prio:** Muss. Extern-wirksame Aktionen müssen zusätzlich zur Konfidenzschwelle eine explizite
-menschliche Freigabe erfordern können; diese ist standardmäßig erforderlich und konfigurierbar.
+menschliche Freigabe erfordern; für extern-wirksame (irreversible) Aktionen ist diese Freigabe
+zwingend und darf nicht abschaltbar sein (fail-safe, konsistent zu LH-OUT-04). Konfigurierbar ist
+ausschließlich ihre Form und ihr Kanal (siehe LH-OP-04), nicht ihr Entfall.
 
 #### LH-FA-POL-005 — Sperre extern-wirksamer Aktionen bei hoher Resthypothese
 
@@ -214,7 +218,7 @@ oder ausgelassen werden können (verpflichtende, nicht umgehbare Prüfung).
 
 #### LH-FA-POL-007 — Konfigurierbare Schwellwerte
 
-**Prio:** Soll. Alle Schwellwerte müssen konfigurierbar sein.
+**Prio:** Soll. Alle Schwellwerte sollen konfigurierbar sein.
 
 ### 6.5 Value of Information (LH-FA-VOI)
 
@@ -300,7 +304,9 @@ erzeugen/verfeinern, Likelihoods schätzen, Aktionen vorschlagen.
 #### LH-FA-LLM-003 — Externalisierung der Modell-Konfidenz
 
 **Prio:** Muss. Die vom Modell gelieferte (implizite) Konfidenz muss in explizite, protokollierte
-und überschreibbare Zahlen überführt werden, die den Gates unterliegen.
+und überschreibbare Zahlen überführt werden, die den Gates unterliegen. Ein Überschreiben erfolgt
+als neues, protokolliertes Ereignis (vgl. LH-FA-AUD-001) und nicht als Mutation eines bestehenden
+Eintrags.
 
 #### LH-FA-LLM-004 — Anbieter-Austauschbarkeit
 
@@ -326,17 +332,17 @@ deterministisch testbar sein.
 
 ### LH-QA-04 — Erweiterbarkeit
 
-**Prio:** Soll. Neue Beobachtungsquellen und Aktionstypen müssen ergänzbar sein, ohne den Kern zu
+**Prio:** Soll. Neue Beobachtungsquellen und Aktionstypen sollen ergänzbar sein, ohne den Kern zu
 ändern.
 
 ### LH-QA-05 — Konfigurierbarkeit
 
-**Prio:** Soll. Schwellwerte, Budgets und die Zuordnung der Wirkungsklassen müssen konfigurierbar
+**Prio:** Soll. Schwellwerte, Budgets und die Zuordnung der Wirkungsklassen sollen konfigurierbar
 sein.
 
 ### LH-QA-06 — Beobachtbarkeit
 
-**Prio:** Soll. Das Ereignisprotokoll muss exportier- und inspizierbar sein.
+**Prio:** Soll. Das Ereignisprotokoll soll exportier- und inspizierbar sein.
 
 ### LH-QA-07 — Performance
 
@@ -356,13 +362,13 @@ Commit als Checkpoint und die Wirkungsklassen).
 
 ### LH-RB-03 — Umgang mit verrauschten Beobachtungen
 
-**Prio:** Soll. Beobachtungen können verrauscht, unvollständig oder korreliert sein; das System muss
+**Prio:** Soll. Beobachtungen können verrauscht, unvollständig oder korreliert sein; das System soll
 damit umgehen.
 
 ### LH-RB-04 — Zielplattform JVM
 
-**Prio:** Kann. Zielplattform ist die JVM; eine spätere Realisierung als Java-/Micronaut-Framework
-ist vorgesehen (Detail in `spec/spezifikation.md`).
+**Prio:** Kann. Zielplattform ist die JVM. Die konkrete Sprach- und Framework-Wahl ist als „Wie"
+nicht Gegenstand dieses Lastenhefts und wird in `spec/spezifikation.md` festgelegt.
 
 ## 9. Nicht-Ziele / Abgrenzung (LH-OUT)
 
@@ -393,9 +399,10 @@ Schwelle und der vorgesehenen menschlichen Freigabe aus.
 | Kennung | Beschreibung |
 |---------|--------------|
 | LH-OP-01 | Konkrete Schwellwerte je Wirkungsklasse (Startwerte) festzulegen. |
-| LH-OP-02 | Schwellwert der Resthypothese, ab dem Re-Hypothesenbildung (LH-FA-BEL-005) bzw. Eskalation (LH-FA-ESK-001) ausgelöst wird. |
+| LH-OP-02 | Schwellwert(e) der Resthypothese, ab dem Re-Hypothesenbildung (LH-FA-BEL-005), Sperre extern-wirksamer Aktionen (LH-FA-POL-005) bzw. Eskalation (LH-FA-ESK-001) ausgelöst wird; offen, ob ein gemeinsamer oder je Zweck eigener Schwellwert gilt. |
 | LH-OP-03 | Kriterien für die Deduplizierung korrelierter Beobachtungen (LH-FA-OBS-004). |
 | LH-OP-04 | Form und Kanal der menschlichen Freigabe/Eskalation (LH-FA-POL-004, LH-FA-ESK-003). |
+| LH-OP-05 | Toleranz der Normierung (Summe = 1) für LH-FA-BEL-002 und LH-FA-BEL-004 festzulegen. |
 
 ## 11. Historie
 
@@ -404,3 +411,4 @@ Schwelle und der vorgesehenen menschlichen Freigabe aus.
 | 0.1 | 2026-06-22 | Initiale Fassung (Anforderungen als Tabellen). |
 | 0.2 | 2026-06-22 | Format-Migration: Anforderungen als Überschriften `### <ID> — <Titel>` (RTM-/Anker-fähig); Inhalt, IDs und Priorität unverändert. Pflichtenheft-Verweise auf `spec/spezifikation.md` konkretisiert. |
 | 0.3 | 2026-06-22 | ID-Schema auf kanonisch `LH-FA-<BEREICH>-<NNN>` / `LH-QA-<NN>` ausgerichtet (RTM-/`ids`-/`suggest-config`-kompatibel); Constraint-/Non-Goal-/Open-Point-Familien `LH-RB`/`LH-OUT`/`LH-OP` beibehalten. Inhalt und Priorität unverändert. |
+| 0.4 | 2026-06-23 | Review-Konsistenz (keine inhaltliche Neuanforderung): Freigabe für extern-wirksame Aktionen als nicht abschaltbar präzisiert (LH-FA-POL-004, fail-safe konform zu LH-OUT-04 — Verschärfung, kein Gate-Lockern); Modalverben an `Prio: Soll` angeglichen (LH-FA-POL-007, LH-QA-04, LH-QA-05, LH-QA-06, LH-RB-03); Gate-Durchlauf bei nur-lesend klargestellt (LH-FA-POL-003); konkrete Sprach-/Framework-Nennung aus LH-RB-04 entfernt (Was/Wie-Trennung); Resthypothesen-Schwelle um LH-FA-POL-005 ergänzt (LH-OP-02) und Normierungs-Toleranz als LH-OP-05 aufgenommen; Glossar um „günstige Beobachtung" erweitert; Abnahme von LH-FA-BEL-004 und Audit-Hinweis in LH-FA-LLM-003 ergänzt. |
