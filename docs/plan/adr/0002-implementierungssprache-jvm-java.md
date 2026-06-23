@@ -16,8 +16,9 @@ ersten Code-Slice in den Build-Dateien und ggf. `spec/spezifikation.md`.)
 
 ## Kontext
 
-`LH-RB-04` (Kann) nennt die **JVM** als Zielplattform und eine Realisierung
-als **Java-/Micronaut-Framework** als vorgesehen. ADR-0001 verlangt einen
+`LH-RB-04` (Kann) nennt die **JVM** als Zielplattform; die konkrete Sprach-,
+Build- und Framework-Wahl delegiert das Lastenheft als „Wie" an
+`spec/spezifikation.md` und damit an diese ADR. ADR-0001 verlangt einen
 **framework-freien Belief-Kern** (Entscheidungslogik außerhalb des Modells
 und außerhalb von Infrastruktur). Eine konkrete Sprach-, Build- und
 Framework-Wahl ist die Vorbedingung (Trigger) für `welle-01-belief-kern`.
@@ -41,19 +42,20 @@ annotationsfrei** (ADR-0001): kein `io.micronaut.*`-Import im Kern.
 ### Option B — Java + Spring Boot
 
 - Pro: großes Ökosystem.
-- Contra: schwergewichtiger, reflection-/proxy-lastig, langsamer Start;
-  `LH-RB-04` nennt ausdrücklich Micronaut, nicht Spring.
+- Contra: schwergewichtiger, reflection-/proxy-lastig, langsamer Start —
+  gegenläufig zum Ziel eines schlanken, AOT-fähigen Rands um einen
+  framework-freien Kern.
 
 ### Option C — Kotlin auf der JVM
 
 - Pro: prägnanter, Null-Safety.
-- Contra: `LH-RB-04` nennt Java; zusätzlicher Sprach-/Team-Aufwand ohne
-  fachlichen Mehrwert für den Belief-Kern.
+- Contra: zusätzlicher Sprach-/Team-Aufwand ohne fachlichen Mehrwert für den
+  Belief-Kern; Java genügt für die hexagonale Reinheit.
 
 ### Option D — Java + Micronaut (gewählt)
 
 - Pro: Konstruktor-DI (passt zur Port/Adapter-Verdrahtung), schneller Start,
-  AOT-/GraalVM-fähig, geringe Reflection; entspricht `LH-RB-04`.
+  AOT-/GraalVM-fähig, geringe Reflection; JVM-konform zu `LH-RB-04`.
 - Contra: erfordert Disziplin, den Kern framework-frei zu halten — abgesichert
   durch die Fitness Function unten.
 
@@ -92,3 +94,4 @@ nötig wird; bei einem Micronaut-Major-Wechsel mit Breaking Changes.
 | Datum | Ereignis | Verweis |
 |---|---|---|
 | 2026-06-22 | Proposed | Bootstrap → Workflow-Übergang (Trigger welle-01) |
+| 2026-06-23 | Bezug an Lastenheft v0.4 angepasst: `LH-RB-04` nennt nur noch die JVM; Sprach-/Framework-Begründung auf technische Merit umgestellt (Status bleibt Proposed) | Review spec/architecture |

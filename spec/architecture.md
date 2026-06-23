@@ -1,6 +1,6 @@
 # Architektur — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-06-22.
+**Status:** Aktiv. **Letzte Änderung:** 2026-06-23.
 
 **Hard Rule:** Diese Datei enthält *keine* Wellen, Slices, Commit-Hashes
 oder Closure-Daten. Die zeitliche Schicht lebt in
@@ -63,8 +63,8 @@ Adapter. Damit ist das LLM ein austauschbares Modul, nicht der Agent
 | Schicht | Verantwortlichkeit | Darf importieren | Darf NICHT importieren |
 |---|---|---|---|
 | ARC-01 Domain/Types | Hypothese, Belief State (inkl. Resthypothese), Evidenz, Beobachtung, Aktion, Wirkungsklasse, Eskalations-Zustand, Ereignis — pur | — | alles andere |
-| ARC-02 Belief-Engine | Bayes-Update, Normierung inkl. Resthypothese, Dedup korrelierter Evidenz, Unsicherheitsmaße, Re-Hypothesen-Auslöser | Types | Adapter, Runtime |
-| ARC-03 Konfidenz-Gate / Policy | Prüft Erfolgswahrscheinlichkeit gegen Wirkungsklassen-Schwelle; gibt frei / ab / eskaliert; liegt außerhalb der Aktion | Types, Audit | Adapter, Runtime |
+| ARC-02 Belief-Engine | Bayes-Update, Normierung inkl. Resthypothese, Dedup korrelierter Evidenz, Unsicherheitsmaße, Re-Hypothesen-/Likelihood-Erzeugung über LLM-Port | Types, Audit, Ports | Adapter, Runtime |
+| ARC-03 Konfidenz-Gate / Policy | Prüft Erfolgswahrscheinlichkeit gegen Wirkungsklassen-Schwelle; holt bei extern-wirksamen Aktionen die menschliche Freigabe über den Human-Approval-Port; gibt frei / ab / eskaliert; liegt außerhalb der Aktion | Types, Audit, Ports | Adapter, Runtime |
 | ARC-04 VoI-Selektor | Wahl der nächsten Beobachtung (Top-2-Diskriminierung, Gewinn/Kosten) | Types, Ports | Adapter, Runtime |
 | ARC-05 Eskalations-Manager | Erzeugt definierten Eskalations-Zustand (kein Fehler) mit Belief + Evidenz + Grund | Types, Audit | Adapter, Runtime |
 | ARC-06 Audit / Event-Log | Unveränderliche, geordnete Ereignisfolge; Belief-Rekonstruktion | Types | Adapter, Runtime |
@@ -76,6 +76,16 @@ Adapter. Damit ist das LLM ein austauschbares Modul, nicht der Agent
 (ARC-03) ist ein eigener Schritt im Orchestrator (ARC-09) *vor* jeder
 Aktionsausführung; eine Aktion erhält keinen Pfad, der das Gate auslässt.
 
+**Port-Konsumenten.** Der Belief-Kern ist *port-führend*: Kern-Komponenten
+rufen über Ports (Interfaces) nach außen, importieren aber **nie** einen
+konkreten Adapter (die Layering-Regel oben verbietet Adapter-, nicht
+Port-Importe). Die Engine (ARC-02) erzeugt Hypothesen/Likelihoods über den
+LLM-Port; das Gate (ARC-03) holt bei extern-wirksamen Aktionen die menschliche
+Freigabe über den Human-Approval-Port ein (`LH-FA-POL-004`), bevor es freigibt;
+der VoI-Selektor (ARC-04) liest die Beobachtungs-Ports zur Aufzählung
+verfügbarer Kandidaten. ARC-09 verdrahtet die Adapter an die Ports (DI),
+beschafft Beobachtungen und führt die Agenten-Schleife.
+
 ## 3. Externe Abhängigkeiten
 
 | System | Rolle | Substituierbarkeit |
@@ -86,7 +96,7 @@ Aktionsausführung; eine Aktion erhält keinen Pfad, der das Gate auslässt.
 
 ## 4. Sequenz-Diagramme
 
-### Use-Case: Entscheidungszyklus mit Konfidenz-Gate (`LH-FA-OBS-002`, `LH-FA-POL-001`)
+### Use-Case: Entscheidungszyklus mit Konfidenz-Gate (`LH-FA-OBS-002`, `LH-FA-POL-001`, `LH-FA-POL-004`)
 
 ```mermaid
 sequenceDiagram
@@ -94,6 +104,7 @@ sequenceDiagram
     participant Engine as ARC-02 Belief-Engine
     participant VoI as ARC-04 VoI-Selektor
     participant Gate as ARC-03 Gate
+    participant Appr as Human-Approval-Port
     participant Esk as ARC-05 Eskalation
     participant Audit as ARC-06 Event-Log
 
@@ -101,8 +112,12 @@ sequenceDiagram
     Engine->>Engine: Bayes-Update + Normierung (inkl. Resthypothese)
     Engine->>Audit: Ereignis "Belief aktualisiert"
     Runtime->>Gate: Aktion prüfen (Erfolgswahrscheinlichkeit, Wirkungsklasse)
+    opt Aktion extern-wirksam (LH-FA-POL-004)
+        Gate->>Appr: menschliche Freigabe anfordern
+        Appr-->>Gate: erteilt / verweigert
+    end
     alt Gate gibt frei
-        Gate-->>Runtime: freigegeben
+        Gate-->>Runtime: freigegeben (Konfidenz + ggf. Freigabe erfüllt)
         Runtime->>Audit: Ereignis "Aktion ausgeführt"
     else Gate geschlossen, günstige Beobachtung verfügbar
         Gate-->>Runtime: abgelehnt

@@ -1,14 +1,15 @@
 # Spezifikation — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-06-22.
+**Status:** Aktiv. **Letzte Änderung:** 2026-06-23.
 
 **Bezug zum Lastenheft:** Diese Spezifikation präzisiert die in
 `spec/lastenheft.md` formulierten Anforderungen (`LH-*`-IDs). Bei Konflikt
 gewinnt das Lastenheft. Sie ist technisch verbindlich, aber ohne
 Lastenheft-Änderung fortschreibbar; eine ADR darf sie schärfen.
 
-Die hier gesetzten Schwellwerte sind **Startwerte** zu den offenen Punkten
-`LH-OP-01`..`LH-OP-04` des Lastenhefts und über ADR-Schärfung anpassbar.
+Die hier gesetzten Schwellwerte und Toleranzen sind **Startwerte** zu den
+offenen Punkten `LH-OP-01`..`LH-OP-05` des Lastenhefts und über
+ADR-Schärfung anpassbar.
 
 ---
 
@@ -57,7 +58,7 @@ aktuelle Resthypothese `p_other`. **Ausgabe:** `frei | ab | eskaliere`.
 3. Bei `P_success ≥ θ_k`: freigeben; `k = extern-wirksam` zusätzlich nur
    mit menschlicher Freigabe (`LH-FA-POL-004`, `LH-OUT-04`).
 4. Sonst: ablehnen; Eskalation, wenn günstige Beobachtungen erschöpft und
-   Resthypothese hoch (`LH-FA-ESK-001`).
+   `p_other ≥ θ_esc` (`LH-FA-ESK-001`).
 
 ### LH-FA-VOI-002.a — Auswahl der nächsten Beobachtung
 
@@ -74,10 +75,12 @@ gewichtet mit Gewinn/Kosten (`LH-FA-VOI-003`). Lokal/heuristisch zulässig
 {
   "hypotheses": [
     {"id": "h1", "label": "Bug in Auth", "p": 0.50, "evidence": ["ev-1", "ev-3"]},
+    {"id": "h2", "label": "Bug in Frontend", "p": 0.25, "evidence": ["ev-2"]},
+    {"id": "h3", "label": "Bug in Gateway", "p": 0.05, "evidence": []},
     {"id": "other", "label": "keine der genannten / unbekannt", "p": 0.20, "evidence": []}
   ],
   "normalized": true,
-  "uncertainty": {"entropy": 1.21, "top2_margin": 0.25}
+  "uncertainty": {"entropy": 1.16, "top2_margin": 0.25}
 }
 ```
 
@@ -107,7 +110,8 @@ Mindest-Erfolgswahrscheinlichkeit (`LH-FA-POL-003`); konfigurierbar
 | `θ_extern-wirksam` | 0.95 | harte Schwelle; zusätzlich menschliche Freigabe (`LH-FA-POL-004`) |
 | `θ_other_block` | 0.10 | Resthypothese-Grenze, ab der extern-wirksame Aktionen blockiert sind (`LH-FA-POL-005`) |
 | `θ_rehyp` | 0.30 | Resthypothese-Grenze, ab der Re-Hypothesenbildung anstößt (`LH-FA-BEL-005`) |
-| `TOL_NORM` | 1e-9 | Normierungs-Toleranz (`LH-FA-BEL-002`) |
+| `θ_esc` | 0.30 | Resthypothese-Grenze für Eskalation; Startwert = `θ_rehyp` (Eskalation greift, wenn Re-Hypothesenbildung indiziert wäre, aber günstige Beobachtungen erschöpft sind, `LH-FA-ESK-001`) |
+| `TOL_NORM` | 1e-9 | Normierungs-Toleranz (`LH-FA-BEL-002`, `LH-OP-05`) |
 | `BUDGET_STEPS` | 20 | Default-Budget Informationssammlung vor Eskalation (`LH-FA-ESK-004`) |
 
 ## 4. Fehler-Codes und Logging-Felder
@@ -123,10 +127,10 @@ Mindest-Erfolgswahrscheinlichkeit (`LH-FA-POL-003`); konfigurierbar
 
 | Span | Pflicht-Attribute | Quelle |
 |---|---|---|
-| `belief.update` | `hypothesis_count`, `entropy`, `top2_margin`, `residual_p` | ARC-02 |
-| `gate.decide` | `action_class`, `p_success`, `threshold`, `decision`, `residual_p` | ARC-03 |
-| `voi.select` | `candidate_count`, `expected_discrimination` | ARC-04 |
-| `escalation.raise` | `reason`, `closed_gate`, `residual_p` | ARC-05 |
+| `belief.update` | `hypothesis_count`, `entropy`, `top2_margin`, `residual_p` | Belief-Engine |
+| `gate.decide` | `action_class`, `p_success`, `threshold`, `decision`, `residual_p` | Konfidenz-Gate |
+| `voi.select` | `candidate_count`, `expected_discrimination` | VoI-Selektor |
+| `escalation.raise` | `reason`, `closed_gate`, `residual_p` | Eskalations-Manager |
 
 ## 6. Externe Verträge
 
@@ -140,3 +144,4 @@ Mindest-Erfolgswahrscheinlichkeit (`LH-FA-POL-003`); konfigurierbar
 | Datum | Änderung | ADR |
 |---|---|---|
 | 2026-06-22 | Initiale Outline (Bootstrap) | — |
+| 2026-06-23 | Review-Fixes: Eskalations-Schwelle `θ_esc` ergänzt (`LH-FA-ESK-001`); Beispiel-Belief-State auf Σ=1 normiert; §5-Metrik-Quellen von ARC-IDs auf Funktionsnamen entkoppelt; Intro-Startwert-Bereich auf `LH-OP-05` erweitert | — |
