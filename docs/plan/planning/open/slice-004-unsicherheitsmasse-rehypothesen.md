@@ -5,10 +5,10 @@
 
 **Welle:** [`welle-01-belief-kern`](../welle-01-belief-kern.md).
 
-**Bezug:** `LH-FA-BEL-005`, `LH-FA-BEL-008`, `LH-QA-03`; `ADR-0001`;
-`ARC-02`.
+**Bezug:** `LH-FA-BEL-005`, `LH-FA-BEL-008`, `LH-QA-03`; `ADR-0001`,
+`ADR-0002`, `ADR-0003`; `ARC-01`, `ARC-02`.
 
-**Autor:** offen. **Datum:** 2026-07-04.
+**Autor:** pt9912. **Datum:** 2026-07-04.
 
 ---
 
@@ -24,17 +24,18 @@ ist Sache späterer Wellen.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-BEL-008` erfüllt: mindestens ein Unsicherheitsmaß
-      (Entropie und/oder Top-2-Abstand) berechnet und bereitgestellt; Test
-      mit bekannten Verteilungen referenziert (deterministisch, `LH-QA-03`).
-- [ ] `LH-FA-BEL-005` erfüllt: Überschreiten des konfigurierbaren
-      Resthypothesen-Schwellwerts löst ein Re-Hypothesen-Signal aus; Test
-      unter/über Schwelle referenziert.
-- [ ] Schwellwert konfigurierbar (benannte Konstante/Config), Default
-      begründet dokumentiert.
-- [ ] Maße/Auslöser Kern-lokal (`ARC-02`), framework-frei (`ADR-0001`),
-      deterministisch (`LH-QA-03`).
-- [ ] `make gates` grün.
+- [x] `LH-FA-BEL-008` erfüllt: **zwei** Maße bereitgestellt —
+      `BeliefState.entropie()` (Shannon, nats) und `top2Abstand()`; Tests mit
+      bekannten Verteilungen (`UnsicherheitTest`, deterministisch `LH-QA-03`).
+- [x] `LH-FA-BEL-005` erfüllt: `ReHypothesenAusloeser.ausgeloest(belief)`
+      feuert bei Resthypothese echt über Schwellwert; Tests unter/über/genau
+      (`ReHypothesenAusloeserTest`).
+- [x] Schwellwert konfigurierbar (`ReHypothesenAusloeser(schwellwert)`,
+      Default `STANDARD_SCHWELLWERT = 0.5` begründet dokumentiert, `[0,1]`
+      validiert).
+- [x] Maße/Auslöser im Domain-Modul `hexagon:domain`, framework-frei
+      (`ADR-0001`/`ADR-0003`), deterministisch (`LH-QA-03`).
+- [x] `make gates` grün (`make build`/`make test` im Docker).
 - [ ] Closure-Notiz mit Steering-Loop-Lerneintrag.
 
 ## 3. Plan (vor Code)
@@ -48,8 +49,9 @@ ist Sache späterer Wellen.
 
 ## 4. Trigger
 
-`slice-003` done (fortschreibbarer, gültiger Belief State inkl.
-Resthypothesen-Masse vorhanden).
+`slice-003`-Bayes-Update geliefert (fortschreibbarer Belief State inkl.
+Resthypothesen-Masse). `slice-003` ist `in-progress`; blockiert `slice-004`
+nicht.
 
 ## 5. Closure-Trigger
 
