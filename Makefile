@@ -10,12 +10,23 @@ DCHECK_DIGEST := sha256:3bbdb19bb73200fa37e30eff961cd5429a44e9e945fff3fb65ba7dc4
 
 include d-check.mk
 
+# a-check (Architektur-Gate, MR-005): v0.10.0 mit fail-closed-Guard gegen
+# mehrdeutige Mehr-Wurzel-Aufloesung. a-check.mk ist tool-generiert
+# (--print-mk); dessen Default-Digest laggt (v0.9.0, ohne Fix), daher hier der
+# verifizierte v0.10.0-Digest-Pin. Bei a-check-Upgrade neuen Digest setzen.
+A_CHECK_IMAGE := ghcr.io/pt9912/a-check@sha256:0932cb1dbdfa6ece0a5f9892dbe541cf29618ffe2667feda01c96d3218af2fc9
+
+include a-check.mk
+
 .PHONY: help gates
 help: ## Targets anzeigen
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-14s %s\n", $$1, $$2}'
 
-gates: doc-check build test coverage-gate ## alle aktuell lauffähigen Gates
+gates: doc-check build test coverage-gate arch-check ## alle aktuell lauffähigen Gates
+
+.PHONY: arch-check
+arch-check: a-check ## Architektur: Kern importiert kein Adapter/Framework (a-check, ADR-0001/0003)
 
 # --- Code-Gates: KMP/HexSlice via multi-stage Dockerfile (Modul 14). ---
 # Einstiegspunkt bleibt make; die Toolchain lebt im Dockerfile (kein Host-JDK,

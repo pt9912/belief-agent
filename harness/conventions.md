@@ -128,6 +128,23 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
 - **Auflösungs-Trigger:** Re-Pin bei d-check-Upgrade (`d-check.mk` neu via
   `--print-mk`, neuer `DCHECK_DIGEST` im `Makefile`); ansonsten permanent.
 
+### MR-005 — a-check-Arch-Gate (v0.10.0, HexSlice-Rollen)
+
+- **Datum:** 2026-07-04
+- **Geltungsbereich:** `.a-check.yml`, `a-check.mk`, `Makefile` (`arch-check`).
+- **Adaption:** `make arch-check` läuft über **a-check v0.10.0**
+  (`ghcr.io/pt9912/a-check`, digest-gepinnt `sha256:0932cb1d…`). `a-check.mk`
+  ist tool-generiert (`--print-mk`); dessen Default-Digest laggt (v0.9.0),
+  daher lebt der Pin als `A_CHECK_IMAGE` im `Makefile` und sticht.
+  `.a-check.yml` bildet die HexSlice-Rollen ab (domain/application/adapters,
+  Kanten nach innen) plus `tech`-Regeln (Framework/DI nur am Adapter-Rand).
+- **Begründung:** a-check ist das für HexSlice gebaute Arch-Gate (`ADR-0003`).
+  v0.10.0 bringt den fail-closed-Guard gegen mehrdeutige Mehr-Wurzel-Auflösung
+  (der von uns gemeldete KMP-Falsch-negativ) — löste `CO-001` auf.
+- **Auflösungs-Trigger:** Re-Pin bei a-check-Upgrade; `resolution` beim
+  Multi-Modul-Ausbau (welle-02) paket-spezifisch erweitern (der Guard erzwingt
+  Korrektheit).
+
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 
 Über die vier kanonischen Bindung-Klassen (ADR, Carveout, Schwelle,

@@ -105,12 +105,12 @@ Gates, Modul 13):
 | `make build` | Reproduzierbarer KMP-Build aller Module (multi-stage Dockerfile) |
 | `make test` | Deterministische Tests (`LH-QA-03`) im Docker-Build |
 | `make coverage-gate` | Line-Coverage-Schwelle (Kover, `ADR-0004`) |
-| `make gates` | alle aktuell lauffähigen Gates (`doc-check` + `build` + `test` + `coverage-gate`) |
+| `make arch-check` | Architektur-Reinheit (a-check, `ADR-0001`/`ADR-0003`) |
+| `make gates` | alle aktuell lauffähigen Gates (`doc-check` + `build` + `test` + `coverage-gate` + `arch-check`) |
 | `make help` | verfügbare Targets anzeigen |
 
 Geplant (entstehen mit den nächsten Slices, dann hier ergänzen):
-`make arch-check` (a-check, sobald verdrahtet), `make lint`,
-`make ci`, `make fullbuild`.
+`make lint`, `make ci`, `make fullbuild`.
 
 ## 5. Dokumentations-Regeln
 

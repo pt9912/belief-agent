@@ -1,0 +1,38 @@
+# .a-check.yml — Architektur-Regeln (a-check, ADR-0001/ADR-0003 HexSlice).
+# Rollen leiten sich aus den Namen ab: domain (importiert nur sich selbst),
+# application (nutzt domain + port), adapter (implementiert Ports).
+#
+# KMP-Hinweis (a-check v0.10.0 fail-closed-Guard): bei mehreren Modul-Roots,
+# die je vollständig in verschiedene Schichten fallen, bricht a-check mit
+# Exit 2 ab. Sobald application-/adapter-Module dazukommen, muss `resolution`
+# paket-spezifisch aufgelöst werden (disjunkte Sub-Namespaces
+# dev.beliefagent.{domain,application,adapter}, Globs tiefer als die Roots).
+# Heute existiert nur hexagon:domain → ein Root, eindeutig.
+version: 1
+
+languages:
+  kotlin: ["**/*.kt"]
+
+layers:
+  domain:      ["hexagon/domain/**"]
+  application: ["hexagon/application/**"]
+  adapters:    ["adapters/**"]
+
+edges:
+  - {from: application, to: domain}   # Use-Case nutzt die Domäne
+  - {from: adapters, to: application} # Adapter rufen Use Cases auf / implementieren Ports
+  - {from: adapters, to: domain}      # Adapter dürfen Domänentypen referenzieren
+
+resolution:
+  kotlin: {mode: fixed-root, roots: ["hexagon/domain/src/commonMain/kotlin/dev/beliefagent"], package_base: "dev.beliefagent"}
+
+# Framework/DI gehören nur an den Adapter-Rand (ADR-0001/0003). Ein Import im
+# Kern (domain/application) ist ein tech-leak — greift auch schon bei einem
+# einzelnen Modul (Roh-Symbol, ohne resolution).
+tech:
+  - {pattern: "org.koin", adapter: "adapters"}      # DI (ADR-0002) nur in jvmMain-Adaptern
+  - {pattern: "io.micronaut", adapter: "adapters"}
+  - {pattern: "io.ktor", adapter: "adapters"}
+
+# Test-Quellen aus dem Arch-Scan ausnehmen (nur Produktivimporte prüfen).
+exclude: ["**/src/*Test/**", "**/src/test/**"]
