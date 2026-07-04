@@ -4,6 +4,7 @@
 |---|---|---|---|
 | [0001](0001-hexagonal-llm-port.md) | Hexagonale Architektur — LLM als austauschbarer Port, Entscheidungslogik im Kern | Accepted | `LH-FA-LLM-001` |
 | [0002](0002-implementierungssprache-jvm-java.md) | Implementierungssprache und Plattform — Kotlin Multiplatform (JVM-Ziel zuerst) | Accepted | `LH-RB-04` |
+| [0003](0003-hexslice-architektur.md) | HexSlice — vertikale Use-Case-Slices im hexagonalen Kern (KMP, Gradle-Multi-Modul) | Proposed | `LH-QA-04` |
 
 ## Konventionen
 

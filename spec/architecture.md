@@ -1,6 +1,6 @@
 # Architektur — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-06-23.
+**Status:** Aktiv. **Letzte Änderung:** 2026-07-04.
 
 **Hard Rule:** Diese Datei enthält *keine* Wellen, Slices, Commit-Hashes
 oder Closure-Daten. Die zeitliche Schicht lebt in
@@ -12,79 +12,110 @@ Anforderungen** — diese stehen im Lastenheft (`LH-*`).
 
 ## 1. Komponenten-Übersicht
 
-Hexagonale Architektur (Ports & Adapter): Der **Belief-Kern** (Domäne +
-Entscheidungslogik) ist von der Außenwelt entkoppelt. Das Sprachmodell und
-alle Beobachtungsquellen sind **Adapter hinter Ports** — austauschbar und
-nicht Teil des Kerns (`LH-FA-LLM-001`, `LH-QA-04`).
+**HexSlice** (Hexagonal + Vertical Slice): Der **Application Core**
+(`hexagon`) ist von der Außenwelt entkoppelt; er ist nach fachlichen **Use
+Cases** als vertikale Slices organisiert. Das Sprachmodell und alle
+Beobachtungsquellen sind **Adapter hinter Ports** — austauschbar und nicht
+Teil des Kerns (`LH-FA-LLM-001`, `LH-QA-04`). Ports gehören dem Core und
+liegen so lokal wie möglich beim Use Case, der sie braucht.
 
 ```mermaid
-flowchart TB
-    subgraph Kern["Belief-Kern (Domäne + Entscheidung)"]
-        Types["ARC-01 Domain/Types"]
-        Engine["ARC-02 Belief-Engine"]
-        Gate["ARC-03 Konfidenz-Gate / Policy"]
-        VoI["ARC-04 VoI-Selektor"]
-        Esk["ARC-05 Eskalations-Manager"]
-        Audit["ARC-06 Audit / Event-Log"]
+flowchart LR
+    subgraph IN["adapters/inbound"]
+        CLI["cli — Composition Root (ARC-09)"]
     end
-    Ports["ARC-07 Ports (Interfaces)"]
-    Runtime["ARC-09 Orchestrator / Runtime"]
-    subgraph Adapter["ARC-08 Adapter (Infrastruktur)"]
-        LLMA["LLM-Provider"]
-        ObsA["Beobachtungsquellen<br/>(Test, Build, Log, Mensch, Repo)"]
-        AppA["Human-Approval"]
+    subgraph HEX["hexagon — Application Core"]
+        direction TB
+        subgraph APP["application — vertikale Use-Case-Slices"]
+            ZYK["entscheidungszyklus (ARC-09)"]
+            UPD["belief-aktualisieren (ARC-02)"]
+            GATE["aktion-gaten (ARC-03)"]
+            VOI["beobachtung-waehlen (ARC-04)"]
+            ESK["eskalieren (ARC-05)"]
+            PORTS["ports: LLM · Human-Approval · Beobachtung · Audit (ARC-06/07)"]
+        end
+        subgraph DOM["domain (ARC-01)"]
+            D["Hypothese · BeliefState · Resthypothese<br/>Evidenz · Beobachtung · Wirkungsklasse · Ereignis"]
+        end
+    end
+    subgraph OUT["adapters/outbound"]
+        LLM["llm (ARC-08)"]
+        OBS["observation (ARC-08)"]
+        AUD["audit (ARC-06/08)"]
     end
 
-    Runtime --> Engine
-    Runtime --> Gate
-    Runtime --> VoI
-    Runtime --> Esk
-    Engine --> Types
-    Gate --> Types
-    VoI --> Types
-    Esk --> Types
-    Audit --> Types
-    Engine --> Audit
-    Gate --> Audit
-    Engine --> Ports
-    VoI --> Ports
-    Gate --> Ports
-    Adapter -.implementiert.-> Ports
+    CLI -->|ruft Use Case auf| ZYK
+    APP -->|nutzt| DOM
+    APP -->|braucht / bietet| PORTS
+    LLM -.implementiert.-> PORTS
+    OBS -.implementiert.-> PORTS
+    AUD -.implementiert.-> PORTS
 ```
 
 ## 2. Schichten und Constraints
 
 Die tragende Layering-Regel erzwingt, dass die **Entscheidungs- und
-Kontrolllogik außerhalb des Sprachmodells** liegt: Der Kern definiert die
-Ports, die Adapter implementieren sie — der Kern importiert **nie** einen
+Kontrolllogik außerhalb des Sprachmodells** liegt: Der Core definiert die
+Ports, die Adapter implementieren sie — der Core importiert **nie** einen
 Adapter. Damit ist das LLM ein austauschbares Modul, nicht der Agent
-(`LH-FA-LLM-001`).
+(`LH-FA-LLM-001`). Die Abhängigkeitsrichtung zeigt **immer nach innen**
+(`adapter → application → domain`).
 
-| Schicht | Verantwortlichkeit | Darf importieren | Darf NICHT importieren |
+Verzeichnis-/Modulbaum (logisch, sprachfrei; die konkrete Toolchain-Abbildung
+lebt in den Build-Dateien):
+
+```text
+hexagon/
+  domain/
+    belief/                    # Hypothese, BeliefState, Resthypothese, Evidenz,
+                               #   Beobachtung, Wirkungsklasse, Ereignis — pur (ARC-01)
+  application/
+    belief/
+      entscheidungszyklus/     # Agenten-Schleife: Belief→Beobachtung→Update→Gate→
+                               #   Aktion/VoI/Eskalation (ARC-09-Orchestrierung)
+      belief-aktualisieren/    # Bayes-Update, Normierung, Dedup, Unsicherheitsmaße (ARC-02)
+        ports/                 #   → LLM-Port (lokal)
+      aktion-gaten/            # Konfidenz-Gate / Policy (ARC-03)
+        ports/                 #   → Human-Approval-Port (lokal)
+      beobachtung-waehlen/     # VoI-Selektor (ARC-04)
+        ports/                 #   → Beobachtungs-Port (lokal)
+      eskalieren/              # Eskalations-Manager (ARC-05)
+    ports/                     # anwendungsweit: Audit/Event-Log-Port (ARC-06)
+adapters/
+  inbound/
+    cli/                       # ruft Use Cases auf; Composition Root / DI (ARC-09-Wiring)
+  outbound/
+    llm/                       # LLM-Provider → implementiert LLM-Port (ARC-08)
+    observation/               # Test/Build/Log/Mensch/Repo → Beobachtungs-Ports (ARC-08)
+    audit/                     # Event-Log-Persistenz → Audit-Port (ARC-06/08)
+```
+
+Rollen und erlaubte Importe (a-check-Rollen in Klammern):
+
+| Bereich (Rolle) | Verantwortlichkeit | Darf importieren | Darf NICHT importieren |
 |---|---|---|---|
-| ARC-01 Domain/Types | Hypothese, Belief State (inkl. Resthypothese), Evidenz, Beobachtung, Aktion, Wirkungsklasse, Eskalations-Zustand, Ereignis — pur | — | alles andere |
-| ARC-02 Belief-Engine | Bayes-Update, Normierung inkl. Resthypothese, Dedup korrelierter Evidenz, Unsicherheitsmaße, Re-Hypothesen-/Likelihood-Erzeugung über LLM-Port | Types, Audit, Ports | Adapter, Runtime |
-| ARC-03 Konfidenz-Gate / Policy | Prüft Erfolgswahrscheinlichkeit gegen Wirkungsklassen-Schwelle; holt bei extern-wirksamen Aktionen die menschliche Freigabe über den Human-Approval-Port; gibt frei / ab / eskaliert; liegt außerhalb der Aktion | Types, Audit, Ports | Adapter, Runtime |
-| ARC-04 VoI-Selektor | Wahl der nächsten Beobachtung (Top-2-Diskriminierung, Gewinn/Kosten) | Types, Ports | Adapter, Runtime |
-| ARC-05 Eskalations-Manager | Erzeugt definierten Eskalations-Zustand (kein Fehler) mit Belief + Evidenz + Grund | Types, Audit | Adapter, Runtime |
-| ARC-06 Audit / Event-Log | Unveränderliche, geordnete Ereignisfolge; Belief-Rekonstruktion | Types | Adapter, Runtime |
-| ARC-07 Ports | Interfaces: LLM-Port, Beobachtungs-Ports, Human-Approval-Port | Types | Adapter, Engine, Gate |
-| ARC-08 Adapter | Konkrete LLM-Provider und Beobachtungsquellen | Types, Ports | Engine, Gate, VoI, Esk (Kern-Innenleben) |
-| ARC-09 Orchestrator / Runtime | Agenten-Schleife (Belief → Beobachtung → Update → Gate → Aktion / VoI / Eskalation), Budget, Verdrahtung (DI) | alles oben | — |
+| Domain (domain), `ARC-01` | Hypothese, Belief State (inkl. Resthypothese), Evidenz, Beobachtung, Aktion, Wirkungsklasse, Eskalations-Zustand, Ereignis — pur | — (nur sich selbst) | Application, Ports, Adapter |
+| Application-Slice (app), `ARC-02`–`ARC-05`, `ARC-09` (Orchestrierung) | Use Case je Slice: command/query · handler · validator · result. Bayes-Update, Gate, VoI, Eskalation, Entscheidungszyklus | Domain, (lokale) Ports | Adapter, Infrastruktur |
+| Ports (port), `ARC-07`/`ARC-06` | Verträge, die der Use Case braucht/anbietet: LLM-, Human-Approval-, Beobachtungs-, Audit-Port — so lokal wie möglich, so geteilt wie nötig | Domain | Adapter, Application-Handler |
+| Inbound-Adapter (adapter, driving), `ARC-09` (Wiring) | Ruft Use Cases auf; Composition Root / DI-Verdrahtung | Application, Domain, Ports | fremder Adapter |
+| Outbound-Adapter (adapter, driven), `ARC-08` | Implementiert Ports: LLM-Provider, Beobachtungsquellen, Audit-Persistenz | Ports, Domain | Application-Interna, fremder Adapter (außer gemeinsamer Adapter-Senke) |
+
+Verboten (Abhängigkeit nach außen): `domain → application`, `domain → adapter`,
+`application → adapter`, `application → Infrastruktur`.
 
 **Nicht-Umgehbarkeit des Gates (`LH-FA-POL-006`):** Das Konfidenz-Gate
-(ARC-03) ist ein eigener Schritt im Orchestrator (ARC-09) *vor* jeder
-Aktionsausführung; eine Aktion erhält keinen Pfad, der das Gate auslässt.
+(`ARC-03`, Slice *aktion-gaten*) ist ein eigener Schritt im
+Entscheidungszyklus (`ARC-09`) *vor* jeder Aktionsausführung; eine Aktion
+erhält keinen Pfad, der das Gate auslässt.
 
-**Port-Konsumenten.** Der Belief-Kern ist *port-führend*: Kern-Komponenten
-rufen über Ports (Interfaces) nach außen, importieren aber **nie** einen
-konkreten Adapter (die Layering-Regel oben verbietet Adapter-, nicht
-Port-Importe). Die Engine (ARC-02) erzeugt Hypothesen/Likelihoods über den
-LLM-Port; das Gate (ARC-03) holt bei extern-wirksamen Aktionen die menschliche
-Freigabe über den Human-Approval-Port ein (`LH-FA-POL-004`), bevor es freigibt;
-der VoI-Selektor (ARC-04) liest die Beobachtungs-Ports zur Aufzählung
-verfügbarer Kandidaten. ARC-09 verdrahtet die Adapter an die Ports (DI),
-beschafft Beobachtungen und führt die Agenten-Schleife.
+**Port-Konsumenten.** Der Core ist *port-führend*: Application-Slices rufen
+über (lokale) Ports nach außen, importieren aber **nie** einen konkreten
+Adapter. Der Slice *belief-aktualisieren* erzeugt Hypothesen/Likelihoods über
+den LLM-Port; *aktion-gaten* holt bei extern-wirksamen Aktionen die
+menschliche Freigabe über den Human-Approval-Port ein (`LH-FA-POL-004`), bevor
+es freigibt; *beobachtung-waehlen* liest die Beobachtungs-Ports zur Aufzählung
+verfügbarer Kandidaten. Der Inbound-Adapter (`cli`) verdrahtet die
+Outbound-Adapter an die Ports (DI) und stößt den Entscheidungszyklus an.
 
 ## 3. Externe Abhängigkeiten
 
@@ -100,13 +131,13 @@ beschafft Beobachtungen und führt die Agenten-Schleife.
 
 ```mermaid
 sequenceDiagram
-    participant Runtime as ARC-09 Orchestrator
-    participant Engine as ARC-02 Belief-Engine
-    participant VoI as ARC-04 VoI-Selektor
-    participant Gate as ARC-03 Gate
+    participant Runtime as ARC-09 Entscheidungszyklus
+    participant Engine as ARC-02 belief-aktualisieren
+    participant VoI as ARC-04 beobachtung-waehlen
+    participant Gate as ARC-03 aktion-gaten
     participant Appr as Human-Approval-Port
-    participant Esk as ARC-05 Eskalation
-    participant Audit as ARC-06 Event-Log
+    participant Esk as ARC-05 eskalieren
+    participant Audit as ARC-06 Audit-Port
 
     Runtime->>Engine: Beobachtung einspeisen
     Engine->>Engine: Bayes-Update + Normierung (inkl. Resthypothese)
@@ -133,7 +164,7 @@ sequenceDiagram
 
 | Fehlerquelle | Behandlung-Schicht | Logging |
 |---|---|---|
-| Ungültiger Belief State (keine Resthypothese / nicht normiert) | ARC-02 weist zurück (`LH-FA-BEL-004`) | Ereignis im Audit-Log |
-| Verrauschte / korrelierte Beobachtung | ARC-02 Dedup gegen Scheingewissheit (`LH-FA-OBS-004`) | Ereignis "Beobachtung erfasst" mit Quelle |
-| Budget erschöpft (Schritte/Kosten/Zeit) | ARC-09 → ARC-05 Eskalation (`LH-FA-ESK-004`) | Ereignis "Eskalation angefordert" |
-| Adapter-/Port-Ausfall (LLM, Quelle) | ARC-09 fail-safe: nicht handeln, sammeln oder eskalieren (`LH-QA-02`) | Ereignis mit Grund |
+| Ungültiger Belief State (keine Resthypothese / nicht normiert) | `ARC-02` weist zurück (`LH-FA-BEL-004`) | Ereignis im Audit-Log |
+| Verrauschte / korrelierte Beobachtung | `ARC-02` Dedup gegen Scheingewissheit (`LH-FA-OBS-004`) | Ereignis "Beobachtung erfasst" mit Quelle |
+| Budget erschöpft (Schritte/Kosten/Zeit) | `ARC-09` → `ARC-05` Eskalation (`LH-FA-ESK-004`) | Ereignis "Eskalation angefordert" |
+| Adapter-/Port-Ausfall (LLM, Quelle) | `ARC-09` fail-safe: nicht handeln, sammeln oder eskalieren (`LH-QA-02`) | Ereignis mit Grund |
