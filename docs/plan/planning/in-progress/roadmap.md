@@ -32,11 +32,22 @@ via eigenem ADR entschieden (`LH-RB-04`). — **Erfüllt 2026-07-04**
 
 ## Meilensteine
 
-| Meilenstein | Welle(n) | Trigger | Status |
+Meilenstein-/Release-Punkte sind **extern beobachtbare Zustände** und leiten
+sich aus *tatsächlich existierenden* Wellen/Slices ab (Regelwerk Modul 06) —
+**keine Vorab-Bindung an noch nicht existierende Wellen**. Ob ein Meilenstein
+bzw. Release-Punkt erreicht ist, wird **je Slice** entschieden und erst dann
+mit konkreter Wellen-/Slice-Bindung eingetragen, wenn die liefernden Slices
+in `done/` sind.
+
+| Meilenstein | Welle(n)/Slice(s) | Trigger (beobachtbar) | Status |
 |---|---|---|---|
-| M1 — Belief-Kern lauffähig | welle-01 | normierter Belief State + Bayes-Update grün | offen |
-| M2 — vollständiger Entscheidungszyklus | welle-02, welle-03, welle-04 | Gate + VoI + Eskalation im Zusammenspiel | offen |
-| M3 — Sprachmodell angebunden | welle-05 | LLM-Port mit erstem Adapter, Konfidenz extern protokolliert | offen |
+| M1 — Belief-Kern lauffähig | welle-01 (`slice-001`..`slice-004`) | ungültiger Belief State wird nachweislich zurückgewiesen (`LH-FA-BEL-004`) **und** deterministisches Bayes-Update grün (`make test`) | offen |
+
+**Ausblick (unverbindlich, noch ohne Wellen-Bindung):** vollständiger
+Entscheidungszyklus (Gate + VoI + Eskalation) und Sprachmodell-Anbindung sind
+erklärte spätere Ziele. Sie werden als Meilenstein mit beobachtbarem Trigger
+eingetragen, sobald die tragenden Slices existieren und ein Release-/
+Beobachtungs-Punkt tatsächlich erreicht ist — Entscheidung je Slice.
 
 ## Abhängigkeitsgraph
 
@@ -64,3 +75,4 @@ flowchart LR
 |---|---|---|
 | 2026-06-22 | Initiale Roadmap (Bootstrap) | — |
 | 2026-07-04 | Welle-01 gestartet (Status `in-progress`); Slices `slice-001`..`slice-004` in `open/` angelegt | Start-Trigger erfüllt: `ADR-0001` & `ADR-0002` Accepted |
+| 2026-07-04 | Meilensteine entkoppelt: M2/M3-Vorab-Bindung an noch nicht existierende Wellen entfernt (Je-Slice-Entscheidung); M1-Trigger auf beobachtbaren Zustand geschärft | Regelwerk Modul 06: keine Phantom-Bindung, beobachtbare Trigger |
