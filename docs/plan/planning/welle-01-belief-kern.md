@@ -4,7 +4,7 @@
 
 **Zielmeilenstein:** M1 — Belief-Kern lauffähig.
 
-**Verantwortlich:** offen. **Datum:** 2026-06-22.
+**Verantwortlich:** pt9912. **Datum:** 2026-06-22.
 
 ---
 

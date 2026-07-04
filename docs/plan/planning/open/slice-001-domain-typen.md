@@ -8,7 +8,7 @@
 **Bezug:** `LH-FA-BEL-001`, `LH-FA-BEL-003`, `LH-QA-03`; `ADR-0001`,
 `ADR-0002`; `ARC-01`.
 
-**Autor:** offen. **Datum:** 2026-07-04.
+**Autor:** pt9912. **Datum:** 2026-07-04.
 
 ---
 
@@ -34,9 +34,11 @@ Folge-Slices zum Kompilieren und Testen brauchen (`ADR-0002`-Folgepflicht).
 - [ ] KMP-Gradle-Skelett steht: `commonMain`/`commonTest`/`jvmMain`/`jvmTest`,
       JDK-21-Pin, `jvm()`-Ziel; `make build` und `make test` grün und
       deterministisch (`LH-QA-03`).
+- [ ] `make arch-check` über `a-check` (GHCR-Image, digest-gepinnt, offline
+      `--network none`) verdrahtet und grün.
 - [ ] `make gates` grün.
-- [ ] Doku-Update: `make build`/`make test` in `AGENTS.md` §4 und
-      `harness/README.md` von „geplant" nach „laufend" verschoben.
+- [ ] Doku-Update: `make build`/`make test`/`make arch-check` in `AGENTS.md`
+      §4 und `harness/README.md` von „geplant" nach „laufend" verschoben.
 - [ ] Closure-Notiz mit Steering-Loop-Lerneintrag.
 
 ## 3. Plan (vor Code)
@@ -47,7 +49,8 @@ Folge-Slices zum Kompilieren und Testen brauchen (`ADR-0002`-Folgepflicht).
 | `src/commonMain/kotlin/**/Hypothese.kt` | neu | Hypothesen-Typ (`ARC-01`) |
 | `src/commonMain/kotlin/**/BeliefState.kt` | neu | Belief-State-Typ inkl. Pflicht-Resthypothese (`ARC-01`) |
 | `src/commonTest/kotlin/**` | neu | deterministische Konstruktionstests (`LH-QA-03`) |
-| `Makefile` | update | `build`, `test` ergänzen (`arch-check`, sobald `a-check` verdrahtet) |
+| `a-check.mk`, `.a-check.yml` | neu | Arch-Gate analog `d-check`: GHCR-Image `ghcr.io/pt9912/a-check`, Digest-Pin, `--network none` |
+| `Makefile` | update | `include a-check.mk`; `build`, `test`, `arch-check` ergänzen |
 
 ## 4. Trigger
 
@@ -61,11 +64,11 @@ DoD vollständig + PR gemerged + Closure-Notiz geschrieben; Datei nach
 
 ## 6. Risiken und offene Punkte
 
-- `arch-check` hängt am Harness-Tool `a-check`, das noch nicht im Repo
-  verdrahtet ist (`d-check` analog). Bis zur Adoption ist die Kern-Reinheit
-  strukturell durch die `commonMain`/`jvmMain`-Trennung gesichert; das
-  `a-check`-Gate (Digest-Pin) wird hier oder in einem Folge-Slice adoptiert.
-  Falls slice-sprengend → Carveout.
+- `arch-check` wird in diesem Slice über das GHCR-Image
+  `ghcr.io/pt9912/a-check` (digest-gepinnt, offline `--network none`)
+  verdrahtet — analog `d-check.mk`/`.d-check.yml`. Rest-Risiko: exakten
+  Digest aus den a-check-Release-Notes ziehen; bis dahin ist die Kern-Reinheit
+  strukturell durch die `commonMain`/`jvmMain`-Trennung gesichert.
 - Normierung/Validierung bewusst **nicht** hier (`slice-002`); Bayes-Update
   bewusst **nicht** hier (`slice-003`).
 
