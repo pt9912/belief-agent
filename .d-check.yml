@@ -8,9 +8,11 @@
 #           Default-doc-check — inert ohne Range): vcs, commits.
 # Beratend erzeugt, geprüft und verengt.
 
+# Ganzes Repo scannen (auch README/AGENTS/version.md im Root), Code-/Build-/
+# Template-Artefakte ausgenommen (analog d-check-Referenz `roots: ["."]`, MR-006).
 scan:
-  roots: [spec, docs, harness]
-  ignore: ["**/*.template.md", ".tmp/**"]
+  roots: ["."]
+  ignore: ["**/*.template.md", ".tmp/**", "**/build/**", "**/.gradle/**"]
 
 modules: [links, anchors, ids, matrix, codepaths, spans, hostpaths, tracked, planning, versions]
 

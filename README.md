@@ -11,12 +11,15 @@ weiß, wann er nicht genug weiß.**
 
 ## Was kann ich heute tun?
 
-Das Repository steht am **Ende des Harness-Bootstraps** (Phase 01): Spec,
-Architektur, ADR-Fundament und Planungs-Harness stehen; Code folgt ab
-Welle 1.
+**Stand:** Version [`v0.1.0`](version.md#aktuell) (in Entwicklung). Welle-01
+(Belief-Kern) ist abgeschlossen; Welle-02 (Evidenz + Audit) läuft.
 
-- `make gates` läuft grün (Doku-Referenz-Gate: `make doc-check` via d-check).
-- `make help` zeigt die verfügbaren Targets.
+- Lauffähiger **Belief-Kern** in `hexagon:domain` (Kotlin Multiplatform,
+  HexSlice-Architektur): normierter Belief State mit Pflicht-Resthypothese,
+  nicht-überschreibendes Bayes-Update, Unsicherheitsmaße, Re-Hypothesen-Auslöser.
+- `make gates` läuft grün — **fünf Gates**: `doc-check` · `build` · `test` ·
+  `coverage-gate` · `arch-check` (alles im Docker, kein Host-JDK).
+- `make help` zeigt die Targets; `make build`/`make test` bauen/testen im Docker.
 - Lastenheft, Spezifikation, Architektur und Roadmap sind les- und
   navigierbar (siehe unten).
 
@@ -42,8 +45,9 @@ gehandelt — andernfalls wird Information gesammelt oder eskaliert.
 - **Verträge:** [`spec/lastenheft.md`](spec/lastenheft.md) (`LH-*`-IDs mit
   Akzeptanzkriterien), [`spec/spezifikation.md`](spec/spezifikation.md),
   [`spec/architecture.md`](spec/architecture.md).
-- **Gates:** `make doc-check` (Doku-Referenzen via d-check, Image
-  digest-gepinnt). Code-Gates wachsen mit dem Code.
+- **Gates:** `make gates` — `doc-check` (d-check), `build`/`test`/`coverage-gate`
+  (Kotlin/Kover im Docker), `arch-check` (a-check, HexSlice-Reinheit); alle
+  reproduzierbar und digest-gepinnt. Versionen: [`version.md`](version.md).
 - **Auditierbarkeit:** Entscheidungen in [`docs/plan/adr/`](docs/plan/adr/),
   Planung in [`docs/plan/planning/`](docs/plan/planning/).
 
