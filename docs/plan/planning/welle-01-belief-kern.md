@@ -1,6 +1,6 @@
 # Welle welle-01-belief-kern: Belief-Kern
 
-**Status:** open
+**Status:** in-progress
 
 **Zielmeilenstein:** M1 — Belief-Kern lauffähig.
 
@@ -31,8 +31,9 @@ der Folge-Wellen aufsetzen.
 
 ## 4. Slices in dieser Welle
 
-Noch nicht als Slice-Dateien angelegt (Bootstrap-Ende = bereit für erste
-Slices). Geplanter Zuschnitt:
+Als Slice-Dateien in `open/` angelegt (2026-07-04). `slice-001` bündelt als
+erster Code-Slice zusätzlich das minimale KMP-Gradle-Skelett
+(`ADR-0002`-Folgepflicht). Zuschnitt:
 
 | Slice | Titel | Status | Bezug |
 |---|---|---|---|

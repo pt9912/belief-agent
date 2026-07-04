@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-06-22.
+**Status:** Aktiv. **Letzte Änderung:** 2026-07-04.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -11,14 +11,15 @@ Wellen-Schätzung, nicht Treiber.
 ## Aktuelle Welle
 
 **Welle-ID:** [`welle-01-belief-kern`](../welle-01-belief-kern.md)
-**Start:** offen (Trigger unten)
-**Geplantes Ende:** Schätzung folgt mit Slice-Aufnahme
+**Start:** 2026-07-04 (Trigger erfüllt) — Status `in-progress`
+**Geplantes Ende:** Schätzung folgt mit Slice-Priorisierung
 
 **Closure-Trigger:** siehe Welle-Datei — gültiger, normierter Belief State
 mit Resthypothese und deterministisch testbarem Bayes-Update.
 
 **Trigger (Welle startet):** ADR-0001 `Accepted`; Implementierungssprache
-via eigenem ADR entschieden (`LH-RB-04`).
+via eigenem ADR entschieden (`LH-RB-04`). — **Erfüllt 2026-07-04**
+(`ADR-0001` & `ADR-0002` Accepted).
 
 ## Nächste Wellen
 
@@ -62,3 +63,4 @@ flowchart LR
 | Datum | Was wurde geändert? | Warum? |
 |---|---|---|
 | 2026-06-22 | Initiale Roadmap (Bootstrap) | — |
+| 2026-07-04 | Welle-01 gestartet (Status `in-progress`); Slices `slice-001`..`slice-004` in `open/` angelegt | Start-Trigger erfüllt: `ADR-0001` & `ADR-0002` Accepted |
