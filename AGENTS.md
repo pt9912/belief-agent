@@ -102,12 +102,14 @@ Gates, Modul 13):
 | Target | Zweck |
 |---|---|
 | `make doc-check` | Doku-Referenzen prüfen (d-check: links, anchors) |
-| `make gates` | alle aktuell lauffähigen Gates (derzeit `doc-check`) |
+| `make build` | Reproduzierbarer KMP-Build aller Module (multi-stage Dockerfile) |
+| `make test` | Deterministische Tests (`LH-QA-03`) im Docker-Build |
+| `make gates` | alle aktuell lauffähigen Gates (`doc-check` + `build` + `test`) |
 | `make help` | verfügbare Targets anzeigen |
 
-Geplant (entstehen mit dem ersten Code-Slice, dann hier ergänzen):
-`make lint`, `make test`, `make arch-check`, `make coverage-gate`,
-`make ci`, `make fullbuild`.
+Geplant (entstehen mit den nächsten Slices, dann hier ergänzen):
+`make arch-check` (a-check, sobald verdrahtet), `make lint`,
+`make coverage-gate`, `make ci`, `make fullbuild`.
 
 ## 5. Dokumentations-Regeln
 

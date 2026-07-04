@@ -15,4 +15,18 @@ help: ## Targets anzeigen
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-14s %s\n", $$1, $$2}'
 
-gates: doc-check ## alle aktuell lauffähigen Gates (Code-Gates ergänzen)
+gates: doc-check build test ## alle aktuell lauffähigen Gates
+
+# --- Code-Gates: KMP/HexSlice via multi-stage Dockerfile (Modul 14). ---
+# Einstiegspunkt bleibt make; die Toolchain lebt im Dockerfile (kein Host-JDK,
+# AGENTS.md §3.1). arch-check folgt, sobald a-check verdrahtet ist.
+IMAGE ?= belief-agent
+
+.PHONY: build
+build: ## Reproduzierbarer Build aller Module (Dockerfile-Stage build)
+	docker build --target build --iidfile harness/image-hash.txt -t $(IMAGE):build .
+	@printf 'build-image: '; cat harness/image-hash.txt; echo
+
+.PHONY: test
+test: ## Deterministische Tests (LH-QA-03, Dockerfile-Stage test)
+	docker build --target test -t $(IMAGE):test .

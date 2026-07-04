@@ -15,6 +15,9 @@ bin/
 *.class
 # Gradle (Wrapper-Dateien gradlew/gradle/wrapper/ werden committet)
 .gradle/
+# Build-Image-Hash (make build; lokaler Reproduzierbarkeits-Anker, Modul 14).
+# Wird bei Replay/Modul 12 gepinnt; bis dahin je Build regeneriert.
+harness/image-hash.txt
 # Maven
 .mvn/timing.properties
 # Java-Fehlerprotokolle

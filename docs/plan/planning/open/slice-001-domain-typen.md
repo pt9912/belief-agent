@@ -5,8 +5,8 @@
 
 **Welle:** [`welle-01-belief-kern`](../welle-01-belief-kern.md).
 
-**Bezug:** `LH-FA-BEL-001`, `LH-FA-BEL-003`, `LH-QA-03`; `ADR-0001`,
-`ADR-0002`; `ARC-01`.
+**Bezug:** `LH-FA-BEL-001`, `LH-FA-BEL-003`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`,
+`ADR-0002`, `ADR-0003`; `ARC-01`.
 
 **Autor:** pt9912. **Datum:** 2026-07-04.
 
@@ -15,35 +15,39 @@
 ## 1. Ziel
 
 Die puren Domänentypen des Belief-Kerns (`ARC-01`) als framework-freie
-Kotlin-Typen in `commonMain`: `Hypothese` (Identität + zugeordnete
+Kotlin-Typen im Modul `hexagon:domain` (`commonMain`, Paket
+`dev.beliefagent.domain.belief`): `Hypothese` (Identität + zugeordnete
 Wahrscheinlichkeit + Evidenz-Referenz) und `BeliefState` (Menge
 konkurrierender Hypothesen) mit der **Pflicht-Resthypothese** als
 strukturellem Erstklasse-Konzept — noch **ohne** Normierungs-/Update-Logik
 (folgt in `slice-002`/`slice-003`). Als **erster Code-Slice** stellt dieser
-Slice zugleich das minimale **KMP-Gradle-Skelett** bereit, das die
-Folge-Slices zum Kompilieren und Testen brauchen (`ADR-0002`-Folgepflicht).
+Slice zugleich das minimale **KMP-Gradle-Multi-Modul-Skelett** (`ADR-0003`)
+bereit, das die Folge-Slices zum Kompilieren und Testen brauchen
+(`ADR-0002`-Folgepflicht).
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-BEL-001` erfüllt: `BeliefState` trägt eine Menge konkurrierender
+- [x] `LH-FA-BEL-001` erfüllt: `BeliefState` trägt eine Menge konkurrierender
       `Hypothese`n mit zugeordneter Wahrscheinlichkeit; Test referenziert.
-- [ ] `LH-FA-BEL-003` erfüllt: die Resthypothese ist struktureller
-      Pflichtbestandteil (nicht weglassbar konstruierbar); Test referenziert.
-- [ ] Typen liegen in `commonMain`, framework-/DI-frei (kein `org.koin.*`,
-      kein Adapter-Paket) — `ADR-0001`, `ADR-0002`.
-- [ ] KMP-Gradle-Skelett steht: `commonMain`/`commonTest`/`jvmMain`/`jvmTest`,
-      JDK-21-Pin, `jvm()`-Ziel; `make build` und `make test` grün und
-      deterministisch (`LH-QA-03`) — **über multi-stage Dockerfile, kein
-      Host-JDK/-Gradle** (AGENTS.md §3.1).
-- [ ] `make arch-check` über `a-check` (GHCR-Image, digest-gepinnt, offline
-      `--network none`) verdrahtet und grün.
-- [ ] Reproduzierbarkeit (Regelwerk Modul 14): Base-Images digest-gepinnt
-      (`FROM …@sha256:…`); Gradle-Dependency-Locking (`gradle.lockfile`);
-      Build-Image-Hash in `harness/image-hash.txt` erfasst (Replay-Beleg,
-      Modul 12); `build`-Target trägt `LH-QA-03`.
-- [ ] `make gates` grün.
-- [ ] Doku-Update: `make build`/`make test`/`make arch-check` in `AGENTS.md`
-      §4 und `harness/README.md` von „geplant" nach „laufend" verschoben.
+- [x] `LH-FA-BEL-003` erfüllt: die Resthypothese ist struktureller
+      Pflichtbestandteil (Konstruktor-Pflicht); Test referenziert.
+- [x] Typen im Modul `hexagon:domain` (`commonMain`), framework-/DI-frei
+      (kein `org.koin.*`, kein Adapter) — `ADR-0001`, `ADR-0002`, `ADR-0003`.
+- [x] KMP-Gradle-Multi-Modul-Skelett steht; `make build` und `make test`
+      grün und deterministisch (`LH-QA-03`) — über multi-stage Dockerfile,
+      kein Host-JDK/-Gradle (AGENTS.md §3.1).
+- [x] Reproduzierbarkeit (Modul 14): Base-Image digest-gepinnt
+      (`gradle:8.14-jdk21@sha256:…`); Build-Image-Hash via `--iidfile`
+      erfasst; `build`-Target Docker-getrieben.
+- [x] `make gates` grün.
+- [x] Doku-Update: `make build`/`make test` in `AGENTS.md` §4 und
+      `harness/README.md` von „geplant" nach „laufend" promotet.
+- [ ] **Zurückgestellt:** Gradle-Dependency-Locking (`gradle.lockfile`) —
+      Direktabhängigkeiten sind versionsgepinnt (Kotlin 2.4.0); volles
+      transitives Locking folgt (Replay/Modul 12).
+- [ ] **Ausgesetzt:** `make arch-check` via `a-check` — KMP-Falsch-negativ an
+      den a-check-Maintainer gemeldet, Antwort ausstehend; Reinheit derweil
+      über Gradle-Modul-Grenzen + KMP-Source-Set-Sicht.
 - [ ] Closure-Notiz mit Steering-Loop-Lerneintrag.
 
 ## 3. Plan (vor Code)
@@ -56,7 +60,7 @@ Folge-Slices zum Kompilieren und Testen brauchen (`ADR-0002`-Folgepflicht).
 | `src/commonMain/kotlin/**/BeliefState.kt` | neu | Belief-State-Typ inkl. Pflicht-Resthypothese (`ARC-01`) |
 | `src/commonTest/kotlin/**` | neu | deterministische Konstruktionstests (`LH-QA-03`) |
 | `gradle.lockfile` | neu | Dependency-Locking, reproduzierbarer Dep-Tree (Modul 14 Lock-File) |
-| `harness/image-hash.txt` | neu | Build-Image-Hash als Replay-Beleg (Modul 14 Schritt 5 / Modul 12) |
+| image-hash.txt (in `harness/`, generiert) | neu | Build-Image-Hash via `make build` (`--iidfile`); lokaler Anker (Modul 14) |
 | `a-check.mk`, `.a-check.yml` | neu | Arch-Gate analog `d-check`: GHCR-Image `ghcr.io/pt9912/a-check`, Digest-Pin, `--network none` |
 | `Makefile` | update | `include a-check.mk`; `build`, `test`, `arch-check` ergänzen (Einstiegspunkt für alle Aktionen) |
 
@@ -72,11 +76,11 @@ DoD vollständig + PR gemerged + Closure-Notiz geschrieben; Datei nach
 
 ## 6. Risiken und offene Punkte
 
-- `arch-check` wird in diesem Slice über das GHCR-Image
-  `ghcr.io/pt9912/a-check` (digest-gepinnt, offline `--network none`)
-  verdrahtet — analog `d-check.mk`/`.d-check.yml`. Rest-Risiko: exakten
-  Digest aus den a-check-Release-Notes ziehen; bis dahin ist die Kern-Reinheit
-  strukturell durch die `commonMain`/`jvmMain`-Trennung gesichert.
+- `arch-check` via `a-check` ist **ausgesetzt**: a-check verfehlt bei
+  KMP-Multi-Source-Set mit flachen `layers`-Globs Source-Set-übergreifende
+  Verletzungen (falsch-negativ) — an den a-check-Maintainer gemeldet, Antwort
+  ausstehend. Bis dahin tragen Gradle-Modul-Grenzen + KMP-Source-Set-Sicht die
+  Reinheit; scharfgeschaltet mit tiefen Modul-Globs, sobald die Antwort da ist.
 - Normierung/Validierung bewusst **nicht** hier (`slice-002`); Bayes-Update
   bewusst **nicht** hier (`slice-003`).
 - Runtime-/Distroless-Stage (Modul 14) ist für diesen Slice

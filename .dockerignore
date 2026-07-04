@@ -30,6 +30,8 @@ build
 out
 bin
 .gradle
+**/build
+**/.gradle
 
 # Temp
 .tmp

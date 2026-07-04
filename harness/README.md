@@ -54,14 +54,16 @@ Kein Lauf-Status (der lebt in CI). Strukturell rote Gates → Carveout in
 
 | Target | Vertrag | Bindung |
 |---|---|---|
-| `make doc-check` | Doku-Referenzen: lokale Links + Heading-Anker auflösbar (d-check `links`/`anchors`) | Reproduzierbarkeit: Image-Digest `sha256:68951f5a…` (v0.23.0) |
-| `make gates` | bündelt alle aktuell lauffähigen Gates (derzeit `doc-check`) | — |
+| `make doc-check` | Doku-Referenzen: lokale Links + Heading-Anker auflösbar (d-check `links`/`anchors`) | Reproduzierbarkeit: Image-Digest `sha256:3bbdb19b…` (v0.37.1, `MR-004`) |
+| `make build` | Reproduzierbarer KMP-Build aller Module (multi-stage Dockerfile, Base digest-gepinnt) | `ADR-0002`/`ADR-0003`; Modul 14 |
+| `make test` | Deterministische Tests (`LH-QA-03`) im Docker-Build | `LH-FA-BEL-001`/`LH-FA-BEL-003` |
+| `make gates` | bündelt alle aktuell lauffähigen Gates (`doc-check` + `build` + `test`) | — |
 
 **Aktueller Lauf-Status:** lokal `make gates` (CI-Badge folgt mit
 CI-Slice).
-**Nicht behauptet** (geplant, entstehen mit dem ersten Code-Slice):
-`make lint`, `make test`, `make arch-check` (Bindung ADR-0001 —
-Kern importiert kein Adapter-Paket), `make coverage-gate` (Welle 1+).
+**Nicht behauptet** (geplant): `make arch-check` (Bindung `ADR-0001`/`ADR-0003`
+— Kern importiert kein Adapter-Paket; via a-check, Upstream-Antwort zum
+KMP-Fall ausstehend), `make lint`, `make coverage-gate` (Welle 1+).
 
 > Sobald ein Code-Gate real im `Makefile` existiert und läuft, wird seine
 > Zeile aus dem „Nicht behauptet"-Block in die Haupt-Tabelle promotet
