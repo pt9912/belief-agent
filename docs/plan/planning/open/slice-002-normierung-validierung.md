@@ -6,9 +6,9 @@
 **Welle:** [`welle-01-belief-kern`](../welle-01-belief-kern.md).
 
 **Bezug:** `LH-FA-BEL-002`, `LH-FA-BEL-004`, `LH-OP-05`, `LH-QA-03`;
-`ADR-0001`; `ARC-01`, `ARC-02`.
+`ADR-0001`, `ADR-0002`, `ADR-0003`; `ARC-01`.
 
-**Autor:** offen. **Datum:** 2026-07-04.
+**Autor:** pt9912. **Datum:** 2026-07-04.
 
 ---
 
@@ -22,17 +22,18 @@ ungültigen Belief States ist damit nicht möglich (Abnahme aus `LH-FA-BEL-004`)
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-BEL-002` erfüllt: Normierung mit definierter Toleranz; Test mit
-      Grenzwerten (innerhalb/außerhalb Toleranz) referenziert.
-- [ ] `LH-FA-BEL-004` erfüllt: ein Belief State ohne Resthypothese **oder**
-      ohne Normierung wird nachweislich zurückgewiesen — negativer Test
-      referenziert (Closure-Trigger der Welle).
-- [ ] Toleranzwert als benannte Konstante/Konfiguration verankert; offener
-      Punkt `LH-OP-05` in der Slice-Closure adressiert oder als bleibend
-      offen markiert.
-- [ ] Validierung ist deterministisch (`LH-QA-03`), Kern-lokal (`ARC-02`),
-      framework-frei (`ADR-0001`).
-- [ ] `make gates` grün.
+- [x] `LH-FA-BEL-002` erfüllt: Normierung im validierenden `BeliefState.of`,
+      Toleranz `NORMIERUNGS_TOLERANZ = 1e-9`; Grenzwert-Tests
+      (innerhalb/außerhalb) referenziert (`NormierungTest`).
+- [x] `LH-FA-BEL-004` erfüllt: ungültiger Belief State (nicht normiert oder
+      negative Wahrscheinlichkeit) wird nachweislich zurückgewiesen — negative
+      Tests referenziert. (Resthypothese-Pflicht ist bereits strukturell,
+      slice-001.)
+- [x] Toleranzwert als benannte Konstante verankert (`NORMIERUNGS_TOLERANZ`,
+      `1e-9`); `LH-OP-05`-Default begründet dokumentiert (revidierbar).
+- [x] Validierung deterministisch (`LH-QA-03`), im Domain-Modul
+      `hexagon:domain`, framework-frei (`ADR-0001`/`ADR-0003`).
+- [x] `make gates` grün (`make build`/`make test` im Docker).
 - [ ] Closure-Notiz mit Steering-Loop-Lerneintrag.
 
 ## 3. Plan (vor Code)
@@ -45,7 +46,9 @@ ungültigen Belief States ist damit nicht möglich (Abnahme aus `LH-FA-BEL-004`)
 
 ## 4. Trigger
 
-`slice-001` done (Domain-Typen vorhanden).
+`slice-001`-Domänentypen geliefert (`hexagon:domain` gebaut/getestet).
+`slice-001` ist `in-progress` (formale Closure wartet extern auf `arch-check`/
+a-check); das blockiert die Substrat-Nutzung durch `slice-002` nicht.
 
 ## 5. Closure-Trigger
 
