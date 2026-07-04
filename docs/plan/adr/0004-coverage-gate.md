@@ -1,6 +1,6 @@
 # ADR-0004: Coverage-Gate — bootstrap-aware Line-Coverage-Schwelle (Kover)
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Datum:** 2026-07-04
 
@@ -71,3 +71,4 @@ die Aussagekraft dominiert (dann Exclude-Regel dokumentieren).
 | Datum | Ereignis | Verweis |
 |---|---|---|
 | 2026-07-04 | Proposed — bootstrap-aware Coverage-Gate (90 % → 95 % bei M2), Kover | Review-Nachlauf Welle-01 |
+| 2026-07-04 | **Accepted** — Coverage-Schwelle final; ab hier immutable (Korrekturen nur als neue ADR mit `Supersedes ADR-0004`) | Freigabe |

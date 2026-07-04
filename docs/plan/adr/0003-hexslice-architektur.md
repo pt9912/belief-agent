@@ -1,6 +1,6 @@
 # ADR-0003: HexSlice-Architektur — vertikale Use-Case-Slices im hexagonalen Kern (KMP, Gradle-Multi-Modul)
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Datum:** 2026-07-04
 
@@ -113,3 +113,4 @@ gefordert wird (`ADR-0002`-Re-Eval).
 | Datum | Ereignis | Verweis |
 |---|---|---|
 | 2026-07-04 | Proposed — HexSlice auf KMP-Multi-Modul, schärft ADR-0001 | Diskussion Architektur (HexSlice vs. hexagonal, d-migrate-Referenz) |
+| 2026-07-04 | **Accepted** — Architektur final; ab hier immutable (Korrekturen nur als neue ADR mit `Supersedes ADR-0003`) | Freigabe |
