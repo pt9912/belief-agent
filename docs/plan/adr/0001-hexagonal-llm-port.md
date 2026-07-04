@@ -74,11 +74,13 @@ geschieht im Orchestrator/Runtime.
 ## Fitness Function (falls maschinell prüfbar)
 
 Greift mit dem ersten Code-Slice (bis dahin „Nicht behauptet" im
-Sensors-Roster). Werkzeug folgt der Implementierungssprache (`LH-RB-04`).
+Sensors-Roster). Werkzeug ist das Harness-Arch-Gate `a-check`
+(sprach-/ziel-agnostisch, digest-gepinnt analog `d-check`); siehe die
+Fitness Function in ADR-0002.
 
 | Tooling | Regel | Make-Target |
 |---|---|---|
-| ArchUnit / import-linter / depguard (sprachabhängig) | Kern-Pakete (Engine, Gate, VoI, Eskalation, Audit) dürfen kein Adapter-Paket importieren | `make arch-check` |
+| `a-check` (Harness-Arch-Gate, sprach-/ziel-agnostisch) | Kern-Pakete (Engine, Gate, VoI, Eskalation, Audit) dürfen kein Adapter-Paket importieren | `make arch-check` |
 
 ## Re-Evaluierungs-Trigger
 
@@ -91,3 +93,4 @@ Port-Vertrag sich als unzureichend erweist.
 | Datum | Ereignis | Verweis |
 |---|---|---|
 | 2026-06-22 | Proposed | Bootstrap (Modul 2, Schritt 8) |
+| 2026-07-04 | Fitness-Function-Werkzeug auf das Harness-Arch-Gate `a-check` festgelegt (statt sprachabhängiger ArchUnit/Linter-Liste); Bindung an ADR-0002 (Kotlin Multiplatform) | Diskussion Sprachwahl |
