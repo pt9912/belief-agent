@@ -33,9 +33,14 @@ Folge-Slices zum Kompilieren und Testen brauchen (`ADR-0002`-Folgepflicht).
       kein Adapter-Paket) — `ADR-0001`, `ADR-0002`.
 - [ ] KMP-Gradle-Skelett steht: `commonMain`/`commonTest`/`jvmMain`/`jvmTest`,
       JDK-21-Pin, `jvm()`-Ziel; `make build` und `make test` grün und
-      deterministisch (`LH-QA-03`).
+      deterministisch (`LH-QA-03`) — **über multi-stage Dockerfile, kein
+      Host-JDK/-Gradle** (AGENTS.md §3.1).
 - [ ] `make arch-check` über `a-check` (GHCR-Image, digest-gepinnt, offline
       `--network none`) verdrahtet und grün.
+- [ ] Reproduzierbarkeit (Regelwerk Modul 14): Base-Images digest-gepinnt
+      (`FROM …@sha256:…`); Gradle-Dependency-Locking (`gradle.lockfile`);
+      Build-Image-Hash in `harness/image-hash.txt` erfasst (Replay-Beleg,
+      Modul 12); `build`-Target trägt `LH-QA-03`.
 - [ ] `make gates` grün.
 - [ ] Doku-Update: `make build`/`make test`/`make arch-check` in `AGENTS.md`
       §4 und `harness/README.md` von „geplant" nach „laufend" verschoben.
@@ -45,12 +50,15 @@ Folge-Slices zum Kompilieren und Testen brauchen (`ADR-0002`-Folgepflicht).
 
 | Datei / Komponente | Änderungs-Art | Begründung |
 |---|---|---|
-| `settings.gradle.kts`, `build.gradle.kts`, Gradle-Wrapper | neu | KMP-Build, `jvm()`-Ziel, JDK-21-Pin (`ADR-0002`) |
+| `Dockerfile` (multi-stage) | neu | Toolchain (Gradle + JDK 21 + Kotlin) im Build-Stage; Host nutzt nur Docker + make (AGENTS.md §3.1, `ADR-0002` JDK-21-Pin). Kein Host-JDK/-Gradle. |
+| `settings.gradle.kts`, `build.gradle.kts` | neu | KMP-Build, `jvm()`-Ziel |
 | `src/commonMain/kotlin/**/Hypothese.kt` | neu | Hypothesen-Typ (`ARC-01`) |
 | `src/commonMain/kotlin/**/BeliefState.kt` | neu | Belief-State-Typ inkl. Pflicht-Resthypothese (`ARC-01`) |
 | `src/commonTest/kotlin/**` | neu | deterministische Konstruktionstests (`LH-QA-03`) |
+| `gradle.lockfile` | neu | Dependency-Locking, reproduzierbarer Dep-Tree (Modul 14 Lock-File) |
+| `harness/image-hash.txt` | neu | Build-Image-Hash als Replay-Beleg (Modul 14 Schritt 5 / Modul 12) |
 | `a-check.mk`, `.a-check.yml` | neu | Arch-Gate analog `d-check`: GHCR-Image `ghcr.io/pt9912/a-check`, Digest-Pin, `--network none` |
-| `Makefile` | update | `include a-check.mk`; `build`, `test`, `arch-check` ergänzen |
+| `Makefile` | update | `include a-check.mk`; `build`, `test`, `arch-check` ergänzen (Einstiegspunkt für alle Aktionen) |
 
 ## 4. Trigger
 
@@ -71,6 +79,11 @@ DoD vollständig + PR gemerged + Closure-Notiz geschrieben; Datei nach
   strukturell durch die `commonMain`/`jvmMain`-Trennung gesichert.
 - Normierung/Validierung bewusst **nicht** hier (`slice-002`); Bayes-Update
   bewusst **nicht** hier (`slice-003`).
+- Runtime-/Distroless-Stage (Modul 14) ist für diesen Slice
+  **zurückgestellt**: `slice-001` liefert eine Bibliothek + Tests, noch keine
+  lauffähige App (`ARC-09`). Das Dockerfile deckt hier `deps` + `build`/Test
+  ab; die gehärtete Runtime-Stage entsteht mit dem ersten lauffähigen
+  Orchestrator.
 
 ## 7. Closure-Notiz (nach `done/`)
 
