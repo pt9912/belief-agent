@@ -1,6 +1,6 @@
 # CO-001: arch-check ausgesetzt — a-check-KMP-Falsch-negativ, Upstream ausstehend
 
-**Status:** Aktiv
+**Status:** Aufgelöst (a-check v0.10.0, 2026-07-04)
 
 **Datum angelegt:** 2026-07-04. **Letzte Prüfung:** 2026-07-04.
 
@@ -48,13 +48,14 @@ Block in `harness/README.md` promoten.
 
 ## Verifikation (nach Auflösung)
 
-- [ ] `.a-check.yml`/`a-check.mk` verdrahtet, `make arch-check` grün für den Geltungsbereich.
-- [ ] `arch-check` in `make gates`; `make gates` grün ohne Ausnahme.
-- [ ] Datei wird nach `docs/plan/carveouts/done/` bewegt (reiner `git mv`). <!-- d-check:ignore (done/ entsteht erst bei erster Carveout-Auflösung) -->
-- [ ] Folge-Slice geschlossen oder explizit dokumentiert.
+- [x] `.a-check.yml`/`a-check.mk` verdrahtet, `make arch-check` grün (a-check v0.10.0; tech-leak-Zähne nachgewiesen).
+- [x] `arch-check` in `make gates`; `make gates` grün (5 Gates).
+- [x] Datei nach `docs/plan/carveouts/done/` bewegt (reiner `git mv`). <!-- d-check:ignore (done/ entsteht erst bei erster Carveout-Auflösung) -->
+- [x] Kein Folge-Slice nötig — direkt durch Upstream-Fix aufgelöst; Multi-Modul-`resolution` wird in welle-02 erweitert (Guard-erzwungen).
 
 ## Geschichte
 
 | Datum | Ereignis | Verweis |
 |---|---|---|
 | 2026-07-04 | Angelegt bei Welle-01-Closure; a-check-Fall an Maintainer gemeldet | `slice-001` DoD (arch-check) |
+| 2026-07-04 | **Aufgelöst** — a-check v0.10.0 fail-closed-Guard + dokumentiertes KMP-Rezept; `arch-check` verdrahtet + grün | `MR-005` |

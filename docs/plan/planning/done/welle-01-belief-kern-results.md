@@ -44,9 +44,8 @@ bestätigt (Befund 3).
 
 ## Offene Punkte / Carveouts
 
-- `CO-001`: `arch-check` via a-check **ausgesetzt** (KMP-Falsch-negativ an
-  Maintainer gemeldet, Antwort ausstehend). Reinheit derweil über
-  Gradle-Modul-Grenzen + KMP-Source-Set-Sicht + Review.
+- `CO-001`: **aufgelöst 2026-07-04** — a-check v0.10.0 (fail-closed-Guard)
+  verdrahtet, `arch-check` grün (zum Closure-Zeitpunkt war es noch ausgesetzt).
 - `gradle.lockfile` (transitives Dependency-Locking) zurückgestellt;
   Direktabhängigkeiten sind versionsgepinnt.
 
