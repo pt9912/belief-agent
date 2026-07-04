@@ -1,25 +1,60 @@
-# d-check.mk — erzeugt von: d-check --print-mk (DC-FA-CLI-010), danach
-# repo-lokal um das `doc-trace`-Target (RTM) erweitert.
+# d-check.mk — erzeugt von: d-check --print-mk (DC-FA-CLI-010).
 #
 # Einbinden: "include d-check.mk" im eigenen Makefile; eine eigene
 # .d-check.yml danebenlegen. Keine Recipe-/Skript-Kopie — der Image-Pin
 # lebt in d-check.
 #
-# DCHECK_IMAGE ist überschreibbar. Für strikte Reproduzierbarkeit den
-# Digest aus den Release-Notes pinnen:
-#   DCHECK_IMAGE = ghcr.io/pt9912/d-check@sha256:<digest>
-# Digest-Pin für strikte Reproduzierbarkeit (MR-004 in harness/conventions.md):
-# d-check v0.23.0. Bei Upgrade neuen Digest aus den Release-Notes setzen.
-DCHECK_IMAGE ?= ghcr.io/pt9912/d-check@sha256:68951f5a3dd7ad3404e1996d45327f3df2585c0ef2b0b6bde7ccf790da4ddf6a
+# Für strikte Reproduzierbarkeit den Digest aus den Release-Notes pinnen —
+# direkt über DCHECK_IMAGE oder bequemer über DCHECK_DIGEST (sticht den Tag):
+#   DCHECK_DIGEST = sha256:<digest>
+DCHECK_IMAGE ?= ghcr.io/pt9912/d-check:v0.37.1
+DCHECK_DIGEST ?=
+# TRACE_FLAGS: optionale Flags für die RTM-Targets (z. B. --json).
+TRACE_FLAGS ?=
+
+# Ein gesetzter DCHECK_DIGEST sticht den Tag von DCHECK_IMAGE.
+ifeq ($(strip $(DCHECK_DIGEST)),)
+DCHECK_REF := $(DCHECK_IMAGE)
+else
+DCHECK_REF := ghcr.io/pt9912/d-check@$(DCHECK_DIGEST)
+endif
 
 .PHONY: doc-check
-doc-check: ## Doku-Referenzen pruefen (Module laut .d-check.yml)
-	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_IMAGE)
+doc-check: ## Doku-Referenzen prüfen (Befund-Gate)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF)
 
-# Repo-lokale Erweiterung (nicht aus --print-mk): Requirements Traceability
-# Matrix. Read-only Report, kein Gate -> NICHT in `gates`. Format anhaengbar,
-# z. B.: make doc-trace TRACE_FLAGS=--json
-TRACE_FLAGS ?=
 .PHONY: doc-trace
-doc-trace: ## RTM: Anforderung -> ADRs/Slices + Waisen (d-check --trace)
-	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_IMAGE) --trace $(TRACE_FLAGS)
+doc-trace: ## Requirements Traceability Matrix auf stdout (advisory, DC-FA-CLI-009)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --trace $(TRACE_FLAGS)
+
+.PHONY: doc-complete
+doc-complete: ## Vollständigkeits-Gate: Requirements-Waise ⇒ Exit 1 (DC-FA-CLI-011)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --trace --require-complete $(TRACE_FLAGS)
+
+.PHONY: doc-doctor
+doc-doctor: ## erklärende Diagnose mit Fix-Kandidaten (DC-FA-CLI-007)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --doctor
+
+.PHONY: doc-repair
+doc-repair: ## Reparatur-Patch (unified diff) auf stdout, git-apply-rein (DC-FA-CLI-008)
+	@docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --repair
+
+.PHONY: doc-immutable
+doc-immutable: ## Doc-/ADR-Immutabilität via git-Diff (Modul vcs); RANGE=base..head oder STAGED=1 (DC-FA-VCS-001)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --enable vcs --disable links --disable anchors --disable ids --disable matrix --disable external --disable codepaths --disable spans --disable hostpaths --disable diagrams --disable versions --disable pins --disable immutable --disable commits --disable planning --disable tracked $(if $(STAGED),--staged,--range $(RANGE))
+
+.PHONY: doc-commits
+doc-commits: ## Commit-Message-Traceability via Modul commits; RANGE=base..head (DC-FA-COMMITS-001)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --enable commits --disable links --disable anchors --disable ids --disable matrix --disable external --disable codepaths --disable spans --disable hostpaths --disable diagrams --disable versions --disable pins --disable immutable --disable vcs --disable planning --disable tracked --range $(RANGE)
+
+.PHONY: doc-planning
+doc-planning: ## Planning-Lifecycle-Konsistenz (Roadmap <-> in-progress) via Modul planning; hermetisch, ohne Range (DC-FA-PLAN-001)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --enable planning --disable links --disable anchors --disable ids --disable matrix --disable external --disable codepaths --disable spans --disable hostpaths --disable diagrams --disable versions --disable pins --disable immutable --disable vcs --disable commits --disable tracked
+
+.PHONY: doc-tracked
+doc-tracked: ## Getrackt-Status aufloesbarer Referenz-Ziele via Modul tracked; braucht .git im Mount, ohne Range (DC-FA-TRK-001)
+	docker run --rm --network none -v "$(CURDIR):/repo:ro" $(DCHECK_REF) --enable tracked --disable links --disable anchors --disable ids --disable matrix --disable external --disable codepaths --disable spans --disable hostpaths --disable diagrams --disable versions --disable pins --disable immutable --disable vcs --disable commits --disable planning
+
+.PHONY: doc-help
+doc-help: ## diese Liste der doc-*-Targets
+	@grep -hE '^doc-[a-z-]+:.*## ' $(MAKEFILE_LIST) | sort | sed -E 's/:.*## /  /'

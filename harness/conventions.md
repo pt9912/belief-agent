@@ -109,8 +109,10 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
 
 - **Datum:** 2026-06-22
 - **Geltungsbereich:** `.d-check.yml`, `d-check.mk`.
-- **Adaption:** Statt des im Template gepinnten d-check `v0.8.0` wird die
-  aktuelle Version **`v0.23.0`** adoptiert (Digest-Pin in `d-check.mk`).
+- **Adaption:** Statt des im Template gepinnten d-check `v0.8.0` wird
+  aktuell **`v0.37.1`** adoptiert. `d-check.mk` ist tool-generiert
+  (`d-check --print-mk`); der Digest-Pin lebt als `DCHECK_DIGEST`
+  (`sha256:3bbdb19b…`) im `Makefile` und sticht den Tag.
   Die `.d-check.yml` wird mit `d-check --suggest-config ai-harness`
   (repo-bewusst) generiert statt von Hand. Das `ids`-Modul nutzt für die
   Lastenheft-Anforderungen die kanonische Regex `LH-(FA-[A-Z]+|QA)-\d+`
@@ -123,8 +125,8 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   offline-Gate (`--network none`) mit; die Config soll werkzeug-generiert
   und damit driftarm bleiben. Die LH-Regex-Anpassung folgt zwingend aus
   `MR-002`.
-- **Auflösungs-Trigger:** Re-Pin bei d-check-Upgrade (neuer Digest in
-  `d-check.mk`); ansonsten permanent.
+- **Auflösungs-Trigger:** Re-Pin bei d-check-Upgrade (`d-check.mk` neu via
+  `--print-mk`, neuer `DCHECK_DIGEST` im `Makefile`); ansonsten permanent.
 
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 
