@@ -10,10 +10,11 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Welle-01 ist abgeschlossen** (siehe [Abgeschlossene Wellen](#abgeschlossene-wellen)).
-Nächste Welle: **welle-02-evidenz-audit** — der Start-Trigger „welle-01 done"
-ist erfüllt; die Welle-Datei und die `open/`-Slices werden bei Aufnahme
-angelegt.
+**Keine aktive Welle.** Welle-01 ist abgeschlossen (siehe
+[Abgeschlossene Wellen](#abgeschlossene-wellen)); **welle-02-evidenz-audit** ist
+in Vorbereitung — der Start-Trigger „welle-01 done" ist erfüllt, Welle-Datei
+und `open/`-Slices folgen. Der Ruhe-Marker weicht, sobald der erste Slice in
+`in-progress/` liegt (Modul `planning`).
 
 ## Nächste Wellen
 

@@ -1,17 +1,18 @@
 # .d-check.yml — generiert mit `d-check --suggest-config ai-harness --id-prefix LH`
 # (repo-bewusst, Baseline v1.3.0) und getunt gemäß harness/conventions.md:
-#   MR-002: kanonisches FA/QA-Schema; LH-ids-Regex LH-(FA-<BEREICH>|QA)
-#          (RTM-/suggest-config-kompatibel).
-#   MR-004: link-policy always -> prose (Inline-Code-IDs bleiben befreit).
+#   MR-002: kanonisches FA/QA-Schema; LH-ids-Regex LH-(FA-<BEREICH>|QA).
+#   MR-004: link-policy prose (Inline-Code-IDs befreit); d-check v0.37.1;
+#           Modul-Auswahl erweitert (2026-07-04, MR-006):
+#           hermetisch aktiv + spans, hostpaths, tracked, planning.
+#           git-Range-Module (nur via doc-immutable/doc-commits, NICHT im
+#           Default-doc-check — inert ohne Range): vcs, commits.
 # Beratend erzeugt, geprüft und verengt.
 
 scan:
   roots: [spec, docs, harness]
-  # Wiederkehrende Vorlagen bleiben co-located im Repo; ihre Platzhalter
-  # (#<anker>, NNNN, <state>) dürfen den Gate nicht röten (Templates-README).
   ignore: ["**/*.template.md", ".tmp/**"]
 
-modules: [links, anchors, ids, matrix, codepaths]
+modules: [links, anchors, ids, matrix, codepaths, spans, hostpaths, tracked, planning]
 
 ids:
   scope:
@@ -33,23 +34,57 @@ ids:
       target: docs/plan/planning/
       link-policy: prose
       exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
-    # Carveouts: target setzen, sobald der erste CO-NNN existiert
-    # - regex: 'CO-\d{3}'
-    #   target: docs/plan/carveouts/
-    #   link-policy: prose
-    #   exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+    # Carveout-CO-IDs werden in Inline-Code zitiert (prose befreit); Pattern
+    # bleibt aus, um keine Prosa-Linkpflicht einzuführen.
 
 matrix:
   classes:
     - {name: spec-straten, paths: [spec/lastenheft.md, spec/spezifikation.md, spec/architecture.md]}
     - {name: adr, paths: ["docs/plan/adr/[0-9]*.md"]}
-    - {name: slice, paths: ["docs/plan/planning/**/slice-*.md"]}
+    - name: slice
+      paths: ["docs/plan/planning/**/slice-*.md"]
+      token: 'slice-\d{3}'   # Slice-Kennung im ADR-/Spec-Körper = Token-Referenz → matrix-forbidden
   rules:
     - {from: spec-straten, to: adr, allow: false}
     - {from: spec-straten, to: slice, allow: false}
+    - {from: adr, to: slice, allow: false}   # ADRs sind stabiler als Slices; kein Abwärtsverweis (Hard Rule 3.4-Geist)
   status:
     forbidden: [superseded, deprecated]
   exclude-sections: [Historie, "7. Historie", Geschichte]
 
 codepaths:
   exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+
+# Host-lokale absolute Pfade dürfen nicht in die Doku lecken (Maschinen-Layout).
+hostpaths:
+  prefixes: ["home", "Users", "Development"]
+
+# Link-Ziele müssen git-getrackt sein; bewusst untrackte Ziele ausnehmen.
+tracked:
+  exempt-targets: ["build/**", "**/build/**", "harness/image-hash.txt"]
+
+# Roadmap-↔-Slice-Lifecycle: Ruhe-Marker „Keine aktive Welle" im
+# „## Aktuelle Welle"-Block genau dann, wenn kein slice-* in in-progress/ liegt.
+planning:
+  roadmap: docs/plan/planning/in-progress/roadmap.md
+
+# --- git-Range-Module (opt-in, NICHT in modules; via doc-immutable/doc-commits) ---
+
+# Maschinelle Durchsetzung von Hard Rule 3.5: Accepted-ADRs sind immutabel
+# (Core ohne Geschichte-Sektion unverändert über eine Commit-Range).
+vcs:
+  paths: ["docs/plan/adr/[0-9]*.md"]
+  immutable-when: '^\*\*Status:\*\* Accepted'
+  exclude-sections: [Geschichte]
+  status-line: '^\*\*Status:\*\*'
+  head-allow: '^\*\*Status:\*\* (Accepted|Superseded by ADR-[0-9]{4})'
+
+# Traceability: jede Commit-Message trägt eine LH-/ADR-/MR-/slice-Kennung.
+commits:
+  id-patterns:
+    - 'LH-(FA-[A-Z]+|QA)-\d+'
+    - 'ADR-\d{4}'
+    - 'MR-\d{3}'
+    - 'CO-\d{3}'
+    - 'slice-\d+'
+  exempt-pattern: '^(Merge |Revert )'

@@ -54,12 +54,17 @@ Kein Lauf-Status (der lebt in CI). Strukturell rote Gates → Carveout in
 
 | Target | Vertrag | Bindung |
 |---|---|---|
-| `make doc-check` | Doku-Referenzen: lokale Links + Heading-Anker auflösbar (d-check `links`/`anchors`) | Reproduzierbarkeit: Image-Digest `sha256:3bbdb19b…` (v0.37.1, `MR-004`) |
+| `make doc-check` | Doku-Referenzen + Hygiene (d-check `links`/`anchors`/`ids`/`matrix`/`codepaths`/`spans`/`hostpaths`/`tracked`/`planning`) | Digest `sha256:3bbdb19b…` (v0.37.1, `MR-004`/`MR-006`) |
 | `make build` | Reproduzierbarer KMP-Build aller Module (multi-stage Dockerfile, Base digest-gepinnt) | `ADR-0002`/`ADR-0003`; Modul 14 |
 | `make test` | Deterministische Tests (`LH-QA-03`) im Docker-Build | `LH-FA-BEL-001`/`LH-FA-BEL-003` |
 | `make coverage-gate` | Line-Coverage ≥ Stufen-Minimum (Kover `koverVerify`) | Schwelle `ADR-0004` (bootstrap-aware 90 % → 95 % bei M2) |
 | `make arch-check` | Kern importiert kein Adapter/Framework (a-check `domain`-Rolle + `tech`-leak) | `ADR-0001`/`ADR-0003`; a-check v0.10.0 (`MR-005`) |
 | `make gates` | bündelt alle aktuell lauffähigen Gates (`doc-check` + `build` + `test` + `coverage-gate` + `arch-check`) | — |
+
+**CI-/Range-Gates** (`MR-006`, brauchen `RANGE=base..head`, laufen **nicht** im
+lokalen `make gates`): `make doc-immutable` (`vcs` — Accepted-ADRs immutabel,
+maschinelle Hard Rule 3.5), `make doc-commits` (`commits` — Traceability-Kennung
+je Commit).
 
 **Aktueller Lauf-Status:** lokal `make gates` (CI-Badge folgt mit
 CI-Slice).

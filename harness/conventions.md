@@ -145,6 +145,26 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   Multi-Modul-Ausbau (welle-02) paket-spezifisch erweitern (der Guard erzwingt
   Korrektheit).
 
+### MR-006 — d-check-Modul-Auswahl erweitert (v0.37.1)
+
+- **Datum:** 2026-07-04
+- **Geltungsbereich:** `.d-check.yml`, `d-check.mk`-Targets.
+- **Adaption:** Zusätzlich zu `links/anchors/ids/matrix/codepaths` sind im
+  hermetischen `make doc-check` aktiv: **spans** (offene Code-Spans /
+  verschachtelte Links), **hostpaths** (Host-Pfad-Leak; `prefixes`
+  `home/Users/Development`), **tracked** (Link-Ziele git-getrackt),
+  **planning** (Roadmap-↔-Slice-Lifecycle: Ruhe-Marker „Keine aktive Welle"
+  gdw. kein `slice-*` in `in-progress/`). Als **git-Range-Targets** (nicht im
+  Default-Gate, brauchen `RANGE=base..head`): **vcs** (`make doc-immutable` —
+  Accepted-ADRs immutabel, maschinelle Durchsetzung von Hard Rule 3.5) und
+  **commits** (`make doc-commits` — Traceability-Kennung je Commit:
+  `LH`/`ADR`/`MR`/`CO`/`slice`).
+- **Begründung:** Analog zur d-check-Eigen-Config (Dogfooding-Referenz). Nicht
+  übernommen: `versions` (keine `version.md`), `diagrams`/`immutable`/`pins`/
+  `external`.
+- **Auflösungs-Trigger:** permanent; Modulwahl bei d-check-Upgrade
+  re-evaluieren.
+
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 
 Über die vier kanonischen Bindung-Klassen (ADR, Carveout, Schwelle,

@@ -109,6 +109,10 @@ Gates, Modul 13):
 | `make gates` | alle aktuell lauffähigen Gates (`doc-check` + `build` + `test` + `coverage-gate` + `arch-check`) |
 | `make help` | verfügbare Targets anzeigen |
 
+Range-basiert (CI, nicht im lokalen `make gates`; `MR-006`): `make doc-immutable`
+(Accepted-ADR-Immutabilität, Hard Rule 3.5), `make doc-commits`
+(Commit-Traceability).
+
 Geplant (entstehen mit den nächsten Slices, dann hier ergänzen):
 `make lint`, `make ci`, `make fullbuild`.
 
