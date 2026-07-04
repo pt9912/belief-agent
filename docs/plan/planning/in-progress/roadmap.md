@@ -12,9 +12,9 @@ Wellen-Schätzung, nicht Treiber.
 
 **Keine aktive Welle.** Welle-01 ist abgeschlossen (siehe
 [Abgeschlossene Wellen](#abgeschlossene-wellen)); **welle-02-evidenz-audit** ist
-in Vorbereitung — der Start-Trigger „welle-01 done" ist erfüllt, Welle-Datei
-und `open/`-Slices folgen. Der Ruhe-Marker weicht, sobald der erste Slice in
-`in-progress/` liegt (Modul `planning`).
+aufgesetzt — Welle-Datei [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md)
+und `slice-005`..`slice-008` liegen in `open/`. Der Ruhe-Marker weicht, sobald
+der erste Slice in `in-progress/` liegt (Modul `planning`).
 
 ## Nächste Wellen
 
@@ -75,3 +75,4 @@ flowchart LR
 | 2026-07-04 | Meilensteine entkoppelt: M2/M3-Vorab-Bindung an noch nicht existierende Wellen entfernt (Je-Slice-Entscheidung); M1-Trigger auf beobachtbaren Zustand geschärft | Regelwerk Modul 06: keine Phantom-Bindung, beobachtbare Trigger |
 | 2026-07-04 | Welle-01 abgeschlossen (Status `done`, Slices → `done/`); M1 erreicht; `CO-001` (arch-check) angelegt | Closure-Trigger erfüllt; `make gates` grün, Review durchgeführt |
 | 2026-07-04 | `CO-001` aufgelöst: a-check v0.10.0 (fail-closed-Fix); `arch-check` verdrahtet, `make gates` = 5 Gates | Upstream-Fix des gemeldeten KMP-Falsch-negativ |
+| 2026-07-04 | welle-02-evidenz-audit aufgesetzt (`slice-005`..`slice-008` in `open/`); d-check-Module erweitert (`MR-006`) + `version.md` | welle-01 done → nächste Welle |

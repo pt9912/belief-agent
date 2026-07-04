@@ -12,7 +12,7 @@ scan:
   roots: [spec, docs, harness]
   ignore: ["**/*.template.md", ".tmp/**"]
 
-modules: [links, anchors, ids, matrix, codepaths, spans, hostpaths, tracked, planning]
+modules: [links, anchors, ids, matrix, codepaths, spans, hostpaths, tracked, planning, versions]
 
 ids:
   scope:
@@ -67,6 +67,14 @@ tracked:
 # „## Aktuelle Welle"-Block genau dann, wenn kein slice-* in in-progress/ liegt.
 planning:
   roadmap: docs/plan/planning/in-progress/roadmap.md
+
+# Gepinnte ghcr-Versions-Tags müssen die aktuelle Version aus version.md#aktuell
+# tragen (wir pinnen primär per Digest; greift, sobald ein :vX.Y.Z-Tag-Pin in
+# den Live-Docs steht). version.md selbst ist die Quelle und ausgenommen.
+versions:
+  pin-pattern: 'ghcr\.io/[^\s:]+:(v[0-9]+\.[0-9]+\.[0-9]+)'
+  current-from: version.md#aktuell
+  exempt-paths: [CHANGELOG.md, "docs/plan/planning/done/**", spec/lastenheft.md, "docs/reviews/**"]
 
 # --- git-Range-Module (opt-in, NICHT in modules; via doc-immutable/doc-commits) ---
 
