@@ -6,6 +6,7 @@
 
 plugins {
     kotlin("multiplatform")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 kotlin {

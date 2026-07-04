@@ -30,3 +30,7 @@ build: ## Reproduzierbarer Build aller Module (Dockerfile-Stage build)
 .PHONY: test
 test: ## Deterministische Tests (LH-QA-03, Dockerfile-Stage test)
 	docker build --target test -t $(IMAGE):test .
+
+.PHONY: coverage
+coverage: ## Test-Coverage messen (Kover; Report — Gate-Schwelle waere ADR-pflichtig, Modul 13)
+	@docker build --progress=plain --target coverage -t $(IMAGE):coverage . 2>&1 | grep -iE 'line coverage' || true

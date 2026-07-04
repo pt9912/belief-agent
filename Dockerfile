@@ -24,3 +24,7 @@ RUN gradle --no-daemon --console=plain :hexagon:domain:assemble
 # --- test: deterministische Tests (LH-QA-03) -------------------------------
 FROM build AS test
 RUN gradle --no-daemon --console=plain :hexagon:domain:allTests
+
+# --- coverage: Kover Line-Coverage-Report (Modul 13; Report, kein Gate) -----
+FROM build AS coverage
+RUN gradle --no-daemon --console=plain :hexagon:domain:koverLog
