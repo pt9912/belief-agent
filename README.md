@@ -46,3 +46,7 @@ gehandelt — andernfalls wird Information gesammelt oder eskaliert.
   digest-gepinnt). Code-Gates wachsen mit dem Code.
 - **Auditierbarkeit:** Entscheidungen in [`docs/plan/adr/`](docs/plan/adr/),
   Planung in [`docs/plan/planning/`](docs/plan/planning/).
+
+## Lizenz
+
+MIT — siehe [`LICENSE`](LICENSE).
