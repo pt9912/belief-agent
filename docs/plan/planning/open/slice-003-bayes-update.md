@@ -5,16 +5,18 @@
 
 **Welle:** [`welle-01-belief-kern`](../welle-01-belief-kern.md).
 
-**Bezug:** `LH-FA-OBS-003`, `LH-FA-OBS-005`, `LH-QA-03`; `ADR-0001`;
-`ARC-02`.
+**Bezug:** `LH-FA-OBS-003`, `LH-FA-OBS-005`, `LH-QA-03`; `ADR-0001`,
+`ADR-0002`, `ADR-0003`; `ARC-01`, `ARC-02`.
 
-**Autor:** offen. **Datum:** 2026-07-04.
+**Autor:** pt9912. **Datum:** 2026-07-04.
 
 ---
 
 ## 1. Ziel
 
-Ein **bayesianisches Belief-Update** in der Belief-Engine (`ARC-02`):
+Ein **bayesianisches Belief-Update** als reine Domänen-Regel in
+`hexagon:domain` (`ARC-01`; die application-Slice *belief-aktualisieren*,
+`ARC-02`, speist die Likelihoods später über den LLM-Port):
 `Posterior ∝ Prior × Likelihood` (`LH-FA-OBS-003`), das den bisherigen
 Belief **nicht überschreibt/verwirft**, sondern fortschreibt, und das bei
 jeder Beobachtung **auch die Resthypothese** über deren Likelihood bewertet
@@ -24,16 +26,17 @@ dieser Welle.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-OBS-003` erfüllt: Update ist `Posterior ∝ Prior × Likelihood`,
-      nicht-überschreibend; Test mit bekanntem Prior/Likelihood → erwarteter,
-      wieder normierter Posterior (deterministisch, `LH-QA-03`).
-- [ ] `LH-FA-OBS-005` erfüllt: die Resthypothese erhält bei jeder
-      Beobachtung eine Likelihood und Masse; Test referenziert.
-- [ ] Ergebnis-Belief ist gültig und normiert (Wiederverwendung der
-      Validierung aus `slice-002`).
-- [ ] Update ist Kern-lokal (`ARC-02`), framework-frei (`ADR-0001`),
-      deterministisch bei gegebenen Likelihoods (`LH-QA-03`).
-- [ ] `make gates` grün.
+- [x] `LH-FA-OBS-003` erfüllt: `BayesUpdate.posterior` = `Posterior ∝ Prior ×
+      Likelihood`, nicht-überschreibend (neuer `BeliefState`, Prior
+      unverändert); Tests mit bekanntem Prior/Likelihood → erwarteter,
+      renormierter Posterior (`BayesUpdateTest`, deterministisch `LH-QA-03`).
+- [x] `LH-FA-OBS-005` erfüllt: die Resthypothese erhält eine eigene Likelihood
+      und Masse; Test referenziert.
+- [x] Ergebnis-Belief gültig und normiert (Wiederverwendung `BeliefState.of`
+      aus `slice-002`); `posterior_ist_normiert`-Test.
+- [x] Update im Domain-Modul `hexagon:domain`, framework-frei
+      (`ADR-0001`/`ADR-0003`), deterministisch (`LH-QA-03`).
+- [x] `make gates` grün (`make build`/`make test` im Docker).
 - [ ] Closure-Notiz mit Steering-Loop-Lerneintrag.
 
 ## 3. Plan (vor Code)
@@ -46,7 +49,8 @@ dieser Welle.
 
 ## 4. Trigger
 
-`slice-002` done (gültiger, normierter Belief State + Validierung vorhanden).
+`slice-002`-Validierung geliefert (normierter `BeliefState` erzwungen).
+`slice-002` ist `in-progress`; das blockiert `slice-003` nicht (Substrat da).
 
 ## 5. Closure-Trigger
 
