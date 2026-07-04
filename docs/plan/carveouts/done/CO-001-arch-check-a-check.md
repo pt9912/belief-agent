@@ -9,7 +9,7 @@
 **Geltungsbereich:** `hexagon:domain` und künftige Kern-Module (HexSlice
 domain/application/ports).
 
-**Folge-Slice:** [`welle-01-belief-kern`](../planning/welle-01-belief-kern.md)
+**Folge-Slice:** [`welle-01-belief-kern`](../../planning/welle-01-belief-kern.md)
 (neuer Slice wird beim Auflösungs-Trigger angelegt).
 
 ---

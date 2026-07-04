@@ -5,13 +5,13 @@ Aktive Carveouts mit Auflösungs-Trigger. Aufgelöste Carveouts wandern nach
 
 ## Aktive Carveouts
 
-| ID | Gate | Kurztitel | Auflösungs-Trigger | Letzte Prüfung |
-|---|---|---|---|---|
-| [CO-001](CO-001-arch-check-a-check.md) | `arch-check` | a-check-KMP-Falsch-negativ, Upstream ausstehend | a-check-Fix oder dokumentiertes KMP-Rezept | 2026-07-04 |
+(keine)
 
 ## Aufgelöste Carveouts
 
-(noch keine)
+| ID | Gate | Kurztitel | Aufgelöst | Wie |
+|---|---|---|---|---|
+| [CO-001](done/CO-001-arch-check-a-check.md) | `arch-check` | a-check-KMP-Falsch-negativ | 2026-07-04 | a-check v0.10.0 fail-closed-Guard + KMP-Rezept; `arch-check` verdrahtet + grün |
 
 ## Konventionen
 
