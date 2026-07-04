@@ -38,6 +38,7 @@ class BeliefState private constructor(
          * Erzeugt einen **gültigen, normierten** Belief State und weist
          * ungültige Zustände zurück (LH-FA-BEL-004):
          *  - jede Wahrscheinlichkeit ≥ 0,
+         *  - eindeutige Hypothesen-IDs (Menge, LH-FA-BEL-001),
          *  - Σ(Hypothesen) + Resthypothese = 1 innerhalb [NORMIERUNGS_TOLERANZ]
          *    (LH-FA-BEL-002).
          * Die Resthypothese ist ohnehin Konstruktor-Pflicht (LH-FA-BEL-003).
@@ -50,6 +51,10 @@ class BeliefState private constructor(
                 require(h.wahrscheinlichkeit >= 0.0) {
                     "Hypothese '${h.id.wert}' hat negative Wahrscheinlichkeit: ${h.wahrscheinlichkeit}"
                 }
+            }
+            val ids = hypothesen.map { it.id }
+            require(ids.toSet().size == ids.size) {
+                "Hypothesen-IDs müssen eindeutig sein (Menge, LH-FA-BEL-001): ${ids.map { it.wert }}"
             }
             val summe = hypothesen.sumOf { it.wahrscheinlichkeit } + resthypothese.wahrscheinlichkeit
             require(abs(summe - 1.0) <= NORMIERUNGS_TOLERANZ) {

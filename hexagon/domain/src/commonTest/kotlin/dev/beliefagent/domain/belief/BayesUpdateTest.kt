@@ -102,4 +102,15 @@ class BayesUpdateTest {
             BayesUpdate.posterior(p, Likelihoods(mapOf(a to 0.0, b to 0.0), resthypothese = 0.0))
         }
     }
+
+    @Test
+    fun unbekannte_likelihood_id_wird_abgelehnt() { // Review-Befund 2
+        val p = prior()
+        assertFailsWith<IllegalArgumentException> {
+            BayesUpdate.posterior(
+                p,
+                Likelihoods(mapOf(a to 0.5, b to 0.3, HypotheseId("X") to 0.1), resthypothese = 0.1),
+            )
+        }
+    }
 }

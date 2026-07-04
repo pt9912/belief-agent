@@ -76,4 +76,17 @@ class NormierungTest {
             )
         }
     }
+
+    @Test
+    fun doppelte_hypothese_id_wird_zurueckgewiesen() { // LH-FA-BEL-001 (Menge, Review-Befund 1)
+        assertFailsWith<IllegalArgumentException> {
+            BeliefState.of(
+                hypothesen = listOf(
+                    Hypothese(HypotheseId("A"), 0.4),
+                    Hypothese(HypotheseId("A"), 0.4),
+                ),
+                resthypothese = Resthypothese(0.2),
+            )
+        }
+    }
 }

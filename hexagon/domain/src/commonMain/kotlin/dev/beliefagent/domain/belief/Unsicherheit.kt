@@ -4,7 +4,9 @@ import kotlin.math.ln
 
 /**
  * Unsicherheitsmaße über einen [BeliefState] (LH-FA-BEL-008). Reine
- * Domänen-Funktionen; die Resthypothese zählt als eigene Masse mit.
+ * Domänen-Funktionen. Die Resthypothese zählt als eigene Masse mit: sie ist
+ * laut LH-FA-BEL-003 selbst eine Hypothese („keine der genannten / unbekannt")
+ * und damit ein legitimer Kandidat für „die wahrscheinlichsten Hypothesen".
  */
 
 /**

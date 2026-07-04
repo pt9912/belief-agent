@@ -16,13 +16,19 @@ object BayesUpdate {
      * Posterior-Belief aus [prior] und [likelihoods], renormiert auf Σp = 1
      * (Validierung via [BeliefState.of]).
      *
-     * Wirft [IllegalArgumentException], wenn eine Likelihood fehlt oder negativ
-     * ist oder die Gesamtmasse `Σ(Prior × Likelihood)` null ist (dann ist kein
-     * normierbarer Posterior definierbar).
+     * Wirft [IllegalArgumentException], wenn eine Likelihood fehlt, für eine
+     * unbekannte Hypothese angegeben oder negativ ist, oder die Gesamtmasse
+     * `Σ(Prior × Likelihood)` null ist (dann ist kein normierbarer Posterior
+     * definierbar).
      */
     fun posterior(prior: BeliefState, likelihoods: Likelihoods): BeliefState {
         require(likelihoods.resthypothese >= 0.0) {
             "Resthypothesen-Likelihood ist negativ: ${likelihoods.resthypothese}"
+        }
+        val bekannteIds = prior.hypothesen.map { it.id }.toSet()
+        val unbekannte = likelihoods.proHypothese.keys - bekannteIds
+        require(unbekannte.isEmpty()) {
+            "Likelihoods für unbekannte Hypothesen: ${unbekannte.map { it.wert }}"
         }
 
         val unnormierteHypothesen: List<Pair<HypotheseId, Double>> = prior.hypothesen.map { h ->
