@@ -39,7 +39,7 @@ erster Code-Slice zusätzlich das minimale KMP-Gradle-Skelett
 |---|---|---|---|
 | `slice-001` | Domain-Typen: Hypothese, Belief State, Resthypothese | in-progress | `LH-FA-BEL-001`, `LH-FA-BEL-003` |
 | `slice-002` | Normierung + Validierung (Resthypothese-Pflicht, Toleranz) | in-progress | `LH-FA-BEL-002`, `LH-FA-BEL-004` |
-| `slice-003` | Bayes-Update (Posterior ∝ Prior × Likelihood), nicht-überschreibend | open | `LH-FA-OBS-003`, `LH-FA-OBS-005` |
+| `slice-003` | Bayes-Update (Posterior ∝ Prior × Likelihood), nicht-überschreibend | in-progress | `LH-FA-OBS-003`, `LH-FA-OBS-005` |
 | `slice-004` | Unsicherheitsmaße + Re-Hypothesen-Auslöser | open | `LH-FA-BEL-005`, `LH-FA-BEL-008` |
 
 ## 5. Abhängigkeiten
