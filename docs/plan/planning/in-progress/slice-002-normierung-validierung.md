@@ -64,7 +64,11 @@ State wird nachweislich zurückgewiesen, `LH-FA-BEL-004`).
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** Validierung im `BeliefState.of` (Normierung +
+Nicht-Negativität), Toleranz `1e-9` als `LH-OP-05`-Default. **Review-Nachlauf:**
+Eindeutigkeit der Hypothesen-IDs ergänzt (Befund 1, `LH-FA-BEL-001` „Menge").
+**Steering-Loop:** Domänen-Invarianten am Typ erzwingen — kein ungültiger
+Belief State konstruierbar. **Offen:** —
 
 ## 8. Sub-Area-Modus-Begründung
 

@@ -1,6 +1,6 @@
 # Welle welle-01-belief-kern: Belief-Kern
 
-**Status:** in-progress
+**Status:** done
 
 **Zielmeilenstein:** M1 — Belief-Kern lauffähig.
 
@@ -31,16 +31,16 @@ der Folge-Wellen aufsetzen.
 
 ## 4. Slices in dieser Welle
 
-Als Slice-Dateien in `open/` angelegt (2026-07-04). `slice-001` bündelt als
-erster Code-Slice zusätzlich das minimale KMP-Gradle-Skelett
-(`ADR-0002`-Folgepflicht). Zuschnitt:
+Alle Slices geliefert, reviewt und nach `done/` geschlossen (2026-07-04).
+`slice-001` brachte zusätzlich das KMP-Gradle-Multi-Modul-Skelett
+(`ADR-0002`/`ADR-0003`). Zuschnitt:
 
 | Slice | Titel | Status | Bezug |
 |---|---|---|---|
-| `slice-001` | Domain-Typen: Hypothese, Belief State, Resthypothese | in-progress | `LH-FA-BEL-001`, `LH-FA-BEL-003` |
-| `slice-002` | Normierung + Validierung (Resthypothese-Pflicht, Toleranz) | in-progress | `LH-FA-BEL-002`, `LH-FA-BEL-004` |
-| `slice-003` | Bayes-Update (Posterior ∝ Prior × Likelihood), nicht-überschreibend | in-progress | `LH-FA-OBS-003`, `LH-FA-OBS-005` |
-| `slice-004` | Unsicherheitsmaße + Re-Hypothesen-Auslöser | in-progress | `LH-FA-BEL-005`, `LH-FA-BEL-008` |
+| `slice-001` | Domain-Typen: Hypothese, Belief State, Resthypothese | done | `LH-FA-BEL-001`, `LH-FA-BEL-003` |
+| `slice-002` | Normierung + Validierung (Resthypothese-Pflicht, Toleranz) | done | `LH-FA-BEL-002`, `LH-FA-BEL-004` |
+| `slice-003` | Bayes-Update (Posterior ∝ Prior × Likelihood), nicht-überschreibend | done | `LH-FA-OBS-003`, `LH-FA-OBS-005` |
+| `slice-004` | Unsicherheitsmaße + Re-Hypothesen-Auslöser | done | `LH-FA-BEL-005`, `LH-FA-BEL-008` |
 
 ## 5. Abhängigkeiten
 
@@ -56,8 +56,12 @@ erster Code-Slice zusätzlich das minimale KMP-Gradle-Skelett
 
 ## 7. Closure-Notiz
 
-(Erst nach Welle-Abschluss füllen; Verweis auf
-`done/welle-01-belief-kern-results.md`.)
+Welle-01 abgeschlossen (2026-07-04): gültiger, normierter Belief State +
+deterministisches, nicht-überschreibendes Bayes-Update, plus Unsicherheitsmaße
+und Re-Hypothesen-Auslöser. 30 deterministische Tests, Line-Coverage 94,83 %
+(`ADR-0004`-Gate ≥ 90 %), `make gates` grün. Review durchgeführt (3 Befunde
+adressiert). **Rest:** `arch-check` via `CO-001` ausgesetzt (a-check-Antwort
+ausstehend). Ergebnisse: `done/welle-01-belief-kern-results.md`.
 
 ## 8. Sub-Area-Modus-Begründung
 

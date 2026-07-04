@@ -10,16 +10,10 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Welle-ID:** [`welle-01-belief-kern`](../welle-01-belief-kern.md)
-**Start:** 2026-07-04 (Trigger erfüllt) — Status `in-progress`
-**Geplantes Ende:** Schätzung folgt mit Slice-Priorisierung
-
-**Closure-Trigger:** siehe Welle-Datei — gültiger, normierter Belief State
-mit Resthypothese und deterministisch testbarem Bayes-Update.
-
-**Trigger (Welle startet):** ADR-0001 `Accepted`; Implementierungssprache
-via eigenem ADR entschieden (`LH-RB-04`). — **Erfüllt 2026-07-04**
-(`ADR-0001` & `ADR-0002` Accepted).
+**Welle-01 ist abgeschlossen** (siehe [Abgeschlossene Wellen](#abgeschlossene-wellen)).
+Nächste Welle: **welle-02-evidenz-audit** — der Start-Trigger „welle-01 done"
+ist erfüllt; die Welle-Datei und die `open/`-Slices werden bei Aufnahme
+angelegt.
 
 ## Nächste Wellen
 
@@ -41,7 +35,7 @@ in `done/` sind.
 
 | Meilenstein | Welle(n)/Slice(s) | Trigger (beobachtbar) | Status |
 |---|---|---|---|
-| M1 — Belief-Kern lauffähig | welle-01 (`slice-001`..`slice-004`) | ungültiger Belief State wird nachweislich zurückgewiesen (`LH-FA-BEL-004`) **und** deterministisches Bayes-Update grün (`make test`) | offen |
+| M1 — Belief-Kern lauffähig | welle-01 (`slice-001`..`slice-004`) | ungültiger Belief State wird nachweislich zurückgewiesen (`LH-FA-BEL-004`) **und** deterministisches Bayes-Update grün (`make test`) | **erreicht (2026-07-04)** |
 
 **Ausblick (unverbindlich, noch ohne Wellen-Bindung):** vollständiger
 Entscheidungszyklus (Gate + VoI + Eskalation) und Sprachmodell-Anbindung sind
@@ -67,7 +61,9 @@ flowchart LR
 
 ## Abgeschlossene Wellen
 
-(noch keine)
+| Welle | Abgeschlossen | Ergebnis |
+|---|---|---|
+| [`welle-01-belief-kern`](../welle-01-belief-kern.md) | 2026-07-04 | M1 erreicht; 30 Tests, 94,83 % Coverage; [Ergebnisse](../done/welle-01-belief-kern-results.md). Rest: `CO-001` (arch-check). |
 
 ## Historische Trigger-Verschiebungen
 
@@ -76,3 +72,4 @@ flowchart LR
 | 2026-06-22 | Initiale Roadmap (Bootstrap) | — |
 | 2026-07-04 | Welle-01 gestartet (Status `in-progress`); Slices `slice-001`..`slice-004` in `open/` angelegt | Start-Trigger erfüllt: `ADR-0001` & `ADR-0002` Accepted |
 | 2026-07-04 | Meilensteine entkoppelt: M2/M3-Vorab-Bindung an noch nicht existierende Wellen entfernt (Je-Slice-Entscheidung); M1-Trigger auf beobachtbaren Zustand geschärft | Regelwerk Modul 06: keine Phantom-Bindung, beobachtbare Trigger |
+| 2026-07-04 | Welle-01 abgeschlossen (Status `done`, Slices → `done/`); M1 erreicht; `CO-001` (arch-check) angelegt | Closure-Trigger erfüllt; `make gates` grün, Review durchgeführt |

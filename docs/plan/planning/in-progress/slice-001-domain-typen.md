@@ -91,7 +91,13 @@ DoD vollständig + PR gemerged + Closure-Notiz geschrieben; Datei nach
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** KMP-Multi-Modul-Skelett + Domänentypen sauber; `make
+build`/`make test` im Docker grün. **Anders als geplant:** Architektur auf
+HexSlice (`ADR-0003`) umgestellt, plain-Single-Modul → **KMP-Multi-Modul**,
+Paket `dev.beliefagent.domain.belief`. **Steering-Loop:** a-check-KMP-Falsch-
+negativ entdeckt → `CO-001`; d-check auf v0.37.1 gehoben. **Offen/Folge:**
+`arch-check` via `CO-001` (a-check-Antwort ausstehend); `gradle.lockfile`
+zurückgestellt.
 
 ## 8. Sub-Area-Modus-Begründung
 

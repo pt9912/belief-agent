@@ -67,7 +67,11 @@ DoD vollständig + PR gemerged + Closure-Notiz geschrieben; Datei nach
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** `BayesUpdate.posterior` nicht-überschreibend, renormiert
+via `BeliefState.of` (Posterior per Konstruktion gültig). **Review-Nachlauf:**
+Ablehnung unbekannter Likelihood-IDs ergänzt (Befund 2). **Steering-Loop:**
+Renormierung an `BeliefState.of` delegiert → keine Doppel-Validierung. **Offen:**
+LLM-Speisung der Likelihoods = Welle-05.
 
 ## 8. Sub-Area-Modus-Begründung
 

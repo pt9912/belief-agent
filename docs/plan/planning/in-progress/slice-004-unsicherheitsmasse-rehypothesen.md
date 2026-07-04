@@ -68,7 +68,11 @@ DoD vollständig + PR gemerged + Closure-Notiz geschrieben; Datei nach
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** Entropie + Top-2-Abstand + Re-Hypothesen-Auslöser
+(konfigurierbare Schwelle, Default `0.5`). **Review-Nachlauf:** Resthypothese
+als Masse bestätigt (`LH-FA-BEL-003` — sie ist selbst eine Hypothese).
+**Steering-Loop:** Maße als reine Extension-Funktionen gut testbar. **Offen:**
+inhaltliche Hypothesen-Erzeugung über LLM-Port = Welle-05.
 
 ## 8. Sub-Area-Modus-Begründung
 
