@@ -68,11 +68,13 @@ tracked:
 planning:
   roadmap: docs/plan/planning/in-progress/roadmap.md
 
-# Gepinnte ghcr-Versions-Tags müssen die aktuelle Version aus version.md#aktuell
-# tragen (wir pinnen primär per Digest; greift, sobald ein :vX.Y.Z-Tag-Pin in
-# den Live-Docs steht). version.md selbst ist die Quelle und ausgenommen.
+# Nur das EIGENE Image gegen version.md#aktuell prüfen (Dogfooding). Fremde
+# Tool-Images (d-check/a-check/…) werden per Digest gepinnt und NICHT hier
+# verglichen — das pin-pattern ist bewusst auf ghcr.io/pt9912/belief-agent
+# verengt (sonst Fehlzündung auf einen Fremd-Tag-Ref). No-op bis wir ein
+# eigenes Image mit :vX.Y.Z-Tag veröffentlichen.
 versions:
-  pin-pattern: 'ghcr\.io/[^\s:]+:(v[0-9]+\.[0-9]+\.[0-9]+)'
+  pin-pattern: 'ghcr\.io/pt9912/belief-agent:(v[0-9]+\.[0-9]+\.[0-9]+)'
   current-from: version.md#aktuell
   exempt-paths: [CHANGELOG.md, "docs/plan/planning/done/**", spec/lastenheft.md, "docs/reviews/**"]
 
