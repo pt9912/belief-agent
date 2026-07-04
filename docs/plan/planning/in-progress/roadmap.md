@@ -10,11 +10,9 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** Welle-01 ist abgeschlossen (siehe
-[Abgeschlossene Wellen](#abgeschlossene-wellen)); **welle-02-evidenz-audit** ist
-aufgesetzt — Welle-Datei [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md)
-und `slice-005`..`slice-008` liegen in `open/`. Der Ruhe-Marker weicht, sobald
-der erste Slice in `in-progress/` liegt (Modul `planning`).
+**Aktuelle Welle: [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md)** —
+Evidenz-Aufnahme + Audit. `slice-005` (Domänentypen) in Arbeit (`in-progress/`);
+`slice-006`..`slice-008` in `open/`. Start-Trigger „welle-01 done" erfüllt.
 
 ## Nächste Wellen
 

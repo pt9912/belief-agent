@@ -37,7 +37,7 @@ In `open/` angelegt (2026-07-04):
 
 | Slice | Titel | Status | Bezug |
 |---|---|---|---|
-| `slice-005` | Domain: Beobachtung/Quelle/Evidenz + Ereignis-Typen | open | `LH-FA-OBS-006`, `LH-FA-AUD-001` |
+| `slice-005` | Domain: Beobachtung/Quelle/Evidenz + Ereignis-Typen | in-progress | `LH-FA-OBS-006`, `LH-FA-AUD-001` |
 | `slice-006` | Dedup korrelierter Beobachtungen | open | `LH-FA-OBS-004` |
 | `slice-007` | Ereignisprotokoll + Belief-Rekonstruktion + Audit-Port | open | `LH-FA-AUD-001`, `LH-FA-AUD-002`, `LH-FA-AUD-003` |
 | `slice-008` | Belief-Update-Pipeline (application `belief-aktualisieren`) + Ports + Fake-Adapter | open | `LH-FA-OBS-001`, `LH-FA-OBS-002` |
