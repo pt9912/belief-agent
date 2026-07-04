@@ -11,8 +11,19 @@ Wellen-Schätzung, nicht Treiber.
 ## Aktuelle Welle
 
 **Aktuelle Welle: [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md)** —
-Evidenz-Aufnahme + Audit. `slice-005` (Domänentypen) in Arbeit (`in-progress/`);
-`slice-006`..`slice-008` in `open/`. Start-Trigger „welle-01 done" erfüllt.
+Evidenz-Aufnahme + Audit.
+
+- `slice-005` (Domänentypen Beobachtung/Quelle/Evidenz/Ereignis) **geliefert**
+  (`make gates` grün, 36 Tests); liegt in `in-progress/` bis Welle-Closure.
+- **⇒ Resume-Punkt: `slice-006`** — Dedup korrelierter Beobachtungen
+  (`LH-FA-OBS-004`), reine Domänen-Regel in `hexagon:domain`. Plan liegt in
+  `open/`; Kriterium: gleiche `Quelle` + `Evidenz`-Signatur → nicht doppelt
+  zählen. Workflow: `git mv` slice-006 nach `in-progress/`, implementieren,
+  `make gates`, committen (der Ruhe-Marker bleibt weg — slice-005 ist schon in
+  `in-progress/`).
+- Danach: `slice-007` (Ereignisprotokoll + Belief-Rekonstruktion, `LH-FA-AUD`),
+  `slice-008` (Update-Pipeline — erster `hexagon:application`-/`adapters:*`-
+  Ausbau; dort a-check-`resolution` paket-spezifisch erweitern).
 
 ## Nächste Wellen
 
