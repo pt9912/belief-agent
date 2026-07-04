@@ -23,13 +23,14 @@ Eskalation angefordert). Noch **ohne** Protokoll-Logik (slice-007) und Dedup
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-OBS-006` erfüllt: `Beobachtung` trägt `Quelle` + `Zeitstempel`; Test.
-- [ ] `LH-FA-AUD-001` erfüllt: `Ereignis` als sealed-Typ deckt die geforderten
-      Ereignisarten ab; Test referenziert.
-- [ ] Typen in `hexagon:domain` (`commonMain`), framework-frei; `Zeitstempel`
-      als reiner Wert (kein `Clock`-Aufruf im Typ).
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz.
+- [x] `LH-FA-OBS-006` erfüllt: `Beobachtung` trägt `Quelle` + `Zeitstempel`;
+      `BeobachtungTest`.
+- [x] `LH-FA-AUD-001` erfüllt: `Ereignis` (sealed) deckt die sechs
+      Ereignisarten ab, je mit `Zeitstempel` (`LH-FA-AUD-004`); `EreignisTest`.
+- [x] Typen in `hexagon:domain` (`commonMain`), framework-frei; `Zeitstempel`
+      reiner, ordnender Wert (kein `Clock`-Aufruf im Typ).
+- [x] `make gates` grün (5 Gates inkl. `arch-check`/`coverage-gate`).
+- [ ] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
