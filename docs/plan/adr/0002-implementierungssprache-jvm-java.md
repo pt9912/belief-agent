@@ -1,6 +1,6 @@
 # ADR-0002: Implementierungssprache und Plattform — Kotlin Multiplatform (JVM-Ziel zuerst)
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Datum:** 2026-06-22
 
@@ -143,3 +143,4 @@ Sensors-Roster). Das `a-check`-Gate wird analog zu `d-check`
 | 2026-06-22 | Proposed (Entscheidung: Java auf der JVM, Micronaut am Rand) | Bootstrap → Workflow-Übergang (Trigger welle-01) |
 | 2026-06-23 | Bezug an Lastenheft v0.4 angepasst: `LH-RB-04` nennt nur noch die JVM; Sprach-/Framework-Begründung auf technische Merit umgestellt (Status bleibt Proposed) | Review spec/architecture |
 | 2026-07-04 | Entscheidung von „Java auf der JVM" auf **Kotlin Multiplatform (JVM-Ziel zuerst)** geändert (Status bleibt Proposed): `commonMain` erzwingt den framework-freien Kern strukturell; das JVM-Ziel erfüllt `LH-RB-04` unverändert; DI am Rand auf **Koin** (KMP-fähig) statt Micronaut; `arch-check` über das Harness-Tool `a-check` statt ArchUnit; weitere KMP-Ziele zurückgestellt (Re-Eval-Trigger). Dateiname (`…-jvm-java`) als numerische ADR-Identität beibehalten. | Diskussion Sprachwahl |
+| 2026-07-04 | **Accepted** — Sprach-/Plattform-Entscheidung final (`LH-RB-04` erfüllt); erfüllt den Start-Trigger für `welle-01-belief-kern`. Ab hier immutable (Korrekturen nur als neue ADR mit `Supersedes ADR-0002`). | Freigabe |

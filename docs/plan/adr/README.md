@@ -2,8 +2,8 @@
 
 | ID | Titel | Status | Bezug |
 |---|---|---|---|
-| [0001](0001-hexagonal-llm-port.md) | Hexagonale Architektur — LLM als austauschbarer Port, Entscheidungslogik im Kern | Proposed | `LH-FA-LLM-001` |
-| [0002](0002-implementierungssprache-jvm-java.md) | Implementierungssprache und Plattform — Kotlin Multiplatform (JVM-Ziel zuerst) | Proposed | `LH-RB-04` |
+| [0001](0001-hexagonal-llm-port.md) | Hexagonale Architektur — LLM als austauschbarer Port, Entscheidungslogik im Kern | Accepted | `LH-FA-LLM-001` |
+| [0002](0002-implementierungssprache-jvm-java.md) | Implementierungssprache und Plattform — Kotlin Multiplatform (JVM-Ziel zuerst) | Accepted | `LH-RB-04` |
 
 ## Konventionen
 

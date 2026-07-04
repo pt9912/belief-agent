@@ -1,6 +1,6 @@
 # ADR-0001: Hexagonale Architektur — LLM als austauschbarer Port, Entscheidungslogik im Kern
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Datum:** 2026-06-22
 
@@ -94,3 +94,4 @@ Port-Vertrag sich als unzureichend erweist.
 |---|---|---|
 | 2026-06-22 | Proposed | Bootstrap (Modul 2, Schritt 8) |
 | 2026-07-04 | Fitness-Function-Werkzeug auf das Harness-Arch-Gate `a-check` festgelegt (statt sprachabhängiger ArchUnit/Linter-Liste); Bindung an ADR-0002 (Kotlin Multiplatform) | Diskussion Sprachwahl |
+| 2026-07-04 | **Accepted** — Architektur-Entscheidung final; erfüllt den Start-Trigger für `welle-01-belief-kern`. Ab hier immutable (Korrekturen nur als neue ADR mit `Supersedes ADR-0001`). | Freigabe |
