@@ -15,7 +15,7 @@ help: ## Targets anzeigen
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | \
 		awk 'BEGIN {FS = ":.*?## "}; {printf "  %-14s %s\n", $$1, $$2}'
 
-gates: doc-check build test ## alle aktuell lauffähigen Gates
+gates: doc-check build test coverage-gate ## alle aktuell lauffähigen Gates
 
 # --- Code-Gates: KMP/HexSlice via multi-stage Dockerfile (Modul 14). ---
 # Einstiegspunkt bleibt make; die Toolchain lebt im Dockerfile (kein Host-JDK,
@@ -32,5 +32,9 @@ test: ## Deterministische Tests (LH-QA-03, Dockerfile-Stage test)
 	docker build --target test -t $(IMAGE):test .
 
 .PHONY: coverage
-coverage: ## Test-Coverage messen (Kover; Report — Gate-Schwelle waere ADR-pflichtig, Modul 13)
+coverage: ## Test-Coverage messen (Kover; Report)
 	@docker build --progress=plain --target coverage -t $(IMAGE):coverage . 2>&1 | grep -iE 'line coverage' || true
+
+.PHONY: coverage-gate
+coverage-gate: ## Coverage-Schwelle pruefen (Kover koverVerify; Schwelle ADR-0004)
+	docker build --target coverage-gate -t $(IMAGE):coverage-gate .

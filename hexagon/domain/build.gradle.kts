@@ -19,3 +19,15 @@ kotlin {
         }
     }
 }
+
+kover {
+    reports {
+        verify {
+            rule {
+                // Bootstrap-aware Line-Coverage-Schwelle (ADR-0004): 90 % ab M1,
+                // Hochschaltung auf 95 % bei M2.
+                minBound(90)
+            }
+        }
+    }
+}
