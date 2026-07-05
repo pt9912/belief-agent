@@ -1,5 +1,6 @@
 # .d-check.yml — generiert mit `d-check --suggest-config ai-harness --id-prefix LH`
-# (repo-bewusst, Baseline v1.3.0) und getunt gemäß harness/conventions.md:
+# (repo-bewusst, Baseline v1.4.0 — Bump v1.3.0→v1.4.0, MR-007) und getunt gemäß
+# harness/conventions.md:
 #   MR-002: kanonisches FA/QA-Schema; LH-ids-Regex LH-(FA-<BEREICH>|QA).
 #   MR-004: link-policy prose (Inline-Code-IDs befreit); d-check v0.37.1;
 #           Modul-Auswahl erweitert (2026-07-04, MR-006):
@@ -10,9 +11,11 @@
 
 # Ganzes Repo scannen (auch README/AGENTS/version.md im Root), Code-/Build-/
 # Template-Artefakte ausgenommen (analog d-check-Referenz `roots: ["."]`, MR-006).
+# Vendored Regelwerk-Baseline (.harness/baseline/**, MR-007) trägt Fremdinhalt
+# mit hunderten Upstream-Links → aus dem Scan genommen (sonst Fehlzündungen).
 scan:
   roots: ["."]
-  ignore: ["**/*.template.md", ".tmp/**", "**/build/**", "**/.gradle/**"]
+  ignore: ["**/*.template.md", ".tmp/**", "**/build/**", "**/.gradle/**", ".harness/baseline/**", ".harness/cache/**"]
 
 modules: [links, anchors, ids, matrix, codepaths, spans, hostpaths, tracked, planning, versions]
 

@@ -5,6 +5,10 @@
 fix.patch
 # Scratch / d-check-Ignore-Wurzel
 .tmp/
+# Vendored Regelwerk-Baseline ist COMMITTET (.harness/baseline/, MR-007);
+# nur ephemere Harness-Nebenprodukte ignorieren (Templates bleiben co-located,
+# MR-008 — kein Template-Cache).
+.harness/cache/
 
 # --- JVM / Java (Zielplattform laut LH-RB-04) ---
 # Build-Ausgaben
