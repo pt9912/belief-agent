@@ -32,10 +32,13 @@ Evidenz-Aufnahme + Audit.
   gates` grün; arch-check **echt durchsetzend** über domain+application via
   a-check **v0.11.0**, negativ-getestet — `CO-001`-Klasse **ohne Carveout**
   aufgelöst). Liegt in `in-progress/` bis Welle-Closure.
-- **⇒ Resume-Punkt: `slice-009`** — Pipeline `belief-aktualisieren` + LLM-/Uhr-
-  Port + Fake-LLM (`LH-FA-OBS-002`). Plan liegt in `open/`.
-- Danach: `slice-010` (Beobachtungs-Port + Quelle-Adapter + E2E-Persistenz,
-  `LH-FA-OBS-001`; **schließt welle-02**).
+- `slice-009` (Pipeline `belief-aktualisieren` + LLM-/Uhr-Port + Fake-LLM,
+  `LH-FA-OBS-002`) **geliefert** (`make gates` grün, 67 Tests; erstes
+  `adapters:*`-Modul `llm-fake`, arch-check echt über drei Module). Liegt in
+  `in-progress/` bis Welle-Closure.
+- **⇒ Resume-Punkt: `slice-010`** — Beobachtungs-Port + Quelle-Adapter +
+  E2E-Persistenz (Audit-Port-Impl), `LH-FA-OBS-001`; **schließt welle-02**. Plan
+  liegt in `open/`.
 
 ## Nächste Wellen
 
@@ -101,3 +104,4 @@ flowchart LR
 | 2026-07-05 | `slice-007` geliefert (Ereignisprotokoll + Rekonstruktion, `LH-FA-AUD-001`/`002`/`003`); Audit-Port nach `slice-008` verschoben (Weg C); Resume-Punkt → `slice-008` | `make gates` grün (59 Tests, 97,37 % Coverage); Audit-Port ist anwendungsweiter Port → application-Schicht (`architecture.md` §2), nicht Domäne; slice-007 bleibt reiner domain-Slice |
 | 2026-07-05 | `slice-008` zerlegt (Modul 5, zu groß): `slice-008` (Fundament: Modul + Audit-Port + Multi-Modul-`arch-check`), `slice-009` (Pipeline), `slice-010` (Quelle + E2E) | 7 DoD-Punkte über mehrere Schichten + Multi-Modul-a-check-Risiko → nicht in einer Sitzung lieferbar; Schnitt nach Lieferwert; a-check-Risiko zuerst isoliert retiren |
 | 2026-07-05 | `slice-008` (Fundament) geliefert; a-check v0.10.0 → **v0.11.0** (Multi-Modul-KMP-Resolution, `MR-005`); Resume-Punkt → `slice-009` | v0.10.0 konnte Multi-Modul nicht durchsetzen (Guard-Reject bzw. falsch-grün, negativ-getestet); Fix-Prompt an a-check → v0.11.0 löst datei-mengen-bewusst auf, echt durchsetzend; kein Carveout |
+| 2026-07-05 | `slice-009` (Pipeline `belief-aktualisieren`) geliefert; erstes `adapters:*`-Modul `llm-fake`; Resume-Punkt → `slice-010` | `make gates` grün (67 Tests); Use-Case + LLM-/Uhr-Port + Fake-LLM; arch-check echt über domain/application/adapters (a-check v0.11.0, Adapter-Root ergänzt) |

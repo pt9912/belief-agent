@@ -24,16 +24,22 @@ kommt über einen **Uhr-Port** (Fake in Tests) — kein `Clock` im Kern. Erster
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-OBS-002` (Kern) erfüllt: eine Beobachtung erzeugt nachvollziehbar
-      ein Belief-Update **und** Protokoll-Einträge; E2E-nah gegen den Fake-LLM
-      getestet, deterministisch (`LH-QA-03`).
-- [ ] **LLM-Port** lokal beim Use-Case (HexSlice); Fake-LLM-Adapter
-      (`adapters/outbound/llm-fake`) liefert deterministische Likelihoods.
-- [ ] **Uhr-Port** liefert `Zeitstempel` (Fake-Uhr in Tests) — kein
-      `Clock`-Aufruf im Kern.
-- [ ] Ports lokal beim Use-Case; Kern importiert keinen Adapter (`arch-check`
-      grün, `ADR-0001`/`ADR-0003`); DI (Koin) nur am Adapter-Rand.
-- [ ] `make gates` grün.
+- [x] `LH-FA-OBS-002` (Kern) erfüllt: `BeliefAktualisieren.ausfuehren` dedupt
+      (slice-006) → `LlmPort`-Likelihoods → `BayesUpdate` (slice-003) → Posterior
+      + `BeobachtungErfasst`/`BeliefAktualisiert`-Ereignisse; **E2E-nah** gegen
+      den echten `FakeLlm` getestet (`FakeLlmTest`), deterministisch (`LH-QA-03`).
+- [x] **LLM-Port** lokal beim Use-Case (`…/aktualisieren/ports/LlmPort.kt`);
+      Fake-LLM-Adapter `adapters/outbound/llm-fake` (`FakeLlm`) liefert
+      deterministische Likelihoods (Evidenz nennt Hypothese → hohe Likelihood).
+- [x] **Uhr-Port** (`…/ports/UhrPort.kt`) liefert `Zeitstempel` (Fake-Uhr in
+      Tests) — kein `Clock`-Aufruf in Domäne/Application.
+- [x] Ports lokal beim Use-Case; Kern importiert keinen Adapter (`arch-check`
+      grün **über drei Module**, `ADR-0001`/`ADR-0003`). DI: noch kein
+      Composition-Root (cli später) → Konstruktor-Injektion in Tests; Koin folgt
+      mit dem Composition-Root.
+- [x] `make gates` grün (5 Gates; 67 Tests). Coverage-Gate auf `hexagon:domain`;
+      application/adapter sind test-abgedeckt, aber noch nicht gate-scoped
+      (Follow-up-ADR, wenn mehr application-Logik da ist).
 - [ ] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)

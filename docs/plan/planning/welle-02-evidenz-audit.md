@@ -42,7 +42,7 @@ zerlegt (Modul 5, zu groß → `slice-008`/`009`/`010`).
 | `slice-006` | Dedup korrelierter Beobachtungen | in-progress (geliefert) | `LH-FA-OBS-004` |
 | `slice-007` | Ereignisprotokoll + Belief-Rekonstruktion | in-progress (geliefert) | `LH-FA-AUD-001`/`002`/`003` |
 | `slice-008` | Fundament: `hexagon:application`-Modul + Audit-Port + Multi-Modul-`arch-check` | open | `LH-FA-AUD-001`, `ARC-06` |
-| `slice-009` | Belief-Update-Pipeline (`belief-aktualisieren`) + LLM-/Uhr-Port + Fake-LLM | open | `LH-FA-OBS-002` |
+| `slice-009` | Belief-Update-Pipeline (`belief-aktualisieren`) + LLM-/Uhr-Port + Fake-LLM | in-progress (geliefert) | `LH-FA-OBS-002` |
 | `slice-010` | Beobachtungs-Port + Quelle-Adapter + E2E-Persistenz | open | `LH-FA-OBS-001` |
 
 ## 5. Abhängigkeiten
