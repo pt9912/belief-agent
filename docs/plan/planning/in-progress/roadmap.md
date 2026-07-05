@@ -10,12 +10,16 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle** (kein `slice-*` in `in-progress/`).
-`welle-02-evidenz-audit` ist **abgeschlossen** (2026-07-05;
-[Ergebnisse](../done/welle-02-evidenz-audit-results.md), Slices `005`..`010` in
-`done/`). **[`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md) ist
-aufgesetzt** — Plan + `slice-011`/`012`/`013` liegen in `open/`; die Welle wird
-**aktiv**, sobald `slice-011` nach `in-progress/` startet (Welle für Welle).
+**Aktuelle Welle: [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md)** —
+Aktionen + Konfidenz-Gate (die Sicherheitsfunktion, `MR-003`).
+(welle-02 abgeschlossen, siehe §Abgeschlossene Wellen.)
+
+- **⇒ Resume-Punkt: `slice-011`** (in `in-progress/`) — Domäne: `Aktion` + vier
+  `Wirkungsklasse`n + Erfolgswahrscheinlichkeit + Evidenz-Referenz
+  (`LH-FA-ACT-001`..`004`).
+- Danach: `slice-012` (Konfidenz-Gate-Regel, `LH-FA-POL-001`/`002`/`003`/`005`/
+  `007`), `slice-013` (aktion-gaten + Human-Approval-Port, `LH-FA-POL-004`/`006`;
+  schließt welle-03).
 
 ## Nächste Wellen
 
