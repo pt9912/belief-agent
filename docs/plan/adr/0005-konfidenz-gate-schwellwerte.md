@@ -1,6 +1,6 @@
 # ADR-0005: Konfidenz-Gate — Default-Schwellwerte je Wirkungsklasse + Resthypothese-Sperre
 
-**Status:** Proposed
+**Status:** Accepted
 
 **Datum:** 2026-07-05
 
@@ -70,7 +70,11 @@ Masse — dann ist der Zustand zu unsicher für Irreversibles.
 ## Konsequenzen
 
 - Positiv: die Sicherheits-Schwellen sind an *einer* begründeten Stelle; das
-  Gate ist deterministisch testbar (`LH-QA-03`) inkl. Grenzfällen.
+  Gate ist deterministisch testbar (`LH-QA-03`) inkl. Grenzfällen. Der
+  `GateSchwellen`-Konstruktor **erzwingt** Monotonie über die Wirkungsklassen
+  und `resthypotheseSperrschwelle < 1` fail-closed — eine fehlkonfigurierte
+  Safety-Inversion (extern-wirksam laxer als reversibel) bzw. eine abgeschaltete
+  POL-005-Sperre ist **nicht konstruierbar** (Code-Review-Nachlauf).
 - Negativ: die konkreten Werte sind eine Setzung; ohne Feld-Daten kalibriert.
 - Folgepflicht: `GateSchwellen`-Defaults in `hexagon:domain`; deterministische
   Tests je Ausgang + Grenzfall; die menschliche Freigabe (`LH-FA-POL-004`) und
@@ -81,7 +85,8 @@ Masse — dann ist der Zustand zu unsicher für Irreversibles.
 
 | Tooling | Regel | Make-Target |
 |---|---|---|
-| Kotlin-Tests (`KonfidenzGateTest`) | irreversible Aktion bei Resthypothese > Sperr-Schwelle wird **nie** freigegeben | `make test` |
+| `GateSchwellen`-Konstruktor | Erfolgs-Schwellen monoton nicht-fallend über die Wirkungsklassen; `resthypotheseSperrschwelle < 1` (fail-closed) | `make test` |
+| Kotlin-Tests (`KonfidenzGateTest`) | irreversible Aktion bei Resthypothese > Sperr-Schwelle wird **nie** freigegeben; invertierte/Sperre-abschaltende Config wird abgewiesen | `make test` |
 
 ## Re-Evaluierungs-Trigger
 
@@ -94,3 +99,4 @@ bzw. ein regulatorischer Freigabe-Zwang hinzukommt.
 | Datum | Ereignis | Verweis |
 |---|---|---|
 | 2026-07-05 | Proposed — Gate-Schwellen + Resthypothese-Sperre | slice-012 |
+| 2026-07-05 | **Accepted** — nach Code-Review: `GateSchwellen` erzwingt Monotonie + Sperr-Schwelle `< 1` (fail-closed); ab hier immutable | Review slice-012 |

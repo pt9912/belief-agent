@@ -18,20 +18,37 @@ sealed interface GateEntscheidung {
 /**
  * Konfigurierbare Schwellen des Konfidenz-Gates (LH-FA-POL-003/007). Default-Werte
  * begründet in `ADR-0005`: Mindest-Erfolgswahrscheinlichkeit je [Wirkungsklasse]
- * (nur-lesend ohne wirksame Schwelle), steigend mit der Reichweite, plus die
- * [resthypotheseSperrschwelle] für irreversible Aktionen (LH-FA-POL-005). Alle
- * Werte in `[0,1]`.
+ * (nur-lesend ohne wirksame Schwelle), **monoton steigend mit der Reichweite**,
+ * plus die [resthypotheseSperrschwelle] für irreversible Aktionen (LH-FA-POL-005).
+ *
+ * Der Konstruktor erzwingt die **Sicherheits-Invarianten** fail-closed (`MR-003`):
+ * alle Werte in `[0,1]`; die Erfolgs-Schwellen **monoton nicht-fallend**
+ * (nur-lesend ≤ arbeitsbereich-lokal ≤ repository-wirksam ≤ extern-wirksam) — sonst
+ * ließe sich die *gefährlichste* Klasse laxer konfigurieren als eine reversible;
+ * und die [resthypotheseSperrschwelle] **echt < 1** — sonst wäre die POL-005-
+ * Sperre (Vergleich `> Schwelle`) stumm abgeschaltet. Der Default ist an
+ * [ReHypothesenAusloeser.STANDARD_SCHWELLWERT] gekoppelt (eine Quelle für „0,5").
  */
 data class GateSchwellen(
     val nurLesend: Double = 0.0,
     val arbeitsbereichLokal: Double = 0.5,
     val repositoryWirksam: Double = 0.7,
     val externWirksam: Double = 0.9,
-    val resthypotheseSperrschwelle: Double = 0.5,
+    val resthypotheseSperrschwelle: Double = ReHypothesenAusloeser.STANDARD_SCHWELLWERT,
 ) {
     init {
         listOf(nurLesend, arbeitsbereichLokal, repositoryWirksam, externWirksam, resthypotheseSperrschwelle)
             .forEach { require(it in 0.0..1.0) { "Gate-Schwelle muss in [0,1] liegen: $it" } }
+        require(nurLesend <= arbeitsbereichLokal && arbeitsbereichLokal <= repositoryWirksam &&
+            repositoryWirksam <= externWirksam) {
+            "Erfolgs-Schwellen müssen monoton mit der Reichweite steigen " +
+                "(nur-lesend ≤ arbeitsbereich-lokal ≤ repository-wirksam ≤ extern-wirksam): " +
+                "$nurLesend/$arbeitsbereichLokal/$repositoryWirksam/$externWirksam"
+        }
+        require(resthypotheseSperrschwelle < 1.0) {
+            "resthypotheseSperrschwelle muss < 1 sein, sonst ist die POL-005-Sperre " +
+                "abgeschaltet: $resthypotheseSperrschwelle"
+        }
     }
 
     /** Mindest-Erfolgswahrscheinlichkeit für die Freigabe einer Aktion dieser [klasse]. */
@@ -66,8 +83,10 @@ object KonfidenzGate {
         belief: BeliefState,
         schwellen: GateSchwellen = GateSchwellen(),
     ): GateEntscheidung {
-        // LH-FA-POL-005 (fail-safe, zuerst): irreversible Aktion bei hoher
-        // Resthypothese wird nie freigegeben — eskalieren.
+        // LH-FA-POL-005 (fail-safe, ZUERST — bewusst vor der Schwellenprüfung):
+        // irreversible Aktion bei hoher Resthypothese wird nie freigegeben. Greift
+        // auch bei niedriger Erfolgs-P, dann überschattet Eskalation die Ablehnung
+        // (Unsicherheit → Mensch; Vorrang durch Test gepinnt).
         if (aktion.wirkungsklasse.irreversibel &&
             belief.resthypothese.wahrscheinlichkeit > schwellen.resthypotheseSperrschwelle
         ) {

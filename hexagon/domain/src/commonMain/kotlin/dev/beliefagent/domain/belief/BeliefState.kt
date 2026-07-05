@@ -10,7 +10,16 @@ import kotlin.math.abs
  */
 data class Resthypothese(
     val wahrscheinlichkeit: Double,
-)
+) {
+    init {
+        // Defense-in-Depth: der Wert liegt auf dem Fail-safe-Pfad des Konfidenz-
+        // Gates (LH-FA-POL-005). NaN/Bereich hier abfangen, nicht nur in
+        // [BeliefState.of] — sonst hinge die Sicherheits-Invariante an einer Fabrik.
+        require(wahrscheinlichkeit in 0.0..1.0) {
+            "Resthypothese-Wahrscheinlichkeit muss in [0,1] liegen: $wahrscheinlichkeit"
+        }
+    }
+}
 
 /**
  * Belief State über konkurrierende Hypothesen (LH-FA-BEL-001) mit

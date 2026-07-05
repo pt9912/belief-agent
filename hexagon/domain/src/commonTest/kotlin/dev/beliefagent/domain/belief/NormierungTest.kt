@@ -89,4 +89,10 @@ class NormierungTest {
             )
         }
     }
+
+    @Test
+    fun resthypothese_ausserhalb_einheitsintervall_wird_abgewiesen() { // Review #5 (Defense-in-Depth)
+        assertFailsWith<IllegalArgumentException> { Resthypothese(1.5) }
+        assertFailsWith<IllegalArgumentException> { Resthypothese(-0.1) }
+    }
 }

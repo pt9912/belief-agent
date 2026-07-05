@@ -76,4 +76,33 @@ class KonfidenzGateTest {
     fun ungueltige_schwelle_wird_abgewiesen() {
         assertFailsWith<IllegalArgumentException> { GateSchwellen(externWirksam = 1.5) }
     }
+
+    @Test
+    fun nicht_monotone_schwellen_werden_abgewiesen() { // Review #1: Safety-Inversion
+        // extern-wirksam laxer als repository-wirksam -> gefährlichste Klasse zu leicht.
+        assertFailsWith<IllegalArgumentException> {
+            GateSchwellen(repositoryWirksam = 0.7, externWirksam = 0.1)
+        }
+    }
+
+    @Test
+    fun sperrschwelle_von_eins_wird_abgewiesen() { // Review #2: POL-005-Sperre nicht abschaltbar
+        assertFailsWith<IllegalArgumentException> { GateSchwellen(resthypotheseSperrschwelle = 1.0) }
+    }
+
+    @Test
+    fun irreversibel_hohe_resthypothese_niedrige_erfolgs_p_wird_eskaliert() { // Review #3: Vorrang
+        // Beide Bedingungen greifen (Sperre UND unter Schwelle) -> Eskalation hat Vorrang.
+        assertTrue(
+            KonfidenzGate.bewerte(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.05), belief(0.6)) is GateEntscheidung.Eskalation,
+        )
+    }
+
+    @Test
+    fun gruende_belegen_die_entscheidung() { // Review #4: Audit-Grund geprüft
+        val ablehnung = KonfidenzGate.bewerte(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.1), belief(0.1))
+        assertTrue(ablehnung is GateEntscheidung.Ablehnung && "LH-FA-POL-002/003" in ablehnung.grund)
+        val eskalation = KonfidenzGate.bewerte(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.99), belief(0.9))
+        assertTrue(eskalation is GateEntscheidung.Eskalation && "LH-FA-POL-005" in eskalation.grund)
+    }
 }
