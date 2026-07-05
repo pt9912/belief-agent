@@ -36,9 +36,14 @@ Evidenz-Aufnahme + Audit.
   `LH-FA-OBS-002`) **geliefert** (`make gates` grün, 67 Tests; erstes
   `adapters:*`-Modul `llm-fake`, arch-check echt über drei Module). Liegt in
   `in-progress/` bis Welle-Closure.
-- **⇒ Resume-Punkt: `slice-010`** — Beobachtungs-Port + Quelle-Adapter +
-  E2E-Persistenz (Audit-Port-Impl), `LH-FA-OBS-001`; **schließt welle-02**. Plan
-  liegt in `open/`.
+- `slice-010` (Beobachtungs-Port + Quelle-Adapter + E2E-Persistenz,
+  `LH-FA-OBS-001`) **geliefert** (`make gates` grün, 71 Tests; E2E
+  `Quelle→Update→Protokoll→Persistenz→Rekonstruktion` grün). Liegt in
+  `in-progress/` bis Welle-Closure.
+- **⇒ Resume-Punkt: welle-02-Closure** — alle Slices `005`..`010` geliefert,
+  Closure-Trigger erfüllt (E2E-Spur grün). Closure: Closure-Notizen je Slice,
+  Slices → `done/`, Lerneintrag in `done/welle-02-evidenz-audit-results.md`,
+  Roadmap auf welle-03.
 
 ## Nächste Wellen
 
@@ -105,3 +110,4 @@ flowchart LR
 | 2026-07-05 | `slice-008` zerlegt (Modul 5, zu groß): `slice-008` (Fundament: Modul + Audit-Port + Multi-Modul-`arch-check`), `slice-009` (Pipeline), `slice-010` (Quelle + E2E) | 7 DoD-Punkte über mehrere Schichten + Multi-Modul-a-check-Risiko → nicht in einer Sitzung lieferbar; Schnitt nach Lieferwert; a-check-Risiko zuerst isoliert retiren |
 | 2026-07-05 | `slice-008` (Fundament) geliefert; a-check v0.10.0 → **v0.11.0** (Multi-Modul-KMP-Resolution, `MR-005`); Resume-Punkt → `slice-009` | v0.10.0 konnte Multi-Modul nicht durchsetzen (Guard-Reject bzw. falsch-grün, negativ-getestet); Fix-Prompt an a-check → v0.11.0 löst datei-mengen-bewusst auf, echt durchsetzend; kein Carveout |
 | 2026-07-05 | `slice-009` (Pipeline `belief-aktualisieren`) geliefert; erstes `adapters:*`-Modul `llm-fake`; Resume-Punkt → `slice-010` | `make gates` grün (67 Tests); Use-Case + LLM-/Uhr-Port + Fake-LLM; arch-check echt über domain/application/adapters (a-check v0.11.0, Adapter-Root ergänzt) |
+| 2026-07-05 | `slice-010` geliefert (Beobachtungs-Port + Quelle-/Audit-Adapter + E2E); **welle-02-Closure-Trigger erfüllt** | `make gates` grün (71 Tests); E2E `Quelle→Update→Protokoll→Persistenz→Rekonstruktion` demonstriert die Welle-Ziele (`LH-FA-OBS-001`/`002`, `LH-FA-AUD-002`) |

@@ -22,18 +22,21 @@ persistierten Protokoll **rekonstruierbar** (`LH-FA-AUD-002`). Schließt welle-0
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-OBS-001` erfüllt: mindestens eine Beobachtungsquelle als Adapter
-      (Fake/Test), über den **Beobachtungs-Port** angebunden.
-- [ ] `LH-FA-OBS-002` (vollständig) erfüllt: Quelle → Update **und**
-      Protokoll-Einträge, E2E gegen Fakes; Belief aus dem Protokoll
-      rekonstruierbar (`LH-FA-AUD-002`, nutzt slice-007), deterministisch
-      (`LH-QA-03`).
-- [ ] **Audit-Persistenz-Adapter** (`adapters/outbound/audit-*`) implementiert
-      den Audit-Port (slice-008) und persistiert das `EreignisProtokoll`.
-- [ ] Ports korrekt platziert (lokal/anwendungsweit); Kern importiert keinen
-      Adapter (`arch-check` grün, `ADR-0001`/`ADR-0003`).
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz.
+- [x] `LH-FA-OBS-001` erfüllt: `FakeBeobachtungsQuelle`
+      (`adapters/outbound/observation-fake`) als Beobachtungsquelle über den
+      **`BeobachtungsPort`** (`FakeBeobachtungsQuelleTest`).
+- [x] `LH-FA-OBS-002` (vollständig) erfüllt: E2E `Quelle → BeliefAktualisieren →
+      Ereignisse → MemoryAudit → Rekonstruktion` (`E2eTest`); rekonstruierter
+      Belief == Live-Posterior (`LH-FA-AUD-002`, nutzt slice-007),
+      deterministisch (`LH-QA-03`).
+- [x] **Audit-Persistenz-Adapter** `MemoryAudit`
+      (`adapters/outbound/audit-memory`) implementiert den `AuditPort`
+      (slice-008), append-only im Speicher (`MemoryAuditTest`).
+- [x] Ports korrekt platziert (`BeobachtungsPort` use-case-lokal, `AuditPort`
+      anwendungsweit); Kern importiert keinen Adapter (`arch-check` grün über
+      **5 Module**, `ADR-0001`/`ADR-0003`).
+- [x] `make gates` grün (5 Gates; 71 Tests).
+- [ ] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
