@@ -22,6 +22,14 @@ Plan + `slice-014`/`015`/`016` liegen in `open/`. **Start** = `slice-014` nach
 `in-progress` (dann Ruhe-Marker weg). Alternativ-Trigger: **welle-05** (LLM-Port),
 ebenfalls „welle-03 done".
 
+**⇒ Resume-Punkt (2026-07-06):** welle-04 **starten** — `slice-014` (VoI-Selektor,
+reine Domänen-Regel, kleiner Einstieg) `open → next → in-progress` nehmen, dann
+Ruhe-Marker auflösen. **Offen im Blick:** `slice-016` ist Teilungs-Kandidat
+(`ARC-09`-Größe **vor** Umsetzung prüfen, ggf. `beobachtung-waehlen` + `entscheidungszyklus`
+trennen); `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-Bereinigung.
+Tracked Follow-ups aus welle-03: Executor darf nur `Aktionsfreigabe.Freigegeben`
+(a-check-Regel, spätere Welle); echter Approval-Adapter mit Binding (welle-05).
+
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
@@ -98,3 +106,4 @@ flowchart LR
 | 2026-07-05 | `welle-03-aktionen-gates` **abgeschlossen** (Slices `011`..`013` → `done/`); „Aktuelle Welle" → Ruhe-Marker | Closure-Trigger erfüllt; Lerneintrag in `done/welle-03-aktionen-gates-results.md` |
 | 2026-07-05 | Coverage-Gate auf `application` + Adapter erweitert (`ADR-0006`, per-Modul kover, kein zentraler Block); Sicherheitskern `AktionGaten` jetzt gate-erzwungen | `make gates` grün; Ist-Coverage application + Adapter 100 %, domain 97,65 % → 90 %-Floor |
 | 2026-07-05 | `welle-04-voi-eskalation` **aufgesetzt** (Plan + `slice-014`/`015`/`016` in `open/`); noch nicht gestartet (Ruhe-Marker bleibt) | Trigger „welle-03 done" erfüllt; Slice-Anlage Welle für Welle (Modul 6) |
+| 2026-07-05 | **Tagesabschluss** — Resume-Punkt: welle-04 starten via `slice-014` | 3 Wellen done + Coverage-Scope (`ADR-0006`) + welle-04 aufgesetzt; alle Gates grün, Working Tree sauber |
