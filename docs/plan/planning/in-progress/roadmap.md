@@ -10,46 +10,17 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktuelle Welle: [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md)** —
-Evidenz-Aufnahme + Audit.
-
-- `slice-005` (Domänentypen Beobachtung/Quelle/Evidenz/Ereignis) **geliefert**
-  (`make gates` grün, 36 Tests); liegt in `in-progress/` bis Welle-Closure.
-- `slice-006` (Dedup korrelierter Beobachtungen, `LH-FA-OBS-004`) **geliefert**
-  (`make gates` grün, 46 Tests, Line-Coverage 96,81 %); reine Domänen-Regel
-  `Dedup` in `hexagon:domain`, Kriterium: gleiche `Quelle` + `Evidenz`
-  (Zeitstempel-unabhängig) → nicht doppelt zählen. Liegt in `in-progress/` bis
-  Welle-Closure.
-- `slice-007` (Ereignisprotokoll + Belief-Rekonstruktion,
-  `LH-FA-AUD-001`/`002`/`003`) **geliefert** (`make gates` grün, 59 Tests,
-  Line-Coverage 97,37 %); `EreignisProtokoll` (append-only, monotone
-  Zeitstempel, Vergangenheit nicht mutierbar) + `Rekonstruktion` (Replay →
-  Belief) in `hexagon:domain`. **Audit-Port → `slice-008`** (Weg C:
-  anwendungsweiter Port gehört in die application-Schicht, nicht in die Domäne).
-  Liegt in `in-progress/` bis Welle-Closure.
-- `slice-008` (Fundament: `hexagon:application`-Modul + **Audit-Port** `ARC-06`
-  + Dockerfile-Multi-Modul + Multi-Modul-`arch-check`) **geliefert** (`make
-  gates` grün; arch-check **echt durchsetzend** über domain+application via
-  a-check **v0.11.0**, negativ-getestet — `CO-001`-Klasse **ohne Carveout**
-  aufgelöst). Liegt in `in-progress/` bis Welle-Closure.
-- `slice-009` (Pipeline `belief-aktualisieren` + LLM-/Uhr-Port + Fake-LLM,
-  `LH-FA-OBS-002`) **geliefert** (`make gates` grün, 67 Tests; erstes
-  `adapters:*`-Modul `llm-fake`, arch-check echt über drei Module). Liegt in
-  `in-progress/` bis Welle-Closure.
-- `slice-010` (Beobachtungs-Port + Quelle-Adapter + E2E-Persistenz,
-  `LH-FA-OBS-001`) **geliefert** (`make gates` grün, 71 Tests; E2E
-  `Quelle→Update→Protokoll→Persistenz→Rekonstruktion` grün). Liegt in
-  `in-progress/` bis Welle-Closure.
-- **⇒ Resume-Punkt: welle-02-Closure** — alle Slices `005`..`010` geliefert,
-  Closure-Trigger erfüllt (E2E-Spur grün). Closure: Closure-Notizen je Slice,
-  Slices → `done/`, Lerneintrag in `done/welle-02-evidenz-audit-results.md`,
-  Roadmap auf welle-03.
+**Keine aktive Welle.** `welle-02-evidenz-audit` ist **abgeschlossen**
+(2026-07-05; siehe §Abgeschlossene Wellen und
+[Ergebnisse](../done/welle-02-evidenz-audit-results.md)) — die Slices `005`..`010`
+liegen in `done/`. Nächster Trigger: **welle-03** (`welle-03-aktionen-gates`);
+deren Slices werden **bei Welle-Start** in `open/` angelegt (Welle für Welle,
+keine Vorab-Slices).
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-02-evidenz-audit | welle-01 done | Beobachtungs-Aufnahme, Bayes-Update-Pipeline, Audit-/Event-Log (`LH-FA-OBS`, `LH-FA-AUD`) | M |
 | welle-03-aktionen-gates | welle-02 done | Wirkungsklassen, Konfidenz-Gate, menschliche Freigabe (`LH-FA-ACT`, `LH-FA-POL`) | M |
 | welle-04-voi-eskalation | welle-03 done | VoI-Selektor, Eskalations-Manager, Budget (`LH-FA-VOI`, `LH-FA-ESK`) | M |
 | welle-05-llm-port | welle-03 done | LLM-Port + erster Adapter, Konfidenz-Externalisierung (`LH-FA-LLM`) | L |
@@ -94,6 +65,7 @@ flowchart LR
 | Welle | Abgeschlossen | Ergebnis |
 |---|---|---|
 | [`welle-01-belief-kern`](../welle-01-belief-kern.md) | 2026-07-04 | M1 erreicht; 30 Tests, 94,83 % Coverage; [Ergebnisse](../done/welle-01-belief-kern-results.md). Rest: `CO-001` (arch-check). |
+| [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md) | 2026-07-05 | Evidenz→Belief→Audit E2E; 71 Tests, 97,37 % Coverage (domain); [Ergebnisse](../done/welle-02-evidenz-audit-results.md). a-check v0.11.0 (Multi-Modul), Regelwerk v1.4.0 vendored. |
 
 ## Historische Trigger-Verschiebungen
 
@@ -111,3 +83,4 @@ flowchart LR
 | 2026-07-05 | `slice-008` (Fundament) geliefert; a-check v0.10.0 → **v0.11.0** (Multi-Modul-KMP-Resolution, `MR-005`); Resume-Punkt → `slice-009` | v0.10.0 konnte Multi-Modul nicht durchsetzen (Guard-Reject bzw. falsch-grün, negativ-getestet); Fix-Prompt an a-check → v0.11.0 löst datei-mengen-bewusst auf, echt durchsetzend; kein Carveout |
 | 2026-07-05 | `slice-009` (Pipeline `belief-aktualisieren`) geliefert; erstes `adapters:*`-Modul `llm-fake`; Resume-Punkt → `slice-010` | `make gates` grün (67 Tests); Use-Case + LLM-/Uhr-Port + Fake-LLM; arch-check echt über domain/application/adapters (a-check v0.11.0, Adapter-Root ergänzt) |
 | 2026-07-05 | `slice-010` geliefert (Beobachtungs-Port + Quelle-/Audit-Adapter + E2E); **welle-02-Closure-Trigger erfüllt** | `make gates` grün (71 Tests); E2E `Quelle→Update→Protokoll→Persistenz→Rekonstruktion` demonstriert die Welle-Ziele (`LH-FA-OBS-001`/`002`, `LH-FA-AUD-002`) |
+| 2026-07-05 | `welle-02-evidenz-audit` **abgeschlossen** (Slices `005`..`010` → `done/`); „Aktuelle Welle" → Ruhe-Marker | Closure-Trigger erfüllt (alle Slices done, E2E grün); Lerneintrag in `done/welle-02-evidenz-audit-results.md` |

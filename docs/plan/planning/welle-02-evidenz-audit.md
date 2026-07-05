@@ -1,6 +1,6 @@
 # Welle welle-02-evidenz-audit: Evidenz-Aufnahme + Audit
 
-**Status:** in-progress
+**Status:** done
 
 **Zielmeilenstein:** kein Meilenstein-Bezug (M2 leitet sich später aus
 welle-02..04 ab).
@@ -61,8 +61,9 @@ zerlegt (Modul 5, zu groß → `slice-008`/`009`/`010`).
 
 ## 7. Closure-Notiz
 
-(Erst nach Welle-Abschluss füllen; Verweis auf
-`done/welle-02-evidenz-audit-results.md`.)
+**Abgeschlossen 2026-07-05** — Evidenz→Belief→Audit-E2E grün (`E2eTest`),
+71 Tests, alle Slices `005`..`010` in `done/`. Lerneintrag:
+[`done/welle-02-evidenz-audit-results.md`](done/welle-02-evidenz-audit-results.md).
 
 ## 8. Sub-Area-Modus-Begründung
 
