@@ -13,3 +13,5 @@ rootProject.name = "belief-agent"
 include("hexagon:domain")
 include("hexagon:application") // Use-Case-Schicht + Ports (slice-008 Fundament)
 include("adapters:outbound:llm-fake") // Fake-LLM-Adapter (slice-009)
+include("adapters:outbound:observation-fake") // Fake-Beobachtungsquelle (slice-010)
+include("adapters:outbound:audit-memory") // In-Memory-Audit-Persistenz (slice-010)
