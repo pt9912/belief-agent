@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-07-04.
+**Status:** Aktiv. **Letzte Änderung:** 2026-07-05.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -15,15 +15,17 @@ Evidenz-Aufnahme + Audit.
 
 - `slice-005` (Domänentypen Beobachtung/Quelle/Evidenz/Ereignis) **geliefert**
   (`make gates` grün, 36 Tests); liegt in `in-progress/` bis Welle-Closure.
-- **⇒ Resume-Punkt: `slice-006`** — Dedup korrelierter Beobachtungen
-  (`LH-FA-OBS-004`), reine Domänen-Regel in `hexagon:domain`. Plan liegt in
-  `open/`; Kriterium: gleiche `Quelle` + `Evidenz`-Signatur → nicht doppelt
-  zählen. Workflow: `git mv` slice-006 nach `in-progress/`, implementieren,
-  `make gates`, committen (der Ruhe-Marker bleibt weg — slice-005 ist schon in
-  `in-progress/`).
-- Danach: `slice-007` (Ereignisprotokoll + Belief-Rekonstruktion, `LH-FA-AUD`),
-  `slice-008` (Update-Pipeline — erster `hexagon:application`-/`adapters:*`-
-  Ausbau; dort a-check-`resolution` paket-spezifisch erweitern).
+- `slice-006` (Dedup korrelierter Beobachtungen, `LH-FA-OBS-004`) **geliefert**
+  (`make gates` grün, 46 Tests, Line-Coverage 96,81 %); reine Domänen-Regel
+  `Dedup` in `hexagon:domain`, Kriterium: gleiche `Quelle` + `Evidenz`
+  (Zeitstempel-unabhängig) → nicht doppelt zählen. Liegt in `in-progress/` bis
+  Welle-Closure.
+- **⇒ Resume-Punkt: `slice-007`** — Ereignisprotokoll + Belief-Rekonstruktion
+  (`LH-FA-AUD`). Plan liegt in `open/`. Workflow: `git mv` slice-007 nach
+  `in-progress/`, implementieren, `make gates`, committen (slice-005/006 bleiben
+  in `in-progress/`).
+- Danach: `slice-008` (Update-Pipeline — erster `hexagon:application`-/
+  `adapters:*`-Ausbau; dort a-check-`resolution` paket-spezifisch erweitern).
 
 ## Nächste Wellen
 
@@ -85,3 +87,4 @@ flowchart LR
 | 2026-07-04 | Welle-01 abgeschlossen (Status `done`, Slices → `done/`); M1 erreicht; `CO-001` (arch-check) angelegt | Closure-Trigger erfüllt; `make gates` grün, Review durchgeführt |
 | 2026-07-04 | `CO-001` aufgelöst: a-check v0.10.0 (fail-closed-Fix); `arch-check` verdrahtet, `make gates` = 5 Gates | Upstream-Fix des gemeldeten KMP-Falsch-negativ |
 | 2026-07-04 | welle-02-evidenz-audit aufgesetzt (`slice-005`..`slice-008` in `open/`); d-check-Module erweitert (`MR-006`) + `version.md` | welle-01 done → nächste Welle |
+| 2026-07-05 | `slice-006` geliefert (Dedup korrelierter Beobachtungen, `LH-FA-OBS-004`); Resume-Punkt → `slice-007` | `make gates` grün (46 Tests, 96,81 % Coverage); DoD erfüllt, liegt in `in-progress/` bis Welle-Closure |

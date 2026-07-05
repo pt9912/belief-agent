@@ -19,11 +19,13 @@ Beobachtungen wird auf unabhängige Evidenz reduziert, bevor sie ins Update geht
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-OBS-004` erfüllt: identische/korrelierte Beobachtungen werden
-      dedupliziert; Test mit Duplikat/Korrelat referenziert.
-- [ ] Deterministisch (`LH-QA-03`), Kern-lokal, framework-frei.
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz.
+- [x] `LH-FA-OBS-004` erfüllt: identische/korrelierte Beobachtungen werden
+      dedupliziert (gleiche `Quelle` + `Evidenz`, Zeitstempel-unabhängig);
+      `DedupTest` referenziert Duplikat **und** Korrelat.
+- [x] Deterministisch (`LH-QA-03`), Kern-lokal (`Dedup` in `hexagon:domain`,
+      `commonMain`), framework-frei (`ADR-0001`/`ADR-0003`).
+- [x] `make gates` grün (5 Gates; 46 Tests, Line-Coverage 96,81 %).
+- [ ] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
