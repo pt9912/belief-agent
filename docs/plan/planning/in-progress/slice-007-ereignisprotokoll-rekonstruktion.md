@@ -35,7 +35,7 @@ gehört in die application-Schicht, nicht in die Domäne.
 - [x] Kern-lokal (`hexagon:domain`, `commonMain`), framework-frei
       (`ADR-0001`/`ADR-0003`), deterministisch (`LH-QA-03`).
 - [x] `make gates` grün (5 Gates; 59 Tests, Line-Coverage 97,37 %).
-- [ ] Closure-Notiz (bei Welle-02-Closure).
+- [x] Closure-Notiz (bei Welle-02-Closure).
 
 **Umschnitt (Weg C):** Der ursprüngliche DoD-Punkt „Audit-Port als Interface"
 ist nach **slice-008** verschoben. Der Audit-Port ist ein **anwendungsweiter
@@ -71,7 +71,12 @@ Welle-Closure-Trigger bei (Rekonstruierbarkeit).
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** `EreignisProtokoll` append-only mit monotonen
+Zeitstempeln (Rück-Datieren abgewiesen); `Rekonstruktion` als **driftfreier**
+Replay über `BeliefAktualisiert`-Snapshots. **Steering-Loop / Entscheidung:**
+Weg C — der Audit-Port ist ein **anwendungsweiter Port** (application-Schicht),
+kein Domänentyp; nach slice-008 verschoben (`architecture.md` §2: Domain darf
+Ports nicht importieren). **Offen:** —.
 
 ## 8. Sub-Area-Modus-Begründung
 

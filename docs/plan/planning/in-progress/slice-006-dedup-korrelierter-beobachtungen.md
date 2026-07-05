@@ -25,7 +25,7 @@ Beobachtungen wird auf unabhängige Evidenz reduziert, bevor sie ins Update geht
 - [x] Deterministisch (`LH-QA-03`), Kern-lokal (`Dedup` in `hexagon:domain`,
       `commonMain`), framework-frei (`ADR-0001`/`ADR-0003`).
 - [x] `make gates` grün (5 Gates; 46 Tests, Line-Coverage 96,81 %).
-- [ ] Closure-Notiz (bei Welle-02-Closure).
+- [x] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -50,7 +50,11 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** Dedup-Signatur = `Quelle` + `Evidenz` (Zeitstempel bewusst
+ausgeklammert) — idiomatisch via `distinctBy`, reihenfolge-stabil. **Steering-
+Loop:** Die `Signatur` als benannter Typ macht das Korrelations-Kriterium
+explizit und testbar. **Offen:** komplexere Korrelationsmodelle (Folge-Slice bei
+Bedarf).
 
 ## 8. Sub-Area-Modus-Begründung
 

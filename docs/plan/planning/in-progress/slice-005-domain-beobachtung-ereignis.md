@@ -30,7 +30,7 @@ Eskalation angefordert). Noch **ohne** Protokoll-Logik (slice-007) und Dedup
 - [x] Typen in `hexagon:domain` (`commonMain`), framework-frei; `Zeitstempel`
       reiner, ordnender Wert (kein `Clock`-Aufruf im Typ).
 - [x] `make gates` grün (5 Gates inkl. `arch-check`/`coverage-gate`).
-- [ ] Closure-Notiz (bei Welle-02-Closure).
+- [x] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -56,7 +56,11 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** Klare Value Objects — `Beobachtung` (Quelle + Zeitstempel
++ Evidenz), `Quelle`-Enum (5 Quellen), `Evidenz` (nicht-leer), sealed `Ereignis`
+(6 Arten). **Steering-Loop:** `Zeitstempel` als reiner, ordnender Wert (kein
+`Clock` im Typ) trug die spätere Uhr-Port-Trennung (slice-009) verlustfrei.
+**Offen:** —.
 
 ## 8. Sub-Area-Modus-Begründung
 

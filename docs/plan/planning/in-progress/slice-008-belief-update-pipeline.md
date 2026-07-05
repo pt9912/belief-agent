@@ -40,7 +40,7 @@ Der Slice **retired isoliert** das Multi-Modul-`arch-check`-Risiko (v0.10.0-Guar
       übergebenem Prompt).
 - [x] `make gates` grün (5 Gates; Coverage-Gate auf `hexagon:domain`, da
       `hexagon:application` in slice-008 interface-only ist).
-- [ ] Closure-Notiz (bei Welle-02-Closure).
+- [x] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -76,7 +76,14 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`. Enabler für slice-009/010
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** `hexagon:application`-Modul + anwendungsweiter
+`AuditPort`; Multi-Modul-Dockerfile. **Steering-Loop (Kern-Lehre der Welle):**
+a-check v0.10.0 konnte Multi-Modul-KMP nicht durchsetzen (Guard-Reject bzw.
+**falsch-grün**, per Negativ-Test entlarvt); ein Fix-Prompt an den a-check-Agenten
+führte zu **v0.11.0** (datei-mengen-bewusste Auflösung) → arch-check echt
+durchsetzend, **kein Carveout** (`CO-001`-Klasse endgültig gelöst). **Regel
+geschärft:** nie eine arch-Config committen, die den Negativ-Test nicht besteht
+(Modul 13). **Offen:** —.
 
 ## 8. Sub-Area-Modus-Begründung
 

@@ -40,7 +40,7 @@ kommt über einen **Uhr-Port** (Fake in Tests) — kein `Clock` im Kern. Erster
 - [x] `make gates` grün (5 Gates; 67 Tests). Coverage-Gate auf `hexagon:domain`;
       application/adapter sind test-abgedeckt, aber noch nicht gate-scoped
       (Follow-up-ADR, wenn mehr application-Logik da ist).
-- [ ] Closure-Notiz (bei Welle-02-Closure).
+- [x] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -69,7 +69,13 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** Use-Case `BeliefAktualisieren` (Dedup → LLM-Port →
+`BayesUpdate` → Ereignisse) + lokale Ports (LLM/Uhr); erstes Adapter-Modul
+`llm-fake`, E2E-nah im Adapter-Test. **Steering-Loop:** DI/Koin auf den
+Composition-Root (cli, welle-03) verschoben — bis dahin Konstruktor-Injektion,
+kein Framework im Kern. **Offen (benannte Lücke):** Coverage-Gate ist
+domain-only; application/adapter-Logik ist test-abgedeckt, aber nicht
+gate-scoped → Coverage-Scope-ADR als Follow-up.
 
 ## 8. Sub-Area-Modus-Begründung
 

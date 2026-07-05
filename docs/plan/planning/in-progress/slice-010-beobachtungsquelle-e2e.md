@@ -36,7 +36,7 @@ persistierten Protokoll **rekonstruierbar** (`LH-FA-AUD-002`). Schließt welle-0
       anwendungsweit); Kern importiert keinen Adapter (`arch-check` grün über
       **5 Module**, `ADR-0001`/`ADR-0003`).
 - [x] `make gates` grün (5 Gates; 71 Tests).
-- [ ] Closure-Notiz (bei Welle-02-Closure).
+- [x] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -68,7 +68,11 @@ rekonstruierbar) → danach Welle-Closure-Notiz in
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** `BeobachtungsPort` + `FakeBeobachtungsQuelle`;
+`MemoryAudit` (Audit-Port-Impl); **E2E-Spur** Quelle → Update → Protokoll →
+Persistenz → Rekonstruktion (rekonstruierter Belief == Live-Posterior).
+**Steering-Loop:** Die Orchestrierung lebt vorerst im arch-check-befreiten
+E2E-Test; der Produktions-Composition-Root (cli) folgt in welle-03. **Offen:** —.
 
 ## 8. Sub-Area-Modus-Begründung
 
