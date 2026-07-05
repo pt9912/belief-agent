@@ -133,22 +133,27 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
 - **Auflösungs-Trigger:** Re-Pin bei d-check-Upgrade (`d-check.mk` neu via
   `--print-mk`, neuer `DCHECK_DIGEST` im `Makefile`); ansonsten permanent.
 
-### MR-005 — a-check-Arch-Gate (v0.10.0, HexSlice-Rollen)
+### MR-005 — a-check-Arch-Gate (v0.11.0, HexSlice-Rollen, Multi-Modul)
 
-- **Datum:** 2026-07-04
+- **Datum:** 2026-07-04 (v0.10.0); Bump auf v0.11.0 am 2026-07-05 (slice-008).
 - **Geltungsbereich:** `.a-check.yml`, `a-check.mk`, `Makefile` (`arch-check`).
-- **Adaption:** `make arch-check` läuft über **a-check v0.10.0**
-  (`ghcr.io/pt9912/a-check`, digest-gepinnt `sha256:0932cb1d…`). `a-check.mk`
-  ist tool-generiert (`--print-mk`); dessen Default-Digest laggt (v0.9.0),
-  daher lebt der Pin als `A_CHECK_IMAGE` im `Makefile` und sticht.
-  `.a-check.yml` bildet die HexSlice-Rollen ab (domain/application/adapters,
-  Kanten nach innen) plus `tech`-Regeln (Framework/DI nur am Adapter-Rand).
+- **Adaption:** `make arch-check` läuft über **a-check v0.11.0**
+  (`ghcr.io/pt9912/a-check`, digest-gepinnt `sha256:f53a06fe…`). `a-check.mk`
+  ist tool-generiert (`--print-mk`); dessen Default-Digest laggt, daher lebt der
+  Pin als `A_CHECK_IMAGE` im `Makefile` und sticht. `.a-check.yml` bildet die
+  HexSlice-Rollen ab (domain/application/adapters, Kanten nach innen) plus
+  `tech`-Regeln (Framework/DI nur am Adapter-Rand); `resolution.kotlin` nutzt je
+  Modul einen Root über geteiltem `package_base` `dev.beliefagent`.
 - **Begründung:** a-check ist das für HexSlice gebaute Arch-Gate (`ADR-0003`).
-  v0.10.0 bringt den fail-closed-Guard gegen mehrdeutige Mehr-Wurzel-Auflösung
-  (der von uns gemeldete KMP-Falsch-negativ) — löste `CO-001` auf.
-- **Auflösungs-Trigger:** Re-Pin bei a-check-Upgrade; `resolution` beim
-  Multi-Modul-Ausbau (welle-02) paket-spezifisch erweitern (der Guard erzwingt
-  Korrektheit).
+  v0.10.0 brachte den fail-closed-Guard gegen mehrdeutige Mehr-Wurzel-Auflösung
+  (der von uns gemeldete KMP-Falsch-negativ) — löste `CO-001` auf. **v0.11.0**
+  löst interne FQNs **datei-mengen-bewusst gegen die realen Dateien unter
+  `roots`** (nicht am Wurzel-Präfix); damit ist der **Multi-Modul-KMP-Fall echt
+  durchsetzbar** (disjunkte Sub-Namespaces `domain.*`/`application.*`;
+  negativ-getestet: `domain→application` = 1 Befund). Ein von uns übergebener
+  Fix-Prompt trug dazu bei — **kein Carveout** nötig.
+- **Auflösungs-Trigger:** Re-Pin bei a-check-Upgrade. Multi-Modul-`resolution`
+  ist ab v0.11.0 gelöst; Adapter-Roots folgen (slice-009/010) demselben Muster.
 
 ### MR-006 — d-check-Modul-Auswahl erweitert (v0.37.1)
 

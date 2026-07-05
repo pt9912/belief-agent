@@ -27,14 +27,15 @@ Evidenz-Aufnahme + Audit.
   Belief) in `hexagon:domain`. **Audit-Port → `slice-008`** (Weg C:
   anwendungsweiter Port gehört in die application-Schicht, nicht in die Domäne).
   Liegt in `in-progress/` bis Welle-Closure.
-- **⇒ Resume-Punkt: `slice-008` (Fundament)** — nach Zerlegung des ursprüngl.
-  slice-008 (Modul 5, zu groß): `hexagon:application`-Modul + **Audit-Port**
-  (`ARC-06`) + Dockerfile-Multi-Modul + `.a-check.yml`-`resolution`-Fix
-  (retired das Multi-Modul-`arch-check`-Risiko, `CO-001`-Klasse, isoliert).
-  Plan liegt in `open/`.
-- Danach: `slice-009` (Pipeline: `belief-aktualisieren` + LLM-/Uhr-Port +
-  Fake-LLM, `LH-FA-OBS-002`), `slice-010` (Beobachtungs-Port + Quelle-Adapter +
-  E2E-Persistenz, `LH-FA-OBS-001`; **schließt welle-02**).
+- `slice-008` (Fundament: `hexagon:application`-Modul + **Audit-Port** `ARC-06`
+  + Dockerfile-Multi-Modul + Multi-Modul-`arch-check`) **geliefert** (`make
+  gates` grün; arch-check **echt durchsetzend** über domain+application via
+  a-check **v0.11.0**, negativ-getestet — `CO-001`-Klasse **ohne Carveout**
+  aufgelöst). Liegt in `in-progress/` bis Welle-Closure.
+- **⇒ Resume-Punkt: `slice-009`** — Pipeline `belief-aktualisieren` + LLM-/Uhr-
+  Port + Fake-LLM (`LH-FA-OBS-002`). Plan liegt in `open/`.
+- Danach: `slice-010` (Beobachtungs-Port + Quelle-Adapter + E2E-Persistenz,
+  `LH-FA-OBS-001`; **schließt welle-02**).
 
 ## Nächste Wellen
 
@@ -99,3 +100,4 @@ flowchart LR
 | 2026-07-05 | `slice-006` geliefert (Dedup korrelierter Beobachtungen, `LH-FA-OBS-004`); Resume-Punkt → `slice-007` | `make gates` grün (46 Tests, 96,81 % Coverage); DoD erfüllt, liegt in `in-progress/` bis Welle-Closure |
 | 2026-07-05 | `slice-007` geliefert (Ereignisprotokoll + Rekonstruktion, `LH-FA-AUD-001`/`002`/`003`); Audit-Port nach `slice-008` verschoben (Weg C); Resume-Punkt → `slice-008` | `make gates` grün (59 Tests, 97,37 % Coverage); Audit-Port ist anwendungsweiter Port → application-Schicht (`architecture.md` §2), nicht Domäne; slice-007 bleibt reiner domain-Slice |
 | 2026-07-05 | `slice-008` zerlegt (Modul 5, zu groß): `slice-008` (Fundament: Modul + Audit-Port + Multi-Modul-`arch-check`), `slice-009` (Pipeline), `slice-010` (Quelle + E2E) | 7 DoD-Punkte über mehrere Schichten + Multi-Modul-a-check-Risiko → nicht in einer Sitzung lieferbar; Schnitt nach Lieferwert; a-check-Risiko zuerst isoliert retiren |
+| 2026-07-05 | `slice-008` (Fundament) geliefert; a-check v0.10.0 → **v0.11.0** (Multi-Modul-KMP-Resolution, `MR-005`); Resume-Punkt → `slice-009` | v0.10.0 konnte Multi-Modul nicht durchsetzen (Guard-Reject bzw. falsch-grün, negativ-getestet); Fix-Prompt an a-check → v0.11.0 löst datei-mengen-bewusst auf, echt durchsetzend; kein Carveout |

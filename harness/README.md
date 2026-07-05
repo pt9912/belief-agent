@@ -58,7 +58,7 @@ Kein Lauf-Status (der lebt in CI). Strukturell rote Gates → Carveout in
 | `make build` | Reproduzierbarer KMP-Build aller Module (multi-stage Dockerfile, Base digest-gepinnt) | `ADR-0002`/`ADR-0003`; Modul 14 |
 | `make test` | Deterministische Tests (`LH-QA-03`) im Docker-Build | `LH-FA-BEL-001`/`LH-FA-BEL-003` |
 | `make coverage-gate` | Line-Coverage ≥ Stufen-Minimum (Kover `koverVerify`) | Schwelle `ADR-0004` (bootstrap-aware 90 % → 95 % bei M2) |
-| `make arch-check` | Kern importiert kein Adapter/Framework (a-check `domain`-Rolle + `tech`-leak) | `ADR-0001`/`ADR-0003`; a-check v0.10.0 (`MR-005`) |
+| `make arch-check` | Kern importiert kein Adapter/Framework; Multi-Modul-Kanten `domain`←`application`←`adapters` (a-check Rollen + `tech`-leak) | `ADR-0001`/`ADR-0003`; a-check v0.11.0 (`MR-005`) |
 | `make gates` | bündelt alle aktuell lauffähigen Gates (`doc-check` + `build` + `test` + `coverage-gate` + `arch-check`) | — |
 
 **CI-/Range-Gates** (`MR-006`, brauchen `RANGE=base..head`, laufen **nicht** im

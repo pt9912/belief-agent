@@ -25,18 +25,21 @@ Der Slice **retired isoliert** das Multi-Modul-`arch-check`-Risiko (v0.10.0-Guar
 
 ## 2. Definition of Done
 
-- [ ] `hexagon:application`-Modul existiert (Gradle-Modul, Dependency auf
-      `hexagon:domain`) und baut im **Multi-Modul-Dockerfile**
-      (`build`/`test`/`coverage` über `domain` + `application`).
-- [ ] **Audit-Port** als **anwendungsweites** Interface
-      (`hexagon/application/.../ports/`, Rolle `port`, `ARC-06`): Vertrag zum
-      Persistieren des `EreignisProtokoll` (slice-007); rein, framework-frei
-      (`ADR-0001`/`ADR-0003`).
-- [ ] `.a-check.yml`-`resolution` paket-spezifisch auf Multi-Modul erweitert
-      (disjunkte Sub-Namespaces, v0.10.0-Guard-konform); `make arch-check` grün
-      über `domain` + `application` (retired die `CO-001`-Klasse).
-- [ ] `make gates` grün (Coverage-Gate berücksichtigt das neue Modul,
-      Interface-Only-Realität dokumentiert).
+- [x] `hexagon:application`-Modul existiert (Gradle-Modul, Dependency auf
+      `hexagon:domain`) und baut im **Multi-Modul-Dockerfile** (`assemble`/
+      `allTests` über beide Module; `make gates` grün).
+- [x] **Audit-Port** als **anwendungsweites** Interface
+      (`hexagon/application/…/ports/AuditPort.kt`, Rolle `port`, `ARC-06`):
+      Vertrag `anhaengen`/`lade` zum Persistieren des `EreignisProtokoll`
+      (slice-007); rein, importiert nur Domäne, framework-frei (`ADR-0001`/`ADR-0003`).
+- [x] `.a-check.yml`-`resolution` auf **Multi-Modul** erweitert (je Modul ein
+      Root, geteiltes `package_base`); **a-check v0.11.0** löst FQNs
+      datei-mengen-bewusst auf → `make arch-check` grün **und echt durchsetzend**
+      über `domain` + `application` (negativ-getestet: `domain→application` = 1
+      Befund). Retired die `CO-001`-Klasse **ohne** Carveout (a-check-Fix per
+      übergebenem Prompt).
+- [x] `make gates` grün (5 Gates; Coverage-Gate auf `hexagon:domain`, da
+      `hexagon:application` in slice-008 interface-only ist).
 - [ ] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
@@ -60,11 +63,13 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`. Enabler für slice-009/010
 
 ## 6. Risiken und offene Punkte
 
-- **Multi-Modul-a-check (Hauptrisiko):** mehrere `resolution`-Roots über
-  geteiltes `package_base` → v0.10.0-Guard bricht bei mehrdeutiger Auflösung
-  mit Exit 2 ab (`CO-001`-Historie). Auflösung: disjunkte Sub-Namespaces
-  `dev.beliefagent.{domain,application}` + Globs tiefer als die Roots. Bei
-  hartnäckigem Guard-Bruch: Carveout mit Auflösungs-Trigger statt roter Merge.
+- **Multi-Modul-a-check (Hauptrisiko) — AUFGELÖST.** v0.10.0 rejectete jede
+  Multi-Root-Config (Exit 2), alle Umgehungen waren falsch-grün (negativ-
+  getestet). Über einen an den a-check-Code-Agenten übergebenen Fix-Prompt
+  entstand **v0.11.0**: der Resolver löst interne FQNs datei-mengen-bewusst
+  gegen die realen Dateien unter `roots` auf (nicht am Wurzel-Präfix). Zwei
+  Modul-Roots über geteiltem `package_base` reichen jetzt und setzen **echt
+  durch** — kein Carveout, `CO-001`-Klasse endgültig aufgelöst.
 - **Coverage-Gate:** ein Interface trägt keine coverbare Logik; ggf.
   `application`-Modul im Kover-Scope so führen, dass die Schwelle (`ADR-0004`)
   nicht durch Interface-Grundlast kippt (dokumentieren, nicht wegfiltern).
