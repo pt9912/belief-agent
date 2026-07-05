@@ -10,11 +10,12 @@ DCHECK_DIGEST := sha256:3bbdb19bb73200fa37e30eff961cd5429a44e9e945fff3fb65ba7dc4
 
 include d-check.mk
 
-# a-check (Architektur-Gate, MR-005): v0.10.0 mit fail-closed-Guard gegen
-# mehrdeutige Mehr-Wurzel-Aufloesung. a-check.mk ist tool-generiert
-# (--print-mk); dessen Default-Digest laggt (v0.9.0, ohne Fix), daher hier der
-# verifizierte v0.10.0-Digest-Pin. Bei a-check-Upgrade neuen Digest setzen.
-A_CHECK_IMAGE := ghcr.io/pt9912/a-check@sha256:0932cb1dbdfa6ece0a5f9892dbe541cf29618ffe2667feda01c96d3218af2fc9
+# a-check (Architektur-Gate, MR-005): v0.11.0 — fixed-root loest interne FQNs
+# datei-mengen-bewusst gegen die realen Dateien unter roots auf und setzt damit
+# Multi-Modul-KMP echt durch (slice-008; loest die v0.10.0-Guard-Reject-Klasse).
+# a-check.mk ist tool-generiert (--print-mk); dessen Default-Digest laggt, daher
+# hier der verifizierte v0.11.0-Digest-Pin. Bei a-check-Upgrade neuen Digest setzen.
+A_CHECK_IMAGE := ghcr.io/pt9912/a-check@sha256:f53a06fe02973a0cd4771eccb3d22171619a5ddfcbca2fac9922ce3fe7520483
 
 include a-check.mk
 

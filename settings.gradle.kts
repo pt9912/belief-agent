@@ -11,3 +11,4 @@ rootProject.name = "belief-agent"
 // Weitere Slices (application/<use-case>) und Adapter (inbound/outbound)
 // kommen als eigene Module hinzu.
 include("hexagon:domain")
+include("hexagon:application") // Use-Case-Schicht + Ports (slice-008 Fundament)

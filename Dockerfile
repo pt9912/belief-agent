@@ -14,18 +14,22 @@ WORKDIR /src
 # sind (kein Neu-Resolve bei reinen Code-Aenderungen).
 COPY settings.gradle.kts build.gradle.kts ./
 COPY hexagon/domain/build.gradle.kts ./hexagon/domain/build.gradle.kts
-RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies
+COPY hexagon/application/build.gradle.kts ./hexagon/application/build.gradle.kts
+RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies
 
-# --- build: Quellcode kompilieren ------------------------------------------
+# --- build: Quellcode kompilieren (alle Module) ----------------------------
 FROM deps AS build
 COPY hexagon ./hexagon
-RUN gradle --no-daemon --console=plain :hexagon:domain:assemble
+RUN gradle --no-daemon --console=plain assemble
 
-# --- test: deterministische Tests (LH-QA-03) -------------------------------
+# --- test: deterministische Tests aller Module (LH-QA-03) ------------------
 FROM build AS test
-RUN gradle --no-daemon --console=plain :hexagon:domain:allTests
+RUN gradle --no-daemon --console=plain allTests
 
 # --- coverage: Kover Line-Coverage-Report (Modul 13; Report, kein Gate) -----
+# Coverage-Gate bleibt auf hexagon:domain: hexagon:application trägt in
+# slice-008 nur den Audit-Port (Interface, keine coverbare Logik) — das
+# Modul-Coverage-Gate aktiviert slice-009 mit der Use-Case-Logik.
 FROM build AS coverage
 RUN gradle --no-daemon --console=plain :hexagon:domain:koverLog
 

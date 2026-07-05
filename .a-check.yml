@@ -2,12 +2,14 @@
 # Rollen leiten sich aus den Namen ab: domain (importiert nur sich selbst),
 # application (nutzt domain + port), adapter (implementiert Ports).
 #
-# KMP-Hinweis (a-check v0.10.0 fail-closed-Guard): bei mehreren Modul-Roots,
-# die je vollständig in verschiedene Schichten fallen, bricht a-check mit
-# Exit 2 ab. Sobald application-/adapter-Module dazukommen, muss `resolution`
-# paket-spezifisch aufgelöst werden (disjunkte Sub-Namespaces
-# dev.beliefagent.{domain,application,adapter}, Globs tiefer als die Roots).
-# Heute existiert nur hexagon:domain → ein Root, eindeutig.
+# KMP/Multi-Modul (a-check v0.11.0): fixed-root mit geteiltem package_base
+# `dev.beliefagent` und je Modul einem Root. Der interne FQN wird
+# **datei-mengen-bewusst gegen die REALEN Dateien unter roots** aufgelöst (nicht
+# am Wurzel-Präfix) — disjunkte Sub-Namespaces (`dev.beliefagent.domain.*` vs.
+# `dev.beliefagent.application.*`) sind damit eindeutig und werden **echt
+# durchgesetzt** (negativ-getestet: `domain→application` = 1 Befund). Nur
+# gleicher FQN real in >=2 roots verschiedener Schichten ⇒ Exit 2. Adapter-Roots
+# folgen (slice-009/010) demselben Muster.
 version: 1
 
 languages:
@@ -24,7 +26,12 @@ edges:
   - {from: adapters, to: domain}      # Adapter dürfen Domänentypen referenzieren
 
 resolution:
-  kotlin: {mode: fixed-root, roots: ["hexagon/domain/src/commonMain/kotlin/dev/beliefagent"], package_base: "dev.beliefagent"}
+  kotlin:
+    mode: fixed-root
+    package_base: "dev.beliefagent"
+    roots:
+      - "hexagon/domain/src/commonMain/kotlin/dev/beliefagent"
+      - "hexagon/application/src/commonMain/kotlin/dev/beliefagent"
 
 # Framework/DI gehören nur an den Adapter-Rand (ADR-0001/0003). Ein Import im
 # Kern (domain/application) ist ein tech-leak — greift auch schon bei einem
