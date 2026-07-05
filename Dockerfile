@@ -31,13 +31,18 @@ RUN gradle --no-daemon --console=plain assemble
 FROM build AS test
 RUN gradle --no-daemon --console=plain allTests
 
-# --- coverage: Kover Line-Coverage-Report (Modul 13; Report, kein Gate) -----
-# Coverage-Gate bleibt auf hexagon:domain: hexagon:application trägt in
-# slice-008 nur den Audit-Port (Interface, keine coverbare Logik) — das
-# Modul-Coverage-Gate aktiviert slice-009 mit der Use-Case-Logik.
+# --- coverage: Kover Line-Coverage-Report je Modul (Modul 13; Report) -------
+# Report über alle logik-tragenden Module (per-Modul kover, ADR-0006).
 FROM build AS coverage
-RUN gradle --no-daemon --console=plain :hexagon:domain:koverLog
+RUN gradle --no-daemon --console=plain \
+    :hexagon:domain:koverLog :hexagon:application:koverLog \
+    :adapters:outbound:llm-fake:koverLog :adapters:outbound:observation-fake:koverLog \
+    :adapters:outbound:audit-memory:koverLog :adapters:outbound:approval-fake:koverLog
 
-# --- coverage-gate: Kover Schwellen-Verifikation (ADR-0004) -----------------
+# --- coverage-gate: Kover Schwellen-Verifikation (ADR-0004/ADR-0006) --------
+# Gate über domain + application + alle Adapter (Schwellen je Modul, ADR-0006).
 FROM build AS coverage-gate
-RUN gradle --no-daemon --console=plain :hexagon:domain:koverVerify
+RUN gradle --no-daemon --console=plain \
+    :hexagon:domain:koverVerify :hexagon:application:koverVerify \
+    :adapters:outbound:llm-fake:koverVerify :adapters:outbound:observation-fake:koverVerify \
+    :adapters:outbound:audit-memory:koverVerify :adapters:outbound:approval-fake:koverVerify

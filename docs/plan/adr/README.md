@@ -7,6 +7,7 @@
 | [0003](0003-hexslice-architektur.md) | HexSlice — vertikale Use-Case-Slices im hexagonalen Kern (KMP, Gradle-Multi-Modul) | Accepted | `LH-QA-04` |
 | [0004](0004-coverage-gate.md) | Coverage-Gate — bootstrap-aware Line-Coverage-Schwelle (Kover) | Accepted | `LH-QA-03` |
 | [0005](0005-konfidenz-gate-schwellwerte.md) | Konfidenz-Gate — Default-Schwellwerte je Wirkungsklasse + Resthypothese-Sperre | Accepted | `LH-FA-POL-003` |
+| [0006](0006-coverage-gate-scope.md) | Coverage-Gate-Scope — Gate auf application + Adapter erweitern (per Modul) | Accepted | `LH-QA-03` |
 
 ## Konventionen
 

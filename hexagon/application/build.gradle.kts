@@ -3,12 +3,13 @@
 // einen Adapter — erzwungen durch die Modul-Grenze (nur domain-Dependency),
 // a-check (application-/port-Rolle) und die commonMain-Source-Set-Sicht.
 //
-// slice-008 (Fundament): trägt vorerst nur den anwendungsweiten Audit-Port
-// (Interface, ARC-06). Use-Case-Logik und ein Coverage-Gate kommen mit
-// slice-009 — bis dahin gibt es hier keine coverbare Logik (Interface-only).
+// Trägt Use-Case-Logik (belief-aktualisieren, aktion-gaten) + Ports. Coverage-
+// Gate per Modul (ADR-0006), Kern-Schicht wie die Domäne: 90 % Line-Coverage ab
+// M1, 95 % bei M2 (Ist: 100 %).
 
 plugins {
     kotlin("multiplatform")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 kotlin {
@@ -21,6 +22,17 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+        }
+    }
+}
+
+kover {
+    reports {
+        verify {
+            rule {
+                // Kern-Schicht (ADR-0004/ADR-0006): 90 % ab M1, 95 % bei M2.
+                minBound(90)
+            }
         }
     }
 }

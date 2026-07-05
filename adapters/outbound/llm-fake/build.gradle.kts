@@ -5,6 +5,7 @@
 
 plugins {
     kotlin("multiplatform")
+    id("org.jetbrains.kotlinx.kover")
 }
 
 kotlin {
@@ -18,6 +19,18 @@ kotlin {
         }
         commonTest.dependencies {
             implementation(kotlin("test"))
+        }
+    }
+}
+
+kover {
+    reports {
+        verify {
+            rule {
+                // Adapter (ADR-0006): 90 % flach — dünner, deterministischer Fake
+                // (Ist: 100 %), voll testbar; kein M2-Bump.
+                minBound(90)
+            }
         }
     }
 }
