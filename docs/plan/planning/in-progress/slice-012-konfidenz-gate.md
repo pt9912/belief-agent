@@ -5,7 +5,7 @@
 **Welle:** [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md).
 
 **Bezug:** `LH-FA-POL-001`, `LH-FA-POL-002`, `LH-FA-POL-003`, `LH-FA-POL-005`,
-`LH-FA-POL-007`, `LH-QA-03`; `ADR-0001`, `ADR-0003`; `ARC-03`.
+`LH-FA-POL-007`, `LH-QA-03`; `ADR-0001`, `ADR-0003`, `ADR-0005`; `ARC-03`.
 
 **Autor:** pt9912. **Datum:** 2026-07-05.
 
@@ -24,16 +24,19 @@ Deterministisch (`LH-QA-03`).
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-POL-001` erfüllt: das Gate liefert genau eine von drei Entscheidungen
-      (`Freigabe`/`Ablehnung`/`Eskalation`); Tests je Ausgang.
-- [ ] `LH-FA-POL-002` erfüllt: geprüft wird die **Erfolgswahrscheinlichkeit der
-      Aktion**, nicht die Wahrscheinlichkeit der Diagnose-/Top-Hypothese.
-- [ ] `LH-FA-POL-003`/`007` erfüllt: Mindest-Konfidenz je Wirkungsklasse,
-      **konfigurierbar** (Default-Schwellen begründet dokumentiert; nur-lesend
-      ohne wirksame Schwelle, aber Gate wird durchlaufen).
-- [ ] `LH-FA-POL-005` erfüllt: extern-wirksame Aktion bei Resthypothese über
-      Schwelle → **gesperrt** (Ablehnung/Eskalation); Test unter/über Schwelle.
-- [ ] Kern-lokal, deterministisch (`LH-QA-03`); `make gates` grün.
+- [x] `LH-FA-POL-001` erfüllt: `KonfidenzGate.bewerte` liefert genau eine von drei
+      `GateEntscheidung` (`Freigabe`/`Ablehnung`/`Eskalation`); `KonfidenzGateTest`
+      je Ausgang.
+- [x] `LH-FA-POL-002` erfüllt: geprüft wird `aktion.erfolgswahrscheinlichkeit`,
+      nicht die Top-Hypothese (Test: niedrige Erfolgs-P → Ablehnung).
+- [x] `LH-FA-POL-003`/`007` erfüllt: Mindest-Konfidenz je Wirkungsklasse via
+      `GateSchwellen` (konfigurierbar); Default-Werte in `ADR-0005`; nur-lesend
+      ohne wirksame Schwelle.
+- [x] `LH-FA-POL-005` erfüllt: irreversible Aktion bei Resthypothese > Sperr-
+      Schwelle → **Eskalation** (fail-safe, **zuerst** geprüft); Grenzfall
+      `==`-Schwelle getestet, hohe Erfolgs-P überstimmt die Sperre **nicht**.
+- [x] Kern-lokal, deterministisch (`LH-QA-03`); `make gates` grün (5 Gates;
+      88 Tests, Coverage 98,1 %).
 - [ ] Closure-Notiz (bei Welle-03-Closure).
 
 ## 3. Plan (vor Code)

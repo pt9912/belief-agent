@@ -18,10 +18,13 @@ Aktionen + Konfidenz-Gate (die Sicherheitsfunktion, `MR-003`).
   Erfolgswahrscheinlichkeit + Evidenz-Ref, `LH-FA-ACT-001`..`004`) **geliefert**
   (`make gates` grün, 78 Tests, Coverage 97,71 %). Liegt in `in-progress/` bis
   Welle-Closure.
-- **⇒ Resume-Punkt: `slice-012`** — Konfidenz-Gate-Regel (`LH-FA-POL-001`/`002`/
-  `003`/`005`/`007`). Plan liegt in `open/`.
-- Danach: `slice-013` (aktion-gaten + Human-Approval-Port, `LH-FA-POL-004`/`006`;
-  schließt welle-03).
+- `slice-012` (Konfidenz-Gate-Regel: Freigabe/Ablehnung/Eskalation, Schwellen je
+  Wirkungsklasse, Resthypothese-Sperre, `LH-FA-POL-001`/`002`/`003`/`005`/`007`)
+  **geliefert** (`make gates` grün, 88 Tests; Schwellwerte `ADR-0005`). Liegt in
+  `in-progress/` bis Welle-Closure.
+- **⇒ Resume-Punkt: `slice-013`** — aktion-gaten: nicht-umgehbares Gate +
+  Human-Approval-Port (`LH-FA-POL-004`/`006`); **schließt welle-03**. Plan liegt
+  in `open/`.
 
 ## Nächste Wellen
 
@@ -92,3 +95,4 @@ flowchart LR
 | 2026-07-05 | `welle-02-evidenz-audit` **abgeschlossen** (Slices `005`..`010` → `done/`); „Aktuelle Welle" → Ruhe-Marker | Closure-Trigger erfüllt (alle Slices done, E2E grün); Lerneintrag in `done/welle-02-evidenz-audit-results.md` |
 | 2026-07-05 | `welle-03-aktionen-gates` aufgesetzt (Plan + `slice-011`/`012`/`013` in `open/`) | welle-02 done → nächste Welle; Zuschnitt nach Lieferwert: Domäne Aktion+Wirkungsklassen / Gate-Regel / aktion-gaten+Freigabe (`LH-FA-ACT`/`LH-FA-POL`) |
 | 2026-07-05 | welle-03 aktiviert; `slice-011` geliefert (Domäne Aktion + 4 Wirkungsklassen + Erfolgs-P + Evidenz-Ref, `LH-FA-ACT-001`..`004`); Resume-Punkt → `slice-012` | `make gates` grün (78 Tests, 97,71 % Coverage); Ruhe-Marker → welle-03 aktiv (slice-011 in `in-progress/`) |
+| 2026-07-05 | `slice-012` geliefert (Konfidenz-Gate-Regel + `ADR-0005` Schwellwerte, `LH-FA-POL-001`/`002`/`003`/`005`/`007`); Resume-Punkt → `slice-013` | `make gates` grün (88 Tests, 98,1 % Coverage); Sicherheitskern (`MR-003`), fail-safe (Resthypothese-Sperre schlägt hohe Erfolgs-P) negativ-getestet |
