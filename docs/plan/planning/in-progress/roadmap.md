@@ -14,11 +14,13 @@ Wellen-Schätzung, nicht Treiber.
 Aktionen + Konfidenz-Gate (die Sicherheitsfunktion, `MR-003`).
 (welle-02 abgeschlossen, siehe §Abgeschlossene Wellen.)
 
-- **⇒ Resume-Punkt: `slice-011`** (in `in-progress/`) — Domäne: `Aktion` + vier
-  `Wirkungsklasse`n + Erfolgswahrscheinlichkeit + Evidenz-Referenz
-  (`LH-FA-ACT-001`..`004`).
-- Danach: `slice-012` (Konfidenz-Gate-Regel, `LH-FA-POL-001`/`002`/`003`/`005`/
-  `007`), `slice-013` (aktion-gaten + Human-Approval-Port, `LH-FA-POL-004`/`006`;
+- `slice-011` (Domäne: `Aktion` + vier `Wirkungsklasse`n +
+  Erfolgswahrscheinlichkeit + Evidenz-Ref, `LH-FA-ACT-001`..`004`) **geliefert**
+  (`make gates` grün, 78 Tests, Coverage 97,71 %). Liegt in `in-progress/` bis
+  Welle-Closure.
+- **⇒ Resume-Punkt: `slice-012`** — Konfidenz-Gate-Regel (`LH-FA-POL-001`/`002`/
+  `003`/`005`/`007`). Plan liegt in `open/`.
+- Danach: `slice-013` (aktion-gaten + Human-Approval-Port, `LH-FA-POL-004`/`006`;
   schließt welle-03).
 
 ## Nächste Wellen
@@ -89,3 +91,4 @@ flowchart LR
 | 2026-07-05 | `slice-010` geliefert (Beobachtungs-Port + Quelle-/Audit-Adapter + E2E); **welle-02-Closure-Trigger erfüllt** | `make gates` grün (71 Tests); E2E `Quelle→Update→Protokoll→Persistenz→Rekonstruktion` demonstriert die Welle-Ziele (`LH-FA-OBS-001`/`002`, `LH-FA-AUD-002`) |
 | 2026-07-05 | `welle-02-evidenz-audit` **abgeschlossen** (Slices `005`..`010` → `done/`); „Aktuelle Welle" → Ruhe-Marker | Closure-Trigger erfüllt (alle Slices done, E2E grün); Lerneintrag in `done/welle-02-evidenz-audit-results.md` |
 | 2026-07-05 | `welle-03-aktionen-gates` aufgesetzt (Plan + `slice-011`/`012`/`013` in `open/`) | welle-02 done → nächste Welle; Zuschnitt nach Lieferwert: Domäne Aktion+Wirkungsklassen / Gate-Regel / aktion-gaten+Freigabe (`LH-FA-ACT`/`LH-FA-POL`) |
+| 2026-07-05 | welle-03 aktiviert; `slice-011` geliefert (Domäne Aktion + 4 Wirkungsklassen + Erfolgs-P + Evidenz-Ref, `LH-FA-ACT-001`..`004`); Resume-Punkt → `slice-012` | `make gates` grün (78 Tests, 97,71 % Coverage); Ruhe-Marker → welle-03 aktiv (slice-011 in `in-progress/`) |

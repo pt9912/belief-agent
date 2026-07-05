@@ -40,7 +40,7 @@ Aufgesetzt 2026-07-05 (`open/`). Zuschnitt nach Lieferwert (Regelwerk Modul 5):
 
 | Slice | Titel | Status | Bezug |
 |---|---|---|---|
-| `slice-011` | Domäne: Aktion + Wirkungsklassen + Erfolgswahrscheinlichkeit | in-progress | `LH-FA-ACT-001`..`004` |
+| `slice-011` | Domäne: Aktion + Wirkungsklassen + Erfolgswahrscheinlichkeit | in-progress (geliefert) | `LH-FA-ACT-001`..`004` |
 | `slice-012` | Konfidenz-Gate-Regel (Freigabe/Ablehnung/Eskalation, Schwellen, Resthypothese-Sperre) | open | `LH-FA-POL-001`/`002`/`003`/`005`/`007` |
 | `slice-013` | aktion-gaten: nicht-umgehbares Gate + Human-Approval-Port | open | `LH-FA-POL-004`/`006` |
 

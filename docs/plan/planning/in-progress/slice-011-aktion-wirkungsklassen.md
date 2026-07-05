@@ -23,17 +23,16 @@ aufsetzt.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-ACT-001` erfüllt: `Wirkungsklasse`-Enum mit **nur-lesend /
-      arbeitsbereich-lokal / repository-wirksam / extern-wirksam**; Test.
-- [ ] `LH-FA-ACT-002` erfüllt: Einstufung nach Seiteneffekt-Reichweite geordnet
-      (repository-wirksam = reversibler Checkpoint, extern-wirksam = irreversibel)
-      — als Ordnung/Eigenschaft am Typ belegt.
-- [ ] `LH-FA-ACT-003` erfüllt: `Aktion` trägt `Erfolgswahrscheinlichkeit` in
-      `[0,1]` (validiert), getrennt von der Hypothesen-Wahrscheinlichkeit.
-- [ ] `LH-FA-ACT-004` erfüllt: `Aktion` referenziert die stützende Evidenz/
-      Beobachtung (slice-005); Test.
-- [ ] Kern-lokal (`hexagon:domain`, `commonMain`), framework-frei, deterministisch
-      (`LH-QA-03`); `make gates` grün.
+- [x] `LH-FA-ACT-001` erfüllt: `Wirkungsklasse`-Enum (**nur-lesend /
+      arbeitsbereich-lokal / repository-wirksam / extern-wirksam**); `AktionTest`.
+- [x] `LH-FA-ACT-002` erfüllt: nach Reichweite geordnet (Enum-Ordinal); nur
+      `EXTERN_WIRKSAM.irreversibel`, repository-wirksam = reversibler Checkpoint.
+- [x] `LH-FA-ACT-003` erfüllt: `Erfolgswahrscheinlichkeit` in `[0,1]` validiert,
+      getrennt von der Hypothesen-Wahrscheinlichkeit.
+- [x] `LH-FA-ACT-004` erfüllt: `Aktion.stuetzendeEvidenz` (≥1 `Beobachtung`,
+      Rückverfolgbarkeit Aktion → Evidenz); leere Evidenz wird abgewiesen.
+- [x] Kern-lokal (`hexagon:domain`, `commonMain`), framework-frei, deterministisch
+      (`LH-QA-03`); `make gates` grün (5 Gates; 78 Tests, Coverage 97,71 %).
 - [ ] Closure-Notiz (bei Welle-03-Closure).
 
 ## 3. Plan (vor Code)
