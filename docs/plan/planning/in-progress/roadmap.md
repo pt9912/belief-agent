@@ -14,9 +14,13 @@ Wellen-Schätzung, nicht Treiber.
 `welle-03-aktionen-gates` ist **abgeschlossen** (2026-07-05;
 [Ergebnisse](../done/welle-03-aktionen-gates-results.md), Slices `011`..`013` in
 `done/`) — die **Sicherheitsfunktion** (`MR-003`: Konfidenz-Gate + menschliche
-Freigabe für irreversible Aktionen) steht. Nächste Trigger: **welle-04** (VoI +
-Eskalation) bzw. **welle-05** (LLM-Port), beide „welle-03 done"; Slices werden
-**bei Welle-Start** in `open/` angelegt (Welle für Welle).
+Freigabe für irreversible Aktionen) steht.
+
+**Aufgesetzt, noch nicht gestartet:**
+[`welle-04-voi-eskalation`](../welle-04-voi-eskalation.md) (VoI + Eskalation) —
+Plan + `slice-014`/`015`/`016` liegen in `open/`. **Start** = `slice-014` nach
+`in-progress` (dann Ruhe-Marker weg). Alternativ-Trigger: **welle-05** (LLM-Port),
+ebenfalls „welle-03 done".
 
 ## Nächste Wellen
 
@@ -92,3 +96,5 @@ flowchart LR
 | 2026-07-05 | `slice-013` geliefert (aktion-gaten: nicht-umgehbares Gate + Human-Approval-Port, `LH-FA-POL-004`/`006`); **welle-03-Closure-Trigger erfüllt** | `make gates` grün (101 Tests); Gate-Kette E2E (extern-wirksam nur mit Freigabe frei, sonst Eskalation) |
 | 2026-07-05 | Ketten-Review welle-03 (+ welle-02 retrospektiv): 7 Befunde fail-closed gefixt (u. a. fail-open-Prädikat, strukturelle POL-006, welle-02 Uhr-Monotonie/Rekonstruierbarkeit) | Reviews von Sicherheitsfunktionen an die Welle-Grenze; Ketten-Sicht findet Fehler, die Einzel-Slices verbergen |
 | 2026-07-05 | `welle-03-aktionen-gates` **abgeschlossen** (Slices `011`..`013` → `done/`); „Aktuelle Welle" → Ruhe-Marker | Closure-Trigger erfüllt; Lerneintrag in `done/welle-03-aktionen-gates-results.md` |
+| 2026-07-05 | Coverage-Gate auf `application` + Adapter erweitert (`ADR-0006`, per-Modul kover, kein zentraler Block); Sicherheitskern `AktionGaten` jetzt gate-erzwungen | `make gates` grün; Ist-Coverage application + Adapter 100 %, domain 97,65 % → 90 %-Floor |
+| 2026-07-05 | `welle-04-voi-eskalation` **aufgesetzt** (Plan + `slice-014`/`015`/`016` in `open/`); noch nicht gestartet (Ruhe-Marker bleibt) | Trigger „welle-03 done" erfüllt; Slice-Anlage Welle für Welle (Modul 6) |
