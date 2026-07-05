@@ -12,3 +12,4 @@ rootProject.name = "belief-agent"
 // kommen als eigene Module hinzu.
 include("hexagon:domain")
 include("hexagon:application") // Use-Case-Schicht + Ports (slice-008 Fundament)
+include("adapters:outbound:llm-fake") // Fake-LLM-Adapter (slice-009)

@@ -15,11 +15,13 @@ WORKDIR /src
 COPY settings.gradle.kts build.gradle.kts ./
 COPY hexagon/domain/build.gradle.kts ./hexagon/domain/build.gradle.kts
 COPY hexagon/application/build.gradle.kts ./hexagon/application/build.gradle.kts
-RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies
+COPY adapters/outbound/llm-fake/build.gradle.kts ./adapters/outbound/llm-fake/build.gradle.kts
+RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies
 
 # --- build: Quellcode kompilieren (alle Module) ----------------------------
 FROM deps AS build
 COPY hexagon ./hexagon
+COPY adapters ./adapters
 RUN gradle --no-daemon --console=plain assemble
 
 # --- test: deterministische Tests aller Module (LH-QA-03) ------------------

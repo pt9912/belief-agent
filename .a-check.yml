@@ -32,6 +32,7 @@ resolution:
     roots:
       - "hexagon/domain/src/commonMain/kotlin/dev/beliefagent"
       - "hexagon/application/src/commonMain/kotlin/dev/beliefagent"
+      - "adapters/outbound/llm-fake/src/commonMain/kotlin/dev/beliefagent"
 
 # Framework/DI gehören nur an den Adapter-Rand (ADR-0001/0003). Ein Import im
 # Kern (domain/application) ist ein tech-leak — greift auch schon bei einem
