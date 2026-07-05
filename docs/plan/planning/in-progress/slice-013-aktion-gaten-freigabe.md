@@ -23,15 +23,15 @@ deterministischer **Fake-Approval-Adapter** (`LH-QA-03`).
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-POL-006` erfüllt: das Gate ist ein eigener, **nicht umgehbarer**
-      Schritt im Use-Case; keine Aktion wird ohne Gate-Durchlauf freigegeben;
-      Test (kein Bypass-Pfad).
-- [ ] `LH-FA-POL-004` erfüllt: extern-wirksame Aktion erfordert **zusätzlich** zur
-      bestandenen Konfidenz-Schwelle eine explizite menschliche Freigabe
-      (Human-Approval-Port); ohne Freigabe → **keine** Freigabe; Fake-Adapter.
-- [ ] Ports lokal beim Use-Case; Kern importiert keinen Adapter (`arch-check`
-      grün, `ADR-0001`/`ADR-0003`); DI am Adapter-Rand (Composition-Root folgt).
-- [ ] `make gates` grün.
+- [x] `LH-FA-POL-006` erfüllt: `AktionGaten.pruefe` ist der einzige Pfad, ruft
+      `KonfidenzGate` **immer** und hebt nie eine Nicht-Freigabe an → nicht
+      umgehbar; `AktionGatenTest` (Ablehnung bleibt Ablehnung).
+- [x] `LH-FA-POL-004` erfüllt: extern-wirksame Freigabe braucht **zusätzlich** die
+      menschliche Freigabe über den `HumanApprovalPort`; ohne → Eskalation;
+      `FakeApproval`-Adapter (Default verweigert, fail-safe).
+- [x] Ports lokal beim Use-Case; Kern importiert keinen Adapter (`arch-check`
+      grün über **6 Module**, `ADR-0001`/`ADR-0003`); DI am Adapter-Rand (cli folgt).
+- [x] `make gates` grün (5 Gates; 101 Tests).
 - [ ] Closure-Notiz (bei Welle-03-Closure).
 
 ## 3. Plan (vor Code)

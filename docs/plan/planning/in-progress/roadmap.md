@@ -22,9 +22,15 @@ Aktionen + Konfidenz-Gate (die Sicherheitsfunktion, `MR-003`).
   Wirkungsklasse, Resthypothese-Sperre, `LH-FA-POL-001`/`002`/`003`/`005`/`007`)
   **geliefert** (`make gates` grün, 88 Tests; Schwellwerte `ADR-0005`). Liegt in
   `in-progress/` bis Welle-Closure.
-- **⇒ Resume-Punkt: `slice-013`** — aktion-gaten: nicht-umgehbares Gate +
-  Human-Approval-Port (`LH-FA-POL-004`/`006`); **schließt welle-03**. Plan liegt
-  in `open/`.
+- `slice-013` (aktion-gaten: nicht-umgehbares Gate + Human-Approval-Port,
+  `LH-FA-POL-004`/`006`) **geliefert** (`make gates` grün, 101 Tests; erstes
+  `approval-fake`-Adapter, Gate-Kette E2E). Liegt in `in-progress/` bis
+  Welle-Closure.
+- **⇒ Resume-Punkt: welle-03-Closure** — alle Slices `011`..`013` geliefert,
+  Closure-Trigger erfüllt (extern-wirksame Aktion ohne Freigabe / bei hoher
+  Resthypothese wird abgelehnt/eskaliert). Closure: Closure-Notizen je Slice,
+  Slices → `done/`, Lerneintrag in `done/welle-03-aktionen-gates-results.md`,
+  Roadmap-Ruhe-Marker.
 
 ## Nächste Wellen
 
@@ -96,3 +102,5 @@ flowchart LR
 | 2026-07-05 | `welle-03-aktionen-gates` aufgesetzt (Plan + `slice-011`/`012`/`013` in `open/`) | welle-02 done → nächste Welle; Zuschnitt nach Lieferwert: Domäne Aktion+Wirkungsklassen / Gate-Regel / aktion-gaten+Freigabe (`LH-FA-ACT`/`LH-FA-POL`) |
 | 2026-07-05 | welle-03 aktiviert; `slice-011` geliefert (Domäne Aktion + 4 Wirkungsklassen + Erfolgs-P + Evidenz-Ref, `LH-FA-ACT-001`..`004`); Resume-Punkt → `slice-012` | `make gates` grün (78 Tests, 97,71 % Coverage); Ruhe-Marker → welle-03 aktiv (slice-011 in `in-progress/`) |
 | 2026-07-05 | `slice-012` geliefert (Konfidenz-Gate-Regel + `ADR-0005` Schwellwerte, `LH-FA-POL-001`/`002`/`003`/`005`/`007`); Resume-Punkt → `slice-013` | `make gates` grün (88 Tests, 98,1 % Coverage); Sicherheitskern (`MR-003`), fail-safe (Resthypothese-Sperre schlägt hohe Erfolgs-P) negativ-getestet |
+| 2026-07-05 | Code-Review slice-012: 2 Safety-Inversionen in `GateSchwellen` gefixt (fail-closed Monotonie + Sperr-Schwelle `< 1`); `ADR-0005` → Accepted | Multi-Agent-Review fand config-erreichbare unsichere Freigabe-Pfade; 5 Tests ergänzt (93 gesamt) |
+| 2026-07-05 | `slice-013` geliefert (aktion-gaten: nicht-umgehbares Gate + Human-Approval-Port, `LH-FA-POL-004`/`006`); **welle-03-Closure-Trigger erfüllt** | `make gates` grün (101 Tests); Gate-Kette E2E (extern-wirksam nur mit Freigabe frei, sonst Eskalation) |
