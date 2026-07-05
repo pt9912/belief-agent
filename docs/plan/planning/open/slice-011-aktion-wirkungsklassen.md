@@ -1,0 +1,70 @@
+# Slice slice-011: Domäne — Aktion + Wirkungsklassen + Erfolgswahrscheinlichkeit
+
+**Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
+
+**Welle:** [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md).
+
+**Bezug:** `LH-FA-ACT-001`, `LH-FA-ACT-002`, `LH-FA-ACT-003`, `LH-FA-ACT-004`,
+`LH-QA-03`; `ADR-0001`, `ADR-0003`; `ARC-01`.
+
+**Autor:** pt9912. **Datum:** 2026-07-05.
+
+---
+
+## 1. Ziel
+
+Reine Domänentypen für Aktionen (`hexagon:domain`): jede `Aktion` trägt genau
+eine von vier **Wirkungsklassen** (`LH-FA-ACT-001`, eingestuft nach
+Seiteneffekt-Reichweite `LH-FA-ACT-002`), eine eigene **Erfolgswahrscheinlichkeit**
+`P(Aktion erreicht Ziel)` (`LH-FA-ACT-003`, getrennt vom Belief) und eine
+**Referenz auf die stützende Evidenz** (`LH-FA-ACT-004`, Rückverfolgbarkeit). Pur,
+framework-frei, deterministisch — das Substrat, auf dem das Gate (slice-012)
+aufsetzt.
+
+## 2. Definition of Done
+
+- [ ] `LH-FA-ACT-001` erfüllt: `Wirkungsklasse`-Enum mit **nur-lesend /
+      arbeitsbereich-lokal / repository-wirksam / extern-wirksam**; Test.
+- [ ] `LH-FA-ACT-002` erfüllt: Einstufung nach Seiteneffekt-Reichweite geordnet
+      (repository-wirksam = reversibler Checkpoint, extern-wirksam = irreversibel)
+      — als Ordnung/Eigenschaft am Typ belegt.
+- [ ] `LH-FA-ACT-003` erfüllt: `Aktion` trägt `Erfolgswahrscheinlichkeit` in
+      `[0,1]` (validiert), getrennt von der Hypothesen-Wahrscheinlichkeit.
+- [ ] `LH-FA-ACT-004` erfüllt: `Aktion` referenziert die stützende Evidenz/
+      Beobachtung (slice-005); Test.
+- [ ] Kern-lokal (`hexagon:domain`, `commonMain`), framework-frei, deterministisch
+      (`LH-QA-03`); `make gates` grün.
+- [ ] Closure-Notiz (bei Welle-03-Closure).
+
+## 3. Plan (vor Code)
+
+| Datei / Komponente | Änderungs-Art | Begründung |
+|---|---|---|
+| `hexagon/domain/.../Wirkungsklasse.kt` | neu | 4 Klassen, geordnet nach Reichweite (`LH-FA-ACT-001`/`002`) |
+| `hexagon/domain/.../Aktion.kt` | neu | Aktion + Erfolgswahrscheinlichkeit + Evidenz-Ref (`LH-FA-ACT-003`/`004`) |
+| `hexagon/domain/.../*Test.kt` | neu | deterministische Typ-Tests (`LH-QA-03`) |
+
+## 4. Trigger
+
+welle-03 Start (welle-02 done). Nutzt `Beobachtung`/`Evidenz` (slice-005) für die
+Rückverfolgbarkeit.
+
+## 5. Closure-Trigger
+
+DoD vollständig + Closure-Notiz; Datei nach `done/`.
+
+## 6. Risiken und offene Punkte
+
+- Reichweiten-Ordnung als Enum-Reihenfolge vs. explizite Eigenschaft
+  (reversibel/irreversibel) — im Slice entscheiden, deterministisch belegen.
+
+## 7. Closure-Notiz (nach `done/`)
+
+<!-- Erst nach Abschluss füllen. -->
+
+## 8. Sub-Area-Modus-Begründung
+
+Alle berührten Sub-Areas GF (frisches Repo, Doku führt; siehe Kurs Modul 5).
+Modus-Deklaration siehe
+[`../../../../harness/conventions.md`](../../../../harness/conventions.md)
+§Modus-Deklaration pro Sub-Area.

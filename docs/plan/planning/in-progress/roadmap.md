@@ -10,12 +10,12 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `welle-02-evidenz-audit` ist **abgeschlossen**
-(2026-07-05; siehe §Abgeschlossene Wellen und
-[Ergebnisse](../done/welle-02-evidenz-audit-results.md)) — die Slices `005`..`010`
-liegen in `done/`. Nächster Trigger: **welle-03** (`welle-03-aktionen-gates`);
-deren Slices werden **bei Welle-Start** in `open/` angelegt (Welle für Welle,
-keine Vorab-Slices).
+**Keine aktive Welle** (kein `slice-*` in `in-progress/`).
+`welle-02-evidenz-audit` ist **abgeschlossen** (2026-07-05;
+[Ergebnisse](../done/welle-02-evidenz-audit-results.md), Slices `005`..`010` in
+`done/`). **[`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md) ist
+aufgesetzt** — Plan + `slice-011`/`012`/`013` liegen in `open/`; die Welle wird
+**aktiv**, sobald `slice-011` nach `in-progress/` startet (Welle für Welle).
 
 ## Nächste Wellen
 
@@ -84,3 +84,4 @@ flowchart LR
 | 2026-07-05 | `slice-009` (Pipeline `belief-aktualisieren`) geliefert; erstes `adapters:*`-Modul `llm-fake`; Resume-Punkt → `slice-010` | `make gates` grün (67 Tests); Use-Case + LLM-/Uhr-Port + Fake-LLM; arch-check echt über domain/application/adapters (a-check v0.11.0, Adapter-Root ergänzt) |
 | 2026-07-05 | `slice-010` geliefert (Beobachtungs-Port + Quelle-/Audit-Adapter + E2E); **welle-02-Closure-Trigger erfüllt** | `make gates` grün (71 Tests); E2E `Quelle→Update→Protokoll→Persistenz→Rekonstruktion` demonstriert die Welle-Ziele (`LH-FA-OBS-001`/`002`, `LH-FA-AUD-002`) |
 | 2026-07-05 | `welle-02-evidenz-audit` **abgeschlossen** (Slices `005`..`010` → `done/`); „Aktuelle Welle" → Ruhe-Marker | Closure-Trigger erfüllt (alle Slices done, E2E grün); Lerneintrag in `done/welle-02-evidenz-audit-results.md` |
+| 2026-07-05 | `welle-03-aktionen-gates` aufgesetzt (Plan + `slice-011`/`012`/`013` in `open/`) | welle-02 done → nächste Welle; Zuschnitt nach Lieferwert: Domäne Aktion+Wirkungsklassen / Gate-Regel / aktion-gaten+Freigabe (`LH-FA-ACT`/`LH-FA-POL`) |
