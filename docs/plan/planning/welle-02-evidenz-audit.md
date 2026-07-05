@@ -33,14 +33,17 @@ als **unveränderliches, rekonstruierbares Ereignisprotokoll** festhalten
 
 ## 4. Slices in dieser Welle
 
-In `open/` angelegt (2026-07-04):
+Angelegt 2026-07-04; `slice-008` am 2026-07-05 in Fundament/Pipeline/Quelle
+zerlegt (Modul 5, zu groß → `slice-008`/`009`/`010`).
 
 | Slice | Titel | Status | Bezug |
 |---|---|---|---|
-| `slice-005` | Domain: Beobachtung/Quelle/Evidenz + Ereignis-Typen | in-progress | `LH-FA-OBS-006`, `LH-FA-AUD-001` |
-| `slice-006` | Dedup korrelierter Beobachtungen | open | `LH-FA-OBS-004` |
-| `slice-007` | Ereignisprotokoll + Belief-Rekonstruktion + Audit-Port | open | `LH-FA-AUD-001`, `LH-FA-AUD-002`, `LH-FA-AUD-003` |
-| `slice-008` | Belief-Update-Pipeline (application `belief-aktualisieren`) + Ports + Fake-Adapter | open | `LH-FA-OBS-001`, `LH-FA-OBS-002` |
+| `slice-005` | Domain: Beobachtung/Quelle/Evidenz + Ereignis-Typen | in-progress (geliefert) | `LH-FA-OBS-006`, `LH-FA-AUD-001` |
+| `slice-006` | Dedup korrelierter Beobachtungen | in-progress (geliefert) | `LH-FA-OBS-004` |
+| `slice-007` | Ereignisprotokoll + Belief-Rekonstruktion | in-progress (geliefert) | `LH-FA-AUD-001`/`002`/`003` |
+| `slice-008` | Fundament: `hexagon:application`-Modul + Audit-Port + Multi-Modul-`arch-check` | open | `LH-FA-AUD-001`, `ARC-06` |
+| `slice-009` | Belief-Update-Pipeline (`belief-aktualisieren`) + LLM-/Uhr-Port + Fake-LLM | open | `LH-FA-OBS-002` |
+| `slice-010` | Beobachtungs-Port + Quelle-Adapter + E2E-Persistenz | open | `LH-FA-OBS-001` |
 
 ## 5. Abhängigkeiten
 

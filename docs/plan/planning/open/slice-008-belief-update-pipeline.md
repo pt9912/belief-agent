@@ -1,74 +1,73 @@
-# Slice slice-008: Belief-Update-Pipeline (application `belief-aktualisieren`)
+# Slice slice-008: Fundament — `hexagon:application`-Modul + Audit-Port + Multi-Modul-arch-check
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
 **Welle:** [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md).
 
-**Bezug:** `LH-FA-OBS-001`, `LH-FA-OBS-002`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`,
-`ADR-0002`, `ADR-0003`; `ARC-02`, `ARC-06`, `ARC-07`, `ARC-08`.
+**Bezug:** `LH-FA-AUD-001`, `LH-QA-04`; `ADR-0001`, `ADR-0003`; `ARC-06`, `ARC-07`.
 
-**Autor:** pt9912. **Datum:** 2026-07-04.
+**Autor:** pt9912. **Datum:** 2026-07-05 (Zerlegung des ursprünglichen slice-008).
 
 ---
 
 ## 1. Ziel
 
-Die **nachvollziehbare Belief-Update-Pipeline** (`LH-FA-OBS-002`) als erste
-**application-Slice** `belief-aktualisieren` (`hexagon:application`): nimmt eine
-`Beobachtung` aus einer Quelle (`LH-FA-OBS-001`) entgegen, holt Likelihoods über
-den **LLM-Port** (in welle-02 ein deterministischer **Fake-Adapter**), dedupt
-(slice-006), ruft `BayesUpdate` (slice-003), schreibt das Ergebnis und die
-Ereignisse ins Protokoll (slice-007). Bringt die ersten **Ports** (LLM-,
-Beobachtungs-, Uhr-, Audit-Port) und die ersten **Adapter** (`adapters:*`).
+Das **Fundament** für den ersten HexSlice-Ausbau über den Kern hinaus: das
+Gradle-Modul `hexagon:application` steht, der **anwendungsweite Audit-Port**
+(`ARC-06`) lebt in seinem korrekten Zuhause (`hexagon/application/.../ports/`,
+Rolle `port`), der Dockerfile-Build umfasst mehrere Module, und die
+**a-check-`resolution`** ist paket-spezifisch auf das Multi-Modul-Layout
+erweitert. Bewusst **ohne** Use-Case-/Adapter-Logik — die kommt in slice-009
+(Pipeline) und slice-010 (Quelle + E2E) darauf.
+
+Der Slice **retired isoliert** das Multi-Modul-`arch-check`-Risiko (v0.10.0-Guard,
+`CO-001`-Klasse), bevor Pipeline-Logik es überlagert.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-OBS-002` erfüllt: eine Beobachtung erzeugt nachvollziehbar ein
-      Belief-Update **und** Protokoll-Einträge; E2E-nah gegen Fake-Adapter
-      getestet (deterministisch, `LH-QA-03`).
-- [ ] `LH-FA-OBS-001` erfüllt: mindestens eine Beobachtungsquelle als Adapter
-      (Fake/Test), über den Beobachtungs-Port angebunden.
-- [ ] Ports lokal beim Use-Case (HexSlice); Kern importiert keinen Adapter
-      (`arch-check` grün, `ADR-0001`/`ADR-0003`).
-- [ ] **Audit-Port** als **anwendungsweites** Interface (`hexagon/application/ports/`,
-      Rolle `port`, `ARC-06`) — von slice-007 hierher verschoben (Weg C: Port
-      gehört in die application-Schicht, nicht in die Domäne); der
-      Audit-Persistenz-Adapter (`adapters/outbound/audit-*`) implementiert ihn
-      und persistiert das `EreignisProtokoll` (slice-007).
-- [ ] Uhr-Port liefert `Zeitstempel` (Fake-Uhr in Tests) — kein `Clock`-Aufruf
-      im Kern.
-- [ ] a-check-`resolution` für die neuen Module paket-spezifisch erweitert
-      (v0.10.0-Guard); `make arch-check` grün.
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz.
+- [ ] `hexagon:application`-Modul existiert (Gradle-Modul, Dependency auf
+      `hexagon:domain`) und baut im **Multi-Modul-Dockerfile**
+      (`build`/`test`/`coverage` über `domain` + `application`).
+- [ ] **Audit-Port** als **anwendungsweites** Interface
+      (`hexagon/application/.../ports/`, Rolle `port`, `ARC-06`): Vertrag zum
+      Persistieren des `EreignisProtokoll` (slice-007); rein, framework-frei
+      (`ADR-0001`/`ADR-0003`).
+- [ ] `.a-check.yml`-`resolution` paket-spezifisch auf Multi-Modul erweitert
+      (disjunkte Sub-Namespaces, v0.10.0-Guard-konform); `make arch-check` grün
+      über `domain` + `application` (retired die `CO-001`-Klasse).
+- [ ] `make gates` grün (Coverage-Gate berücksichtigt das neue Modul,
+      Interface-Only-Realität dokumentiert).
+- [ ] Closure-Notiz (bei Welle-02-Closure).
 
 ## 3. Plan (vor Code)
 
 | Datei / Komponente | Änderungs-Art | Begründung |
 |---|---|---|
-| `hexagon/application/belief/belief-aktualisieren/**` | neu | Use-Case-Slice + lokale Ports (`ARC-02`, HexSlice) |
-| `settings.gradle.kts` | update | neue Module `hexagon:application`, `adapters:*` |
-| `adapters/outbound/llm-fake/**` | neu | Fake-LLM-Adapter (Likelihoods, `LH-QA-03`) |
-| `adapters/outbound/observation-*/**`, `adapters/outbound/audit-*/**` | neu | Beobachtungsquelle + Audit-Persistenz |
+| `settings.gradle.kts` | update | `include("hexagon:application")` |
+| `hexagon/application/build.gradle.kts` | neu | KMP-Modul, Dependency auf `hexagon:domain` |
+| `hexagon/application/.../ports/AuditPort.kt` | neu | anwendungsweiter Audit-Port (`ARC-06`) |
+| `Dockerfile` | update | `build`/`test`/`coverage` über `domain` + `application` |
 | `.a-check.yml` | update | Multi-Modul-`resolution` (paket-spezifisch, Guard-konform) |
 
 ## 4. Trigger
 
-`slice-005`/`006`/`007` done (Typen, Dedup, Protokoll vorhanden).
+`slice-007` done (das `EreignisProtokoll`, das der Audit-Port persistiert,
+existiert).
 
 ## 5. Closure-Trigger
 
-DoD vollständig + Closure-Notiz; Datei nach `done/`. Erfüllt zusammen mit
-slice-007 den Welle-Closure-Trigger (Beobachtung → Update + Protokoll).
+DoD vollständig + Closure-Notiz; Datei nach `done/`. Enabler für slice-009/010.
 
 ## 6. Risiken und offene Punkte
 
-- **Multi-Modul-a-check:** neue Module = mehrere `resolution`-Roots über
-  geteiltes `package_base` → v0.10.0-Guard bricht bei mehrdeutiger Auflösung ab;
-  disjunkte Sub-Namespaces `dev.beliefagent.{domain,application,adapter}` +
-  tiefe Globs (siehe `CO-001`-Historie). Ggf. eigener Vorschalt-Schritt.
-- Erster application-/adapter-Ausbau: Gradle-Modul-Verdrahtung + DI (Koin am
-  Rand) — Umfang beobachten, ggf. Slice teilen.
+- **Multi-Modul-a-check (Hauptrisiko):** mehrere `resolution`-Roots über
+  geteiltes `package_base` → v0.10.0-Guard bricht bei mehrdeutiger Auflösung
+  mit Exit 2 ab (`CO-001`-Historie). Auflösung: disjunkte Sub-Namespaces
+  `dev.beliefagent.{domain,application}` + Globs tiefer als die Roots. Bei
+  hartnäckigem Guard-Bruch: Carveout mit Auflösungs-Trigger statt roter Merge.
+- **Coverage-Gate:** ein Interface trägt keine coverbare Logik; ggf.
+  `application`-Modul im Kover-Scope so führen, dass die Schwelle (`ADR-0004`)
+  nicht durch Interface-Grundlast kippt (dokumentieren, nicht wegfiltern).
 
 ## 7. Closure-Notiz (nach `done/`)
 
@@ -76,7 +75,7 @@ slice-007 den Welle-Closure-Trigger (Beobachtung → Update + Protokoll).
 
 ## 8. Sub-Area-Modus-Begründung
 
-Neue Sub-Areas `hexagon:application`, `adapters:*` — GF (frisch angelegt, Doku
-führt, kein Bestandscode). Modus-Deklaration siehe
+Neue Sub-Area `hexagon:application` — GF (frisch angelegt, Doku führt, kein
+Bestandscode). Modus-Deklaration siehe
 [`../../../../harness/conventions.md`](../../../../harness/conventions.md)
 §Modus-Deklaration pro Sub-Area.
