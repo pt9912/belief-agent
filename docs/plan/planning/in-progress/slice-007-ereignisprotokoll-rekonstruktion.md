@@ -1,4 +1,4 @@
-# Slice slice-007: Ereignisprotokoll + Belief-Rekonstruktion + Audit-Port
+# Slice slice-007: Ereignisprotokoll + Belief-Rekonstruktion
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
@@ -17,20 +17,34 @@ Ein **unveränderliches, geordnetes Ereignisprotokoll** (`LH-FA-AUD-001`) im
 Kern: append-only Sequenz von `Ereignis`, aus der der Belief State zu jedem
 vergangenen Zeitpunkt **rekonstruierbar** ist (`LH-FA-AUD-002`). Die
 Entscheidungsspur ist damit ein auditierbares Protokoll, kein verstecktes
-Reasoning (`LH-FA-AUD-003`). Plus der **Audit-Port** (Vertrag zum Persistieren
-des Protokolls; Adapter folgt in slice-008/später).
+Reasoning (`LH-FA-AUD-003`). Der **Audit-Port** (Persistenz-Vertrag) ist als
+**anwendungsweiter Port** nach slice-008 verschoben (Weg C, siehe DoD) — er
+gehört in die application-Schicht, nicht in die Domäne.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-AUD-001` erfüllt: `EreignisProtokoll` ist append-only + geordnet;
-      Mutation der Vergangenheit ist nicht möglich; Test.
-- [ ] `LH-FA-AUD-002` erfüllt: Belief State ist aus dem Protokoll rekonstruierbar
-      (Replay der Ereignisse); Test mit erwartetem End-Belief.
-- [ ] `LH-FA-AUD-003` erfüllt: die Spur liegt als prüfbares Protokoll vor (nicht
-      modellintern) — durch die Typen belegt.
-- [ ] Audit-Port als Interface im Core; framework-frei (`ADR-0001`).
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz.
+- [x] `LH-FA-AUD-001` erfüllt: `EreignisProtokoll` ist append-only + geordnet
+      (monotone Zeitstempel); Rück-Datieren wird abgewiesen, jede Operation
+      liefert ein neues Protokoll (Vergangenheit nicht mutierbar);
+      `EreignisProtokollTest`.
+- [x] `LH-FA-AUD-002` erfüllt: Belief State ist aus dem Protokoll rekonstruierbar
+      (`Rekonstruktion.endBelief`/`rekonstruiereBis`, Replay der Ereignisse);
+      `RekonstruktionTest` mit erwartetem End-Belief und vergangenem Zustand.
+- [x] `LH-FA-AUD-003` erfüllt: die Spur liegt als prüfbares append-only Protokoll
+      vor (nicht modellintern) — durch die Typen belegt.
+- [x] Kern-lokal (`hexagon:domain`, `commonMain`), framework-frei
+      (`ADR-0001`/`ADR-0003`), deterministisch (`LH-QA-03`).
+- [x] `make gates` grün (5 Gates; 59 Tests, Line-Coverage 97,37 %).
+- [ ] Closure-Notiz (bei Welle-02-Closure).
+
+**Umschnitt (Weg C):** Der ursprüngliche DoD-Punkt „Audit-Port als Interface"
+ist nach **slice-008** verschoben. Der Audit-Port ist ein **anwendungsweiter
+Port** (`hexagon/application/ports/`, Rolle `port`, `ARC-06`), **kein**
+Domänentyp — `architecture.md` §2 verbietet der Domain den Import von Ports. Er
+landet in slice-008, wo `hexagon:application` gebaut und a-check um die
+`port`-Rolle erweitert wird — dort sofort im korrekten Zuhause statt
+provisorisch in der Domäne. Das hält slice-007 als reinen domain-Slice
+(Regelwerk Modul 5: Schnitt nach Lieferwert, ≤ drei Schichten).
 
 ## 3. Plan (vor Code)
 
@@ -38,7 +52,6 @@ des Protokolls; Adapter folgt in slice-008/später).
 |---|---|---|
 | `hexagon/domain/.../EreignisProtokoll.kt` | neu | append-only Sequenz (`ARC-06`, `LH-FA-AUD-001`) |
 | `hexagon/domain/.../Rekonstruktion.kt` | neu | Replay → Belief (`LH-FA-AUD-002`) |
-| Audit-Port (Interface) | neu | Vertrag zum Persistieren (`ARC-07`) |
 | `hexagon/domain/.../*Test.kt` | neu | Append-/Replay-Tests (`LH-QA-03`) |
 
 ## 4. Trigger

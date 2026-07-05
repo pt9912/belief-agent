@@ -5,7 +5,7 @@
 **Welle:** [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md).
 
 **Bezug:** `LH-FA-OBS-001`, `LH-FA-OBS-002`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`,
-`ADR-0002`, `ADR-0003`; `ARC-02`, `ARC-07`, `ARC-08`.
+`ADR-0002`, `ADR-0003`; `ARC-02`, `ARC-06`, `ARC-07`, `ARC-08`.
 
 **Autor:** pt9912. **Datum:** 2026-07-04.
 
@@ -30,6 +30,11 @@ Beobachtungs-, Uhr-, Audit-Port) und die ersten **Adapter** (`adapters:*`).
       (Fake/Test), über den Beobachtungs-Port angebunden.
 - [ ] Ports lokal beim Use-Case (HexSlice); Kern importiert keinen Adapter
       (`arch-check` grün, `ADR-0001`/`ADR-0003`).
+- [ ] **Audit-Port** als **anwendungsweites** Interface (`hexagon/application/ports/`,
+      Rolle `port`, `ARC-06`) — von slice-007 hierher verschoben (Weg C: Port
+      gehört in die application-Schicht, nicht in die Domäne); der
+      Audit-Persistenz-Adapter (`adapters/outbound/audit-*`) implementiert ihn
+      und persistiert das `EreignisProtokoll` (slice-007).
 - [ ] Uhr-Port liefert `Zeitstempel` (Fake-Uhr in Tests) — kein `Clock`-Aufruf
       im Kern.
 - [ ] a-check-`resolution` für die neuen Module paket-spezifisch erweitert
