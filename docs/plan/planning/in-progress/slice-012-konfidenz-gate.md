@@ -37,7 +37,7 @@ Deterministisch (`LH-QA-03`).
       `==`-Schwelle getestet, hohe Erfolgs-P überstimmt die Sperre **nicht**.
 - [x] Kern-lokal, deterministisch (`LH-QA-03`); `make gates` grün (5 Gates;
       88 Tests, Coverage 98,1 %).
-- [ ] Closure-Notiz (bei Welle-03-Closure).
+- [x] Closure-Notiz (bei Welle-03-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -65,7 +65,13 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** `KonfidenzGate` (Freigabe/Ablehnung/Eskalation), fail-safe-
+Ordnung (Resthypothese-Sperre **zuerst**), konfigurierbare `GateSchwellen`,
+`ADR-0005`. **Steering-Loop (Kern-Lehre):** das Code-Review fand **zwei
+config-erreichbare Safety-Inversionen** (nicht-monotone Schwellen; per `1.0`
+abschaltbare Sperre) — jetzt **fail-closed im Konstruktor** erzwungen (nicht
+konstruierbar). **Regel geschärft:** Review von Sicherheitsfunktionen ist Pflicht;
+Negativ-Tests für böse Configs. **Offen:** —.
 
 ## 8. Sub-Area-Modus-Begründung
 

@@ -33,7 +33,7 @@ aufsetzt.
       Rückverfolgbarkeit Aktion → Evidenz); leere Evidenz wird abgewiesen.
 - [x] Kern-lokal (`hexagon:domain`, `commonMain`), framework-frei, deterministisch
       (`LH-QA-03`); `make gates` grün (5 Gates; 78 Tests, Coverage 97,71 %).
-- [ ] Closure-Notiz (bei Welle-03-Closure).
+- [x] Closure-Notiz (bei Welle-03-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -59,7 +59,12 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** `Aktion` mit `Wirkungsklasse` (4, nach Reichweite
+geordnet, nur extern-wirksam irreversibel), `Erfolgswahrscheinlichkeit` in `[0,1]`
+**getrennt** vom Belief, Rückverfolgbarkeit Aktion → Evidenz (≥1 Beobachtung).
+**Steering-Loop:** `Wirkungsklasse.irreversibel` als **semantisches** Prädikat am
+Enum trug die fail-closed-Gate-Prüfung in beiden Schichten (statt Enum-Vergleich;
+Review-Nachlauf slice-013). **Offen:** —.
 
 ## 8. Sub-Area-Modus-Begründung
 

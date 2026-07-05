@@ -32,7 +32,7 @@ deterministischer **Fake-Approval-Adapter** (`LH-QA-03`).
 - [x] Ports lokal beim Use-Case; Kern importiert keinen Adapter (`arch-check`
       grün über **6 Module**, `ADR-0001`/`ADR-0003`); DI am Adapter-Rand (cli folgt).
 - [x] `make gates` grün (5 Gates; 101 Tests).
-- [ ] Closure-Notiz (bei Welle-03-Closure).
+- [x] Closure-Notiz (bei Welle-03-Closure).
 
 ## 3. Plan (vor Code)
 
@@ -70,7 +70,14 @@ hoher Resthypothese wird abgelehnt/eskaliert).
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** `AktionGaten` als nicht-umgehbarer Schritt +
+`HumanApprovalPort` (Fake, Default verweigert). **Steering-Loop:** das
+**Ketten-Review** (an der Welle-Grenze) fand ein **fail-open** (`== EXTERN_WIRKSAM`
+statt `.irreversibel`) und die fehlende strukturelle POL-006 — behoben durch den
+verbindlichen, nur-intern konstruierbaren `Aktionsfreigabe`-Typ. **Regel
+geschärft:** Reviews von Sicherheitsfunktionen an die Welle-Grenze legen — die
+Ketten-Sicht findet Fehler, die Einzel-Slices verbergen. **Follow-ups:**
+Executor-Erzwingung + echter Approval-Adapter (welle-05).
 
 ## 8. Sub-Area-Modus-Begründung
 
