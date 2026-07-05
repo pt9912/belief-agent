@@ -19,21 +19,26 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
 ## Baseline
 
 - **Konvention:** AI-Harness-Kurs (`pt9912/ai-harness-course`)
-- **Stand:** v1.3.0 (Regelwerk- und Template-Set)
-- **Datum der Adoption:** 2026-06-22
+- **Stand:** v1.4.0 (Regelwerk- und Template-Set)
+- **Datum der Adoption:** 2026-06-22 (initial v1.3.0); Bump v1.3.0 → v1.4.0 am
+  2026-07-05 (`MR-007`).
 
 ## Adoptierte Konventions-Quellen
 
-- **Extern (Lehrmaterial):** <https://github.com/pt9912/ai-harness-course/tree/v1.3.0/kurs/de>
-- **Extern (Agenten-Regelwerk, ZIP pro Modul):**
-  <https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/lab-regelwerk.zip>
-  — adoptierter Stand: Release-Tag `v1.3.0` (self-navigierbares Bundle,
-  interne Verweise auf den Tag gepinnt).
+- **Extern (Lehrmaterial):** <https://github.com/pt9912/ai-harness-course/tree/v1.4.0/kurs/de>
+- **Regelwerk (committet vendored, `MR-007`):** die Lese-Form ist das nach
+  Modulen aufgeteilte Bundle, entpackt und committet unter
+  `.harness/baseline/v1.4.0/regelwerk/` (Index `regelwerk/README.md`), samt
+  `.harness/baseline/v1.4.0/SHA256SUMS`-Integritätsmanifest — netzlos auf jedem
+  Checkout, offline verifizierbar per `tools/harness/fetch-baseline-cache.sh`
+  (`--verify`). Bundle-Quelle: Release-Asset `lab-regelwerk.zip`, Tag `v1.4.0`.
 - **In-Repo (verkörperte Form):** die wiederkehrenden Templates
   (`docs/plan/adr/NNNN-titel.template.md`, `docs/plan/planning/slice.template.md`,
   `docs/plan/planning/welle.template.md`, `docs/plan/carveouts/carveout.template.md`,
   `docs/reviews/review-report.template.md`) sowie die Gate-Baseline
-  (`.d-check.yml`, `d-check.mk`, `Makefile`).
+  (`.d-check.yml`, `d-check.mk`, `Makefile`). Die Templates bleiben **co-located**
+  und sind Autorenquelle — Upstream-MR-018 („keine co-located Templates", nur
+  für Producer/Self-Hoster) wird bewusst **nicht** adoptiert (`MR-008`).
 
 ## Adaptions-Block
 
@@ -164,6 +169,55 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   `external`.
 - **Auflösungs-Trigger:** permanent; Modulwahl bei d-check-Upgrade
   re-evaluieren.
+
+### MR-007 — Regelwerk-Lese-Form committet vendored + Baseline-Bump v1.4.0
+
+- **Datum:** 2026-07-05
+- **Geltungsbereich:** `.harness/baseline/`, `tools/harness/fetch-baseline-cache.sh`,
+  `AGENTS.md` §1, `harness/README.md` §Guides, `.d-check.yml` (`scan.ignore`),
+  `.gitignore`, §Baseline oben.
+- **Adaption:** Die Lese-Form des adoptierten Regelwerks wechselt von „pro
+  Session das Remote-ZIP holen" auf **committet vendored**:
+  `.harness/baseline/v1.4.0/regelwerk/` (+ `SHA256SUMS`-Integritätsmanifest),
+  netzlos auf jedem Checkout präsent und offline verifizierbar
+  (`tools/harness/fetch-baseline-cache.sh --verify`). Zugleich **Bump des
+  adoptierten Stands v1.3.0 → v1.4.0** (das für beide Adopter geltende
+  Regelwerk; belief-agent zieht nach). Realisiert als eigene belief-agent-
+  Adaption nach dem Muster der Referenz d-check (dortiges `MR-019`) — nicht
+  importiert.
+- **Begründung:** `AGENTS.md` §1 verlangt, das aufgaben-relevante Regelwerk-
+  Modul **einmal pro Session zu lesen** — das setzt einen aus dem Checkout
+  lesbaren, netzlosen, integritäts-verifizierten Bestand voraus (konsistent mit
+  der digest-gepinnten, netzlosen Tool-Haltung, `MR-004`/`MR-006`). Die
+  Remote-ZIP-Form erfüllte das nicht.
+- **Reviewter Umfang / offener Punkt:** Dieser MR deckt **Lese-Form** und
+  **Versions-Pin** ab. Der v1.3.0 → v1.4.0-Delta-Scan bestätigte, dass die
+  Template-Kopier-Vorgabe in v1.4.0 fortbesteht (`modul-02` Bootstrap) → kein
+  Konflikt mit den co-located Templates (`MR-008`). **Offen** (eigener
+  Trigger): vollständige v1.4.0-Konformitäts-Durchsicht aller Module — v. a.
+  die Lifecycle-Disziplin (Modul 5 WIP=1 / Lerneintrag je Slice; „delivered
+  bleibt in `in-progress/` bis Welle-Closure" ist eine noch undokumentierte
+  Abweichung).
+- **Auflösungs-Trigger:** Lese-Form permanent; Versions-Pin beim nächsten
+  Baseline-Bump nachziehen; Konformitäts-Durchsicht als eigener Slice/MR.
+
+### MR-008 — Upstream-MR-018 („keine co-located Templates") nicht adoptiert
+
+- **Datum:** 2026-07-05
+- **Geltungsbereich:** Template-Haltung; §Adoptierte Konventions-Quellen,
+  `tools/harness/fetch-baseline-cache.sh`.
+- **Adaption:** Die Referenz d-check verzichtet auf co-located Templates
+  (dortiges `MR-018`), **weil d-check Producer/Self-Hoster des Kurs-/Template-
+  Materials ist**. belief-agent ist **Consumer**, nicht Producer; damit gilt
+  der Baseline-**Default**: Skelett-Vorlagen liegen co-located im Repo und sind
+  Autorenquelle (beim Anlegen neuer Artefakte kopieren, nicht frei
+  formulieren). v1.4.0 schreibt diese Kopier-Vorgabe selbst fort (`modul-02`
+  Bootstrap-Sequenz). Das fetch-Skript stagt daher **kein** `lab-templates.zip`.
+- **Begründung:** MR-018 ist eine rollen-spezifische Producer-Adaption, kein
+  Regelwerk-Stand-Fortschritt. Übernahme wäre ein Fehl-Import; die bewusste
+  Nicht-Adoption wird dokumentiert, damit sie nicht als Versäumnis erscheint.
+- **Auflösungs-Trigger:** permanent, solange belief-agent Consumer (nicht
+  Producer) der Baseline ist.
 
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 

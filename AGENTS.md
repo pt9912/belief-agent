@@ -15,21 +15,24 @@ Strukturregeln (ID-Schemata, Verzeichniskonvention, Adaptionen ggü.
 Baseline, Modus-Deklarationen pro Sub-Area, Zusatzklassen für
 Sensors-Bindung) leben in [`harness/conventions.md`](harness/conventions.md).
 
-Das **Betriebsregelwerk der adoptierten Baseline** liegt als ZIP-Bundle
-(Regelwerk pro Modul, self-navigierbar) als Release-Asset bereit:
-<https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/lab-regelwerk.zip>
-— pro Session das aufgaben-relevante Modul lesen, bevor der Workflow (§6)
-startet. Derivativ: bei
-Konflikt gelten die kanonischen Quellen; adoptierter Stand in
+Das **Betriebsregelwerk der adoptierten Baseline** ist **committet vendored**
+(`MR-007`): das nach Modulen aufgeteilte Bundle liegt entpackt unter
+`.harness/baseline/v1.4.0/regelwerk/` (Index
+[`regelwerk/README.md`](.harness/baseline/v1.4.0/regelwerk/README.md), samt
+`.harness/baseline/v1.4.0/SHA256SUMS`-Integritätsmanifest) — netzlos auf jedem
+Checkout, offline verifizierbar per `tools/harness/fetch-baseline-cache.sh`
+(`--verify`). Pro Session **nur das aufgaben-relevante Modul lesen**, bevor der
+Workflow (§6) startet — nicht das gesamte Regelwerk im Kontext halten.
+Derivativ: bei Konflikt gelten die kanonischen Quellen; adoptierter Stand in
 [`harness/conventions.md`](harness/conventions.md) §Baseline.
 
-Die **Skelett-Vorlagen** der Baseline liegen als ZIP bereit:
-<https://github.com/pt9912/ai-harness-course/releases/download/v1.3.0/lab-templates.zip>
-— beim Anlegen neuer Artefakte das passende Template kopieren statt frei zu
-formulieren. Wiederkehrende Vorlagen liegen co-located im Repo
+Die **Skelett-Vorlagen** der Baseline liegen **co-located im Repo**
 (`docs/plan/adr/NNNN-titel.template.md`, `docs/plan/planning/slice.template.md`,
 `docs/plan/planning/welle.template.md`, `docs/plan/carveouts/carveout.template.md`,
-`docs/reviews/review-report.template.md`).
+`docs/reviews/review-report.template.md`) — beim Anlegen neuer Artefakte das
+passende Template **kopieren** statt frei zu formulieren. Upstream-MR-018
+(„keine co-located Templates") gilt nur für Producer/Self-Hoster und wird
+bewusst **nicht** adoptiert (`MR-008`).
 
 ## 2. Kanonische Quellen (Source Precedence)
 
