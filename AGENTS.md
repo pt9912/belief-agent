@@ -16,13 +16,14 @@ Baseline, Modus-Deklarationen pro Sub-Area, Zusatzklassen für
 Sensors-Bindung) leben in [`harness/conventions.md`](harness/conventions.md).
 
 Das **Betriebsregelwerk der adoptierten Baseline** ist **committet vendored**
-(`MR-007`): das nach Modulen aufgeteilte Bundle liegt entpackt unter
-`.harness/baseline/v1.4.0/regelwerk/` (Index
-[`regelwerk/README.md`](.harness/baseline/v1.4.0/regelwerk/README.md), samt
-`.harness/baseline/v1.4.0/SHA256SUMS`-Integritätsmanifest) — netzlos auf jedem
-Checkout, offline verifizierbar per `tools/harness/fetch-baseline-cache.sh`
-(`--verify`). Pro Session **nur das aufgaben-relevante Modul lesen**, bevor der
-Workflow (§6) startet — nicht das gesamte Regelwerk im Kontext halten.
+(`MR-007`): das nach Modulen **und Grundlagen-Abschnitten** aufgeteilte Regelwerk
+liegt entpackt unter `.harness/baseline/<tag>/regelwerk/` (die dortige
+`README.md` ist der Index), samt `.harness/baseline/<tag>/SHA256SUMS`-
+Integritätsmanifest — **netzlos auf jedem Checkout präsent**, offline
+materialisier-/verifizierbar per `tools/harness/fetch-baseline-cache.sh`
+(`--verify`; Tag aus §Baseline; Quelle ist das derivative Release-Bundle
+`lab-regelwerk.zip`). Pro Session **nur den benötigten Abschnitt** lesen, bevor
+der Workflow (§6) startet — nicht das gesamte Regelwerk im Kontext halten.
 Derivativ: bei Konflikt gelten die kanonischen Quellen; adoptierter Stand in
 [`harness/conventions.md`](harness/conventions.md) §Baseline.
 
