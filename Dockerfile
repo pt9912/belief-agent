@@ -18,7 +18,8 @@ COPY hexagon/application/build.gradle.kts ./hexagon/application/build.gradle.kts
 COPY adapters/outbound/llm-fake/build.gradle.kts ./adapters/outbound/llm-fake/build.gradle.kts
 COPY adapters/outbound/observation-fake/build.gradle.kts ./adapters/outbound/observation-fake/build.gradle.kts
 COPY adapters/outbound/audit-memory/build.gradle.kts ./adapters/outbound/audit-memory/build.gradle.kts
-RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:audit-memory:dependencies
+COPY adapters/outbound/approval-fake/build.gradle.kts ./adapters/outbound/approval-fake/build.gradle.kts
+RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:approval-fake:dependencies
 
 # --- build: Quellcode kompilieren (alle Module) ----------------------------
 FROM deps AS build
