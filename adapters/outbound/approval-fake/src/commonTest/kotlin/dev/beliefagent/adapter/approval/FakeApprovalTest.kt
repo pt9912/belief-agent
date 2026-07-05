@@ -1,12 +1,12 @@
 package dev.beliefagent.adapter.approval
 
 import dev.beliefagent.application.belief.gaten.AktionGaten
+import dev.beliefagent.application.belief.gaten.Aktionsfreigabe
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
 import dev.beliefagent.domain.belief.Erfolgswahrscheinlichkeit
 import dev.beliefagent.domain.belief.Evidenz
-import dev.beliefagent.domain.belief.GateEntscheidung
 import dev.beliefagent.domain.belief.Hypothese
 import dev.beliefagent.domain.belief.HypotheseId
 import dev.beliefagent.domain.belief.Quelle
@@ -45,7 +45,7 @@ class FakeApprovalTest {
     fun e2e_extern_wirksam_nur_mit_freigabe_frei() { // LH-FA-POL-004/006 (E2E gegen echten Fake-Adapter)
         val aktion = aktion(0.95)
         val belief = belief(0.1)
-        assertTrue(AktionGaten(FakeApproval(freigabe = false)).pruefe(aktion, belief) is GateEntscheidung.Eskalation)
-        assertTrue(AktionGaten(FakeApproval(freigabe = true)).pruefe(aktion, belief) is GateEntscheidung.Freigabe)
+        assertTrue(AktionGaten(FakeApproval(freigabe = false)).pruefe(aktion, belief) is Aktionsfreigabe.Eskaliert)
+        assertTrue(AktionGaten(FakeApproval(freigabe = true)).pruefe(aktion, belief) is Aktionsfreigabe.Freigegeben)
     }
 }

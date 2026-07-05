@@ -59,4 +59,12 @@ class RekonstruktionTest {
         val b = Rekonstruktion.endBelief(EreignisProtokoll.von(eingabe))!!
         assertEquals(a.hypothesen.single().wahrscheinlichkeit, b.hypothesen.single().wahrscheinlichkeit)
     }
+
+    @Test
+    fun zustand_nach_index_isoliert_gleiche_zeitstempel() { // #7: sequenz-genau bei gleichem ts
+        val p = EreignisProtokoll.von(listOf(aktualisiert(10, 0.6), aktualisiert(10, 0.9)))
+        assertEquals(0.6, Rekonstruktion.zustandNach(p, 1)!!.hypothesen.single().wahrscheinlichkeit)
+        assertEquals(0.9, Rekonstruktion.zustandNach(p, 2)!!.hypothesen.single().wahrscheinlichkeit)
+        assertNull(Rekonstruktion.zustandNach(p, 0))
+    }
 }

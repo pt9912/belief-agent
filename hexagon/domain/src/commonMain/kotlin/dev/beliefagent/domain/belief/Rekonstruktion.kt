@@ -26,9 +26,24 @@ object Rekonstruktion {
      * Belief State nach Replay aller Ereignisse **bis einschließlich** [bis];
      * `null`, falls bis dahin kein Belief etabliert wurde. Erlaubt die
      * Rekonstruktion eines vergangenen Zustands (LH-FA-AUD-002).
+     *
+     * Tie-Break bei **gleichem** Zeitstempel: es zählt der **letzte** Belief mit
+     * `zeitstempel ≤ bis` (mehrere Updates teilen oft denselben `epochMillis`).
+     * Für sequenz-genaue Zwischenzustände siehe [zustandNach].
      */
     fun rekonstruiereBis(protokoll: EreignisProtokoll, bis: Zeitstempel): BeliefState? =
         falte(protokoll.ereignisse.filter { it.zeitstempel <= bis })
+
+    /**
+     * Belief State nach Replay der **ersten [anzahl] Ereignisse** (Einfüge-
+     * reihenfolge, 0-basiert: `zustandNach(p, 2)` = Zustand nach den ersten zwei).
+     * Isoliert Zwischenzustände **sequenz-genau** auch bei gleichem Zeitstempel,
+     * wo [rekonstruiereBis] nur zeitstempel-genau auflöst (LH-FA-AUD-002). `null`,
+     * falls unter den ersten [anzahl] kein Belief etabliert wurde; [anzahl] wird
+     * auf `[0, Größe]` geklemmt.
+     */
+    fun zustandNach(protokoll: EreignisProtokoll, anzahl: Int): BeliefState? =
+        falte(protokoll.ereignisse.take(anzahl.coerceAtLeast(0)))
 
     private fun falte(ereignisse: List<Ereignis>): BeliefState? =
         ereignisse.fold(null as BeliefState?) { belief, ereignis ->

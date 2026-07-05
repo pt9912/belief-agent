@@ -56,6 +56,6 @@ class FakeLlmTest {
         val regression = ergebnis.belief.hypothesen.single { it.id.wert == "regression" }
         val flaky = ergebnis.belief.hypothesen.single { it.id.wert == "flaky" }
         assertTrue(regression.wahrscheinlichkeit > flaky.wahrscheinlichkeit) // Evidenz nennt regression
-        assertEquals(2, ergebnis.ereignisse.size)
+        assertEquals(3, ergebnis.ereignisse.size) // Initial-Snapshot + erfasst + aktualisiert
     }
 }

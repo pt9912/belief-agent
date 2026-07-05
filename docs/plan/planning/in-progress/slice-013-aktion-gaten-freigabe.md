@@ -58,6 +58,15 @@ hoher Resthypothese wird abgelehnt/eskaliert).
 
 - Ohne Composition-Root (cli) läuft die Gate-Orchestrierung E2E-nah im Testcode
   (wie slice-010); der Produktions-`ARC-09`-Zyklus folgt.
+- **Review-Nachlauf (welle-03-Gate-Kette, Code-Review):** gefixt — Freigabe-
+  Prädikat auf `.irreversibel` (fail-closed für künftige irreversible Klassen);
+  verbindlicher, **nur-intern konstruierbarer** `Aktionsfreigabe.Freigegeben`-Typ
+  (Provenienz + strukturelle POL-006, nicht via `KonfidenzGate` umgehbar);
+  Uhr-Monotonie-Vertrag; Ausgangs-Belief protokolliert (volle Rekonstruierbarkeit,
+  `LH-FA-AUD-002`); `Rekonstruktion.zustandNach` (sequenz-genau). **Follow-ups:**
+  der künftige **Executor** darf nur `Aktionsfreigabe.Freigegeben` ausführen
+  (a-check-Regel bei Bedarf); der **echte Approval-Adapter** (welle-05) muss die
+  Freigabe binden/einmal-gültig machen (`HumanApprovalPort`-KDoc).
 
 ## 7. Closure-Notiz (nach `done/`)
 

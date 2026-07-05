@@ -41,6 +41,9 @@ class BeliefAktualisieren(
     fun ausfuehren(befehl: BeliefAktualisierenBefehl): BeliefAktualisierenErgebnis {
         var belief = befehl.prior
         val ereignisse = mutableListOf<Ereignis>()
+        // Ausgangs-Belief protokollieren, damit der Zustand aus dem Protokoll
+        // vollständig rekonstruierbar ist (LH-FA-AUD-002) — auch bei null Updates.
+        ereignisse += BeliefAktualisiert(uhr.jetzt(), belief)
         for (beobachtung in Dedup.unabhaengig(befehl.beobachtungen)) {
             val t = uhr.jetzt()
             ereignisse += BeobachtungErfasst(t, beobachtung)

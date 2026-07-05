@@ -44,9 +44,10 @@ class BeliefAktualisierenTest {
         val ergebnis = BeliefAktualisieren(llmFavorisiertA, uhr(100L))
             .ausfuehren(BeliefAktualisierenBefehl(prior(), listOf(beob(100L, "Test rot"))))
         assertTrue(ergebnis.belief.hypothesen.single { it.id.wert == "A" }.wahrscheinlichkeit > 0.5)
-        assertEquals(2, ergebnis.ereignisse.size)
-        assertTrue(ergebnis.ereignisse[0] is BeobachtungErfasst)
-        assertTrue(ergebnis.ereignisse[1] is BeliefAktualisiert)
+        assertEquals(3, ergebnis.ereignisse.size) // Initial-Snapshot + erfasst + aktualisiert
+        assertTrue(ergebnis.ereignisse[0] is BeliefAktualisiert) // Ausgangs-Belief (LH-FA-AUD-002)
+        assertTrue(ergebnis.ereignisse[1] is BeobachtungErfasst)
+        assertTrue(ergebnis.ereignisse[2] is BeliefAktualisiert)
     }
 
     @Test
@@ -54,7 +55,7 @@ class BeliefAktualisierenTest {
         val doppelt = listOf(beob(1L, "gleich"), beob(2L, "gleich")) // gleiche Quelle + Evidenz
         val ergebnis = BeliefAktualisieren(llmFavorisiertA, uhr(1L))
             .ausfuehren(BeliefAktualisierenBefehl(prior(), doppelt))
-        assertEquals(2, ergebnis.ereignisse.size) // nur eine unabhängige Beobachtung
+        assertEquals(3, ergebnis.ereignisse.size) // Initial-Snapshot + eine unabhängige Beobachtung
     }
 
     @Test
@@ -66,11 +67,13 @@ class BeliefAktualisierenTest {
     }
 
     @Test
-    fun leere_beobachtungen_ergeben_prior_ohne_ereignisse() {
+    fun leere_beobachtungen_ergeben_prior_mit_initial_snapshot() { // LH-FA-AUD-002
         val p = prior()
         val ergebnis = BeliefAktualisieren(llmFavorisiertA, uhr(1L))
             .ausfuehren(BeliefAktualisierenBefehl(p, emptyList()))
-        assertTrue(ergebnis.ereignisse.isEmpty())
+        // Kein Update, aber der Ausgangs-Belief ist protokolliert (rekonstruierbar).
+        assertEquals(1, ergebnis.ereignisse.size)
+        assertTrue(ergebnis.ereignisse.single() is BeliefAktualisiert)
         assertEquals(
             p.hypothesen.map { it.wahrscheinlichkeit },
             ergebnis.belief.hypothesen.map { it.wahrscheinlichkeit },

@@ -6,7 +6,6 @@ import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
 import dev.beliefagent.domain.belief.Erfolgswahrscheinlichkeit
 import dev.beliefagent.domain.belief.Evidenz
-import dev.beliefagent.domain.belief.GateEntscheidung
 import dev.beliefagent.domain.belief.Hypothese
 import dev.beliefagent.domain.belief.HypotheseId
 import dev.beliefagent.domain.belief.Quelle
@@ -18,7 +17,7 @@ import kotlin.test.assertTrue
 
 /**
  * Deterministische Tests des aktion-gaten-Use-Cases (LH-FA-POL-004/006, LH-QA-03)
- * gegen In-Test-Approval-Fakes.
+ * gegen In-Test-Approval-Fakes. Ergebnis ist die verbindliche [Aktionsfreigabe].
  */
 class AktionGatenTest {
 
@@ -38,28 +37,28 @@ class AktionGatenTest {
     fun gate_wird_nicht_umgangen_ablehnung_bleibt_ablehnung() { // LH-FA-POL-006
         // Niedrige Erfolgs-P -> Gate lehnt ab; aktion-gaten hebt das NICHT zur Freigabe an.
         assertTrue(
-            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.1), belief(0.1)) is GateEntscheidung.Ablehnung,
+            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.1), belief(0.1)) is Aktionsfreigabe.Abgelehnt,
         )
     }
 
     @Test
-    fun extern_wirksam_ohne_freigabe_wird_eskaliert() { // LH-FA-POL-004
+    fun irreversibel_ohne_freigabe_wird_eskaliert() { // LH-FA-POL-004
         val e = AktionGaten(approval(false)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.1))
-        assertTrue(e is GateEntscheidung.Eskalation && "LH-FA-POL-004" in e.grund)
+        assertTrue(e is Aktionsfreigabe.Eskaliert && "LH-FA-POL-004" in e.grund)
     }
 
     @Test
-    fun extern_wirksam_mit_freigabe_wird_freigegeben() { // LH-FA-POL-004
+    fun irreversibel_mit_freigabe_wird_freigegeben() { // LH-FA-POL-004
         assertTrue(
-            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.1)) is GateEntscheidung.Freigabe,
+            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.1)) is Aktionsfreigabe.Freigegeben,
         )
     }
 
     @Test
     fun reversible_freigabe_braucht_keine_menschliche_freigabe() {
-        // repository-wirksam ist reversibel -> Freigabe ohne Approval.
+        // repository-wirksam ist reversibel -> Freigegeben ohne Approval.
         assertTrue(
-            AktionGaten(approval(false)).pruefe(aktion(Wirkungsklasse.REPOSITORY_WIRKSAM, 0.9), belief(0.1)) is GateEntscheidung.Freigabe,
+            AktionGaten(approval(false)).pruefe(aktion(Wirkungsklasse.REPOSITORY_WIRKSAM, 0.9), belief(0.1)) is Aktionsfreigabe.Freigegeben,
         )
     }
 
@@ -67,7 +66,7 @@ class AktionGatenTest {
     fun gate_eskalation_bleibt_unabhaengig_von_freigabe() { // LH-FA-POL-005 dominiert
         // extern-wirksam + hohe Resthypothese -> Gate eskaliert; Approval ändert nichts.
         assertTrue(
-            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.6)) is GateEntscheidung.Eskalation,
+            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.6)) is Aktionsfreigabe.Eskaliert,
         )
     }
 }
