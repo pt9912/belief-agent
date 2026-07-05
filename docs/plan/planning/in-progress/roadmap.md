@@ -10,33 +10,18 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktuelle Welle: [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md)** —
-Aktionen + Konfidenz-Gate (die Sicherheitsfunktion, `MR-003`).
-(welle-02 abgeschlossen, siehe §Abgeschlossene Wellen.)
-
-- `slice-011` (Domäne: `Aktion` + vier `Wirkungsklasse`n +
-  Erfolgswahrscheinlichkeit + Evidenz-Ref, `LH-FA-ACT-001`..`004`) **geliefert**
-  (`make gates` grün, 78 Tests, Coverage 97,71 %). Liegt in `in-progress/` bis
-  Welle-Closure.
-- `slice-012` (Konfidenz-Gate-Regel: Freigabe/Ablehnung/Eskalation, Schwellen je
-  Wirkungsklasse, Resthypothese-Sperre, `LH-FA-POL-001`/`002`/`003`/`005`/`007`)
-  **geliefert** (`make gates` grün, 88 Tests; Schwellwerte `ADR-0005`). Liegt in
-  `in-progress/` bis Welle-Closure.
-- `slice-013` (aktion-gaten: nicht-umgehbares Gate + Human-Approval-Port,
-  `LH-FA-POL-004`/`006`) **geliefert** (`make gates` grün, 101 Tests; erstes
-  `approval-fake`-Adapter, Gate-Kette E2E). Liegt in `in-progress/` bis
-  Welle-Closure.
-- **⇒ Resume-Punkt: welle-03-Closure** — alle Slices `011`..`013` geliefert,
-  Closure-Trigger erfüllt (extern-wirksame Aktion ohne Freigabe / bei hoher
-  Resthypothese wird abgelehnt/eskaliert). Closure: Closure-Notizen je Slice,
-  Slices → `done/`, Lerneintrag in `done/welle-03-aktionen-gates-results.md`,
-  Roadmap-Ruhe-Marker.
+**Keine aktive Welle** (kein `slice-*` in `in-progress/`).
+`welle-03-aktionen-gates` ist **abgeschlossen** (2026-07-05;
+[Ergebnisse](../done/welle-03-aktionen-gates-results.md), Slices `011`..`013` in
+`done/`) — die **Sicherheitsfunktion** (`MR-003`: Konfidenz-Gate + menschliche
+Freigabe für irreversible Aktionen) steht. Nächste Trigger: **welle-04** (VoI +
+Eskalation) bzw. **welle-05** (LLM-Port), beide „welle-03 done"; Slices werden
+**bei Welle-Start** in `open/` angelegt (Welle für Welle).
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-03-aktionen-gates | welle-02 done | Wirkungsklassen, Konfidenz-Gate, menschliche Freigabe (`LH-FA-ACT`, `LH-FA-POL`) | M |
 | welle-04-voi-eskalation | welle-03 done | VoI-Selektor, Eskalations-Manager, Budget (`LH-FA-VOI`, `LH-FA-ESK`) | M |
 | welle-05-llm-port | welle-03 done | LLM-Port + erster Adapter, Konfidenz-Externalisierung (`LH-FA-LLM`) | L |
 
@@ -81,6 +66,7 @@ flowchart LR
 |---|---|---|
 | [`welle-01-belief-kern`](../welle-01-belief-kern.md) | 2026-07-04 | M1 erreicht; 30 Tests, 94,83 % Coverage; [Ergebnisse](../done/welle-01-belief-kern-results.md). Rest: `CO-001` (arch-check). |
 | [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md) | 2026-07-05 | Evidenz→Belief→Audit E2E; 71 Tests, 97,37 % Coverage (domain); [Ergebnisse](../done/welle-02-evidenz-audit-results.md). a-check v0.11.0 (Multi-Modul), Regelwerk v1.4.0 vendored. |
+| [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md) | 2026-07-05 | Sicherheitsfunktion (`MR-003`): Wirkungsklassen + Konfidenz-Gate + menschliche Freigabe; 102 Tests, 97,65 % Coverage (domain); [Ergebnisse](../done/welle-03-aktionen-gates-results.md). 2 Code-Reviews (7 Safety-Befunde fail-closed gefixt), `ADR-0005` Accepted. |
 
 ## Historische Trigger-Verschiebungen
 
@@ -104,3 +90,5 @@ flowchart LR
 | 2026-07-05 | `slice-012` geliefert (Konfidenz-Gate-Regel + `ADR-0005` Schwellwerte, `LH-FA-POL-001`/`002`/`003`/`005`/`007`); Resume-Punkt → `slice-013` | `make gates` grün (88 Tests, 98,1 % Coverage); Sicherheitskern (`MR-003`), fail-safe (Resthypothese-Sperre schlägt hohe Erfolgs-P) negativ-getestet |
 | 2026-07-05 | Code-Review slice-012: 2 Safety-Inversionen in `GateSchwellen` gefixt (fail-closed Monotonie + Sperr-Schwelle `< 1`); `ADR-0005` → Accepted | Multi-Agent-Review fand config-erreichbare unsichere Freigabe-Pfade; 5 Tests ergänzt (93 gesamt) |
 | 2026-07-05 | `slice-013` geliefert (aktion-gaten: nicht-umgehbares Gate + Human-Approval-Port, `LH-FA-POL-004`/`006`); **welle-03-Closure-Trigger erfüllt** | `make gates` grün (101 Tests); Gate-Kette E2E (extern-wirksam nur mit Freigabe frei, sonst Eskalation) |
+| 2026-07-05 | Ketten-Review welle-03 (+ welle-02 retrospektiv): 7 Befunde fail-closed gefixt (u. a. fail-open-Prädikat, strukturelle POL-006, welle-02 Uhr-Monotonie/Rekonstruierbarkeit) | Reviews von Sicherheitsfunktionen an die Welle-Grenze; Ketten-Sicht findet Fehler, die Einzel-Slices verbergen |
+| 2026-07-05 | `welle-03-aktionen-gates` **abgeschlossen** (Slices `011`..`013` → `done/`); „Aktuelle Welle" → Ruhe-Marker | Closure-Trigger erfüllt; Lerneintrag in `done/welle-03-aktionen-gates-results.md` |

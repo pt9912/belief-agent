@@ -1,6 +1,6 @@
 # Welle welle-03-aktionen-gates: Aktionen + Konfidenz-Gate
 
-**Status:** in-progress
+**Status:** done
 
 **Zielmeilenstein:** kein direkter Meilenstein (M2 leitet sich aus welle-02..04 ab).
 
@@ -61,7 +61,11 @@ Aufgesetzt 2026-07-05 (`open/`). Zuschnitt nach Lieferwert (Regelwerk Modul 5):
 
 ## 7. Closure-Notiz
 
-<!-- Erst nach Welle-Abschluss füllen; Verweis auf done/welle-03-aktionen-gates-results.md. -->
+**Abgeschlossen 2026-07-05** — die Sicherheitsfunktion (`MR-003`) steht: eine
+extern-wirksame Aktion kommt nur durch bei harter Konfidenz **und** niedriger
+Resthypothese **und** menschlicher Freigabe. 102 Tests, zwei Code-Reviews (7
+Safety-Befunde fail-closed gefixt), `ADR-0005` Accepted. Lerneintrag:
+[`done/welle-03-aktionen-gates-results.md`](done/welle-03-aktionen-gates-results.md).
 
 ## 8. Sub-Area-Modus-Begründung
 
