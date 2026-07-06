@@ -55,8 +55,8 @@ class KonfidenzGateTest {
     }
 
     @Test
-    fun resthypothese_genau_auf_schwelle_sperrt_nicht() { // Grenzfall: echt > (nicht >=)
-        assertEquals(GateEntscheidung.Freigabe, KonfidenzGate.bewerte(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.5)))
+    fun resthypothese_genau_auf_schwelle_sperrt_nicht() { // Grenzfall: echt > (nicht >=); θ_other_block=0,10 (ADR-0008)
+        assertEquals(GateEntscheidung.Freigabe, KonfidenzGate.bewerte(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.10)))
     }
 
     @Test

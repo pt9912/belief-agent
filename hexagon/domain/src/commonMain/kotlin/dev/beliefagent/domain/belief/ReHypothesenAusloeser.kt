@@ -24,10 +24,11 @@ class ReHypothesenAusloeser(
 
     companion object {
         /**
-         * Default-Schwellwert (`LH-FA-BEL-005`, revidierbar): oberhalb 0.5 trägt
-         * „keine der genannten / unbekannt" die Mehrheit der Masse — ein
-         * klares Signal, den Hypothesenraum zu erweitern.
+         * Default-Schwellwert θ_rehyp (`LH-FA-BEL-005`, `spezifikation.md` §3,
+         * `ADR-0008`): ab **0,30** Resthypothese-Masse ist der Hypothesenraum
+         * erweiterungs-bedürftig. Deckt sich mit θ_esc (`ADR-0007`) — Spec:
+         * „θ_esc Startwert = θ_rehyp".
          */
-        const val STANDARD_SCHWELLWERT: Double = 0.5
+        const val STANDARD_SCHWELLWERT: Double = 0.30
     }
 }

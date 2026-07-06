@@ -10,21 +10,19 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle** (kein `slice-*` in `in-progress/`).
-`welle-04-voi-eskalation` (VoI + Eskalation) ist **abgeschlossen** (2026-07-06;
+**Aktive Korrektur-Slice:** `slice-018` (Schwellwert-Reconciliation) in
+`in-progress/` — gleicht die Gate-/Resthypothese-Schwellen im Code an die
+Spezifikation §3 an (verschärft; `ADR-0008` **supersedes** `ADR-0005`). Vorgänger
+`welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md), Slices `014`..`017` in
 `done/`) — der **Entscheidungszyklus** (`ARC-09`: sammeln | handeln | eskalieren)
-steht: der Agent sammelt bei Unsicherheit statt blind zu handeln (`LH-FA-VOI-001`)
-und eskaliert als definierten Zustand mit Kontext (`LH-FA-ESK`). Review-gehärtet
-(sequentiell `014`/`015` + Ketten `016`/`017`, 10 Befunde gefixt).
+steht, review-gehärtet (10 Befunde gefixt).
 
-**⇒ Resume-Punkt (2026-07-06):** **nächster Schritt frei wählbar** —
-**(a)** der **Schwellwert-Reconciliation-Slice** (`ADR-0007`-Follow-up): Spec-Tabelle
-§3 (θ_rehyp/θ_esc = 0,30, θ_other_block = 0,10) ↔ Code/`ADR-0005`
-(`STANDARD_SCHWELLWERT`/Gate-Sperre = 0,5) abgleichen (θ_esc ist mit `ADR-0007`
-bereits spec-konform); **(b)** **welle-05** (LLM-Port, Trigger „welle-03 done"
-erfüllt): echtes Sprachmodell hinter dem `LlmPort`, belief-abhängige VoI-Kandidaten
-(F4b) + Konfidenz-Externalisierung.
+**⇒ Resume-Punkt (2026-07-06):** `slice-018` liefert (θ_repository 0,7→0,80,
+θ_extern 0,9→0,95, θ_other_block 0,5→0,10, θ_rehyp 0,5→0,30; `ADR-0008` Accepted) —
+Code + Tests spec-konform, `make gates` grün, dann Closure. **Danach:** **welle-05**
+(LLM-Port, Trigger „welle-03 done" erfüllt): echtes Sprachmodell hinter dem `LlmPort`,
+belief-abhängige VoI-Kandidaten (F4b), Konfidenz-Externalisierung.
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
 Bereinigung. Tracked Follow-ups (welle-05): Executor darf nur

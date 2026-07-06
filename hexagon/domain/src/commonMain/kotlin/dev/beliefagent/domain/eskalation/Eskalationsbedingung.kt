@@ -17,11 +17,11 @@ import dev.beliefagent.domain.belief.GateEntscheidung
  * slice-017). Deterministisch (`LH-QA-03`), framework-frei.
  *
  * Die [schwelle] ist **θ_esc = 0,30** (`ADR-0007`, spec-konform, `spezifikation.md`
- * §3), **entkoppelt** von der Gate-Sperre (`ADR-0005`, 0,5) — die Eskalation soll den
- * Menschen **früher** holen als die Irreversibel-Sperre blockiert. Bewusst **nicht**
- * über [dev.beliefagent.domain.belief.ReHypothesenAusloeser] wiederverwendet: dessen
- * `STANDARD_SCHWELLWERT` (0,5) driftet selbst vom Spec-θ_rehyp (0,30) und nutzt
- * striktes `>` — eine Reconciliation von θ_rehyp ist ein offener Follow-up (`ADR-0007`).
+ * §3). Sie deckt sich seit `ADR-0008` mit θ_rehyp
+ * ([dev.beliefagent.domain.belief.ReHypothesenAusloeser.STANDARD_SCHWELLWERT] = 0,30;
+ * Spec: „θ_esc Startwert = θ_rehyp") und ist **verschieden** von der Irreversibel-Sperre
+ * θ_other_block (`ADR-0008`, 0,10). Als **eigener** Default gehalten, damit die
+ * `≥`-Semantik (`LH-FA-POL-002.a`) explizit bleibt — θ_rehyp nutzt striktes `>`.
  *
  * Der **Budget-Auslöser** (`LH-FA-ESK-004`) ist bewusst **nicht** Teil dieser
  * Bedingung — er ist ein getrennter Pfad ([Budget.erschoepft]).

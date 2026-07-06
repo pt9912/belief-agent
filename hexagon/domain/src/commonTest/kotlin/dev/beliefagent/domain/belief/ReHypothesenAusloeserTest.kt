@@ -24,8 +24,8 @@ class ReHypothesenAusloeserTest {
     }
 
     @Test
-    fun nicht_ausgeloest_wenn_resthypothese_unter_schwellwert() { // LH-FA-BEL-005
-        assertFalse(ReHypothesenAusloeser().ausgeloest(mitRest(0.4)))
+    fun nicht_ausgeloest_wenn_resthypothese_unter_schwellwert() { // LH-FA-BEL-005 (θ_rehyp=0,30, ADR-0008)
+        assertFalse(ReHypothesenAusloeser().ausgeloest(mitRest(0.2)))
     }
 
     @Test
@@ -35,9 +35,9 @@ class ReHypothesenAusloeserTest {
 
     @Test
     fun konfigurierbarer_schwellwert_wirkt() { // LH-FA-BEL-005
-        // Rest 0.4 löst bei Standard (0.5) nicht aus, bei 0.3 schon.
-        assertFalse(ReHypothesenAusloeser().ausgeloest(mitRest(0.4)))
-        assertTrue(ReHypothesenAusloeser(schwellwert = 0.3).ausgeloest(mitRest(0.4)))
+        // Rest 0.2 löst bei Standard (0.30) nicht aus, bei 0.1 schon.
+        assertFalse(ReHypothesenAusloeser().ausgeloest(mitRest(0.2)))
+        assertTrue(ReHypothesenAusloeser(schwellwert = 0.1).ausgeloest(mitRest(0.2)))
     }
 
     @Test

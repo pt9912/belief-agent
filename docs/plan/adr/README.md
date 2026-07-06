@@ -6,9 +6,10 @@
 | [0002](0002-implementierungssprache-jvm-java.md) | Implementierungssprache und Plattform — Kotlin Multiplatform (JVM-Ziel zuerst) | Accepted | `LH-RB-04` |
 | [0003](0003-hexslice-architektur.md) | HexSlice — vertikale Use-Case-Slices im hexagonalen Kern (KMP, Gradle-Multi-Modul) | Accepted | `LH-QA-04` |
 | [0004](0004-coverage-gate.md) | Coverage-Gate — bootstrap-aware Line-Coverage-Schwelle (Kover) | Accepted | `LH-QA-03` |
-| [0005](0005-konfidenz-gate-schwellwerte.md) | Konfidenz-Gate — Default-Schwellwerte je Wirkungsklasse + Resthypothese-Sperre | Accepted | `LH-FA-POL-003` |
+| [0005](0005-konfidenz-gate-schwellwerte.md) | Konfidenz-Gate — Default-Schwellwerte je Wirkungsklasse + Resthypothese-Sperre (superseded → `ADR-0008`) | Accepted | `LH-FA-POL-003` |
 | [0006](0006-coverage-gate-scope.md) | Coverage-Gate-Scope — Gate auf application + Adapter erweitern (per Modul) | Accepted | `LH-QA-03` |
 | [0007](0007-eskalations-schwelle.md) | Eskalations-Schwelle θ_esc = 0,30 (spec-konform), entkoppelt von der Gate-Sperre | Accepted | `LH-FA-ESK-001` |
+| [0008](0008-schwellwerte-spec-konform.md) | Gate-/Resthypothese-Schwellwerte spec-konform verschärft (Supersedes `ADR-0005`) | Accepted | `LH-FA-POL-003` |
 
 ## Konventionen
 

@@ -17,24 +17,26 @@ sealed interface GateEntscheidung {
 
 /**
  * Konfigurierbare Schwellen des Konfidenz-Gates (LH-FA-POL-003/007). Default-Werte
- * begründet in `ADR-0005`: Mindest-Erfolgswahrscheinlichkeit je [Wirkungsklasse]
- * (nur-lesend ohne wirksame Schwelle), **monoton steigend mit der Reichweite**,
- * plus die [resthypotheseSperrschwelle] für irreversible Aktionen (LH-FA-POL-005).
+ * **spec-konform** (`spezifikation.md` §3, `ADR-0008` supersedes `ADR-0005`):
+ * Mindest-Erfolgswahrscheinlichkeit je [Wirkungsklasse] (nur-lesend ohne wirksame
+ * Schwelle) **monoton steigend mit der Reichweite** (0,0/0,50/0,80/0,95), plus die
+ * [resthypotheseSperrschwelle] θ_other_block = **0,10** für irreversible Aktionen
+ * (LH-FA-POL-005) — bewusst **entkoppelt** von θ_rehyp/θ_esc (0,30): die
+ * Irreversibel-Sperre greift konservativer als die Re-Hypothesen-/Eskalations-Schwelle.
  *
  * Der Konstruktor erzwingt die **Sicherheits-Invarianten** fail-closed (`MR-003`):
  * alle Werte in `[0,1]`; die Erfolgs-Schwellen **monoton nicht-fallend**
  * (nur-lesend ≤ arbeitsbereich-lokal ≤ repository-wirksam ≤ extern-wirksam) — sonst
  * ließe sich die *gefährlichste* Klasse laxer konfigurieren als eine reversible;
  * und die [resthypotheseSperrschwelle] **echt < 1** — sonst wäre die POL-005-
- * Sperre (Vergleich `> Schwelle`) stumm abgeschaltet. Der Default ist an
- * [ReHypothesenAusloeser.STANDARD_SCHWELLWERT] gekoppelt (eine Quelle für „0,5").
+ * Sperre (Vergleich `> Schwelle`) stumm abgeschaltet.
  */
 data class GateSchwellen(
     val nurLesend: Double = 0.0,
     val arbeitsbereichLokal: Double = 0.5,
-    val repositoryWirksam: Double = 0.7,
-    val externWirksam: Double = 0.9,
-    val resthypotheseSperrschwelle: Double = ReHypothesenAusloeser.STANDARD_SCHWELLWERT,
+    val repositoryWirksam: Double = 0.80,
+    val externWirksam: Double = 0.95,
+    val resthypotheseSperrschwelle: Double = 0.10,
 ) {
     init {
         listOf(nurLesend, arbeitsbereichLokal, repositoryWirksam, externWirksam, resthypotheseSperrschwelle)
