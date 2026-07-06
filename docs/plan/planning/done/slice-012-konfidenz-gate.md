@@ -2,7 +2,7 @@
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
-**Welle:** [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md).
+**Welle:** `welle-03-aktionen-gates` ([Ergebnisse](welle-03-aktionen-gates-results.md)).
 
 **Bezug:** `LH-FA-POL-001`, `LH-FA-POL-002`, `LH-FA-POL-003`, `LH-FA-POL-005`,
 `LH-FA-POL-007`, `LH-QA-03`; `ADR-0001`, `ADR-0003`, `ADR-0005`; `ARC-03`.

@@ -18,24 +18,27 @@ Rule „git mv + Inhaltsänderung = zwei Commits" in
 ## Slices vs. Wellen — zwei Status-Mechanismen
 
 - **Slices** tragen ihren Status über das **Verzeichnis** (open → … → done).
-- Eine **Welle** (Bündel von Slices) wird **in der Roadmap** geführt
-  ([`in-progress/roadmap.md`](in-progress/roadmap.md)); ihr Status lebt im
-  `Status:`-Feld, nicht im Verzeichnis. Ein Welle-Plan liegt **flach** in
-  `planning/` (`<welle-id>.md`) — die Lifecycle-Verzeichnisse sind
-  **slice-reserviert**. Welle-Closure: Lerneintrag in
-  `done/<welle-id>-results.md`.
+- Eine **Welle** (Bündel von Slices) lebt **ausschließlich in der Roadmap**
+  ([`in-progress/roadmap.md`](in-progress/roadmap.md): Meilensteine, Wellen, aktive
+  Welle) als **Eintrag** mit Slice-IDs · beobachtbarem Trigger · Closure-Kriterien
+  (Regelwerk Modul 6); ihr Status lebt im Prosa-Eintrag, nicht im Verzeichnis. **Es
+  gibt keine eigenständigen `<welle-id>.md`-Wellen-Plan-Dateien** — die
+  Lifecycle-Verzeichnisse sind **slice-reserviert** (Modul 5). Welle-Closure:
+  Lerneintrag in `done/<welle-id>-results.md`. Begründung: `MR-009`.
 
 ## Vorlagen
 
 - Slice: [`slice.template.md`](slice.template.md)
-- Welle: [`welle.template.md`](welle.template.md)
+
+(Kein Wellen-Template: Wellen werden als Roadmap-Eintrag geführt, nicht als
+eigene Datei — siehe oben und `MR-009`.)
 
 ## Aktueller Stand
 
 Der Stand ergibt sich aus den `open/`/`next/`/`in-progress/`/`done/`-
 Verzeichnissen, nicht aus einem Snapshot hier. Beim Bootstrap-Ende existiert
-noch kein Slice; die erste Welle ist als Outline in
-[`welle-01-belief-kern.md`](welle-01-belief-kern.md) beschrieben.
+noch kein Slice; die erste Welle wird als Eintrag in
+[`in-progress/roadmap.md`](in-progress/roadmap.md) geführt.
 
 ## Roadmap
 

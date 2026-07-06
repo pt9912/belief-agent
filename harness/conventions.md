@@ -34,7 +34,7 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   (`--verify`). Bundle-Quelle: Release-Asset `lab-regelwerk.zip`, Tag `v1.4.0`.
 - **In-Repo (verkörperte Form):** die wiederkehrenden Templates
   (`docs/plan/adr/NNNN-titel.template.md`, `docs/plan/planning/slice.template.md`,
-  `docs/plan/planning/welle.template.md`, `docs/plan/carveouts/carveout.template.md`,
+  `docs/plan/carveouts/carveout.template.md`,
   `docs/reviews/review-report.template.md`) sowie die Gate-Baseline
   (`.d-check.yml`, `d-check.mk`, `Makefile`). Die Templates bleiben **co-located**
   und sind Autorenquelle — Upstream-MR-018 („keine co-located Templates", nur
@@ -223,6 +223,34 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   Nicht-Adoption wird dokumentiert, damit sie nicht als Versäumnis erscheint.
 - **Auflösungs-Trigger:** permanent, solange belief-agent Consumer (nicht
   Producer) der Baseline ist.
+
+### MR-009 — Keine eigenständigen Wellen-Plan-Dateien; `welle.template.md` nicht adoptiert
+
+- **Datum:** 2026-07-06
+- **Geltungsbereich:** `docs/plan/planning/` (Wellen-Repräsentation),
+  `docs/plan/planning/README.md`, `AGENTS.md` §1, §Adoptierte Konventions-Quellen
+  oben; entfernte Dateien `docs/plan/planning/welle.template.md` und
+  `docs/plan/planning/welle-01..04-<name>.md`.
+- **Adaption:** Wellen werden **ausschließlich** geführt als (1) **Eintrag in
+  `in-progress/roadmap.md`** (Slice-IDs · beobachtbarer Trigger · Closure-Kriterien,
+  Modul 6) und (2) **Closure-Lerneintrag** in `done/<welle-id>-results.md` (Modul 5)
+  — exakt wie das Baseline-Referenz-Projekt (`lab/example`, das ebenfalls keine
+  eigenständigen Wellen-Pläne führt, sondern die Welle inline in der Roadmap). Der
+  von der Baseline als **optional** angebotene eigenständige Wellen-Plan
+  (`welle.template.md` → `planning/<welle-id>.md`) wird **nicht geführt**; die
+  Vorlage `welle.template.md` wird **nicht adoptiert** und ist entfernt. Die
+  Lifecycle-Verzeichnisse bleiben **slice-reserviert** (Modul 5).
+- **Begründung:** Die separate `<welle-id>.md` duplizierte Trigger/Slice-Liste ohne
+  eigenen normativen Wert — Roadmap/Welle ist ohnehin **nicht-normativ**
+  (grundlagen-konventionen: „Roadmap/Welle steht außerhalb der normativen Klammer")
+  — und erzeugte Roadmap-↔-Datei-Drift. Die Nicht-Adoption **einer einzelnen**
+  Vorlage ist — analog `MR-008` — eine **bewusste, dokumentierte** Abweichung von
+  der Modul-2-„alle Skelette"-Kopiervorgabe, kein Versäumnis; die übrigen
+  co-located Templates bleiben unberührt. Korrigiert zugleich den zuvor
+  undokumentierten Drift (die frühere `planning/README.md` ließ das Baseline-Wort
+  „optional" weg).
+- **Auflösungs-Trigger:** permanent, solange Wellen inline in der Roadmap geführt
+  werden.
 
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 

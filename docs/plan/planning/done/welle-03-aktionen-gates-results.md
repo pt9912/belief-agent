@@ -3,7 +3,7 @@
 **Abgeschlossen:** 2026-07-05. **Zielmeilenstein:** kein direkter Meilenstein
 (M2 leitet sich aus welle-02..04 ab).
 
-Verweis: [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md).
+Verweis: `welle-03-aktionen-gates` ([Roadmap](../in-progress/roadmap.md)).
 
 ---
 

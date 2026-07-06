@@ -2,7 +2,7 @@
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
-**Welle:** [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md).
+**Welle:** `welle-02-evidenz-audit` ([Ergebnisse](welle-02-evidenz-audit-results.md)).
 
 **Bezug:** `LH-FA-OBS-002`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`, `ADR-0003`;
 `ARC-02`, `ARC-07`, `ARC-08`.

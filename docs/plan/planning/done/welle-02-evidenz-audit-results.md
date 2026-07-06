@@ -3,7 +3,7 @@
 **Abgeschlossen:** 2026-07-05. **Zielmeilenstein:** kein direkter Meilenstein
 (M2 leitet sich aus welle-02..04 ab).
 
-Verweis: [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md).
+Verweis: `welle-02-evidenz-audit` ([Roadmap](../in-progress/roadmap.md)).
 
 ---
 

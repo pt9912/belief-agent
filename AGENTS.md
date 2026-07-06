@@ -29,11 +29,12 @@ Derivativ: bei Konflikt gelten die kanonischen Quellen; adoptierter Stand in
 
 Die **Skelett-Vorlagen** der Baseline liegen **co-located im Repo**
 (`docs/plan/adr/NNNN-titel.template.md`, `docs/plan/planning/slice.template.md`,
-`docs/plan/planning/welle.template.md`, `docs/plan/carveouts/carveout.template.md`,
+`docs/plan/carveouts/carveout.template.md`,
 `docs/reviews/review-report.template.md`) — beim Anlegen neuer Artefakte das
 passende Template **kopieren** statt frei zu formulieren. Upstream-MR-018
 („keine co-located Templates") gilt nur für Producer/Self-Hoster und wird
-bewusst **nicht** adoptiert (`MR-008`).
+bewusst **nicht** adoptiert (`MR-008`). Das Wellen-Template wird **nicht**
+geführt — Wellen leben als Roadmap-Eintrag, nicht als Datei (`MR-009`).
 
 ## 2. Kanonische Quellen (Source Precedence)
 

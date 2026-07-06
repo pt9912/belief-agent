@@ -3,7 +3,7 @@
 **Status:** open → next → in-progress → done (Verzeichniswechsel, siehe
 [Planning-README](../README.md)).
 
-**Welle:** [`welle-01-belief-kern`](../welle-01-belief-kern.md).
+**Welle:** `welle-01-belief-kern` ([Ergebnisse](welle-01-belief-kern-results.md)).
 
 **Bezug:** `LH-FA-BEL-001`, `LH-FA-BEL-003`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`,
 `ADR-0002`, `ADR-0003`; `ARC-01`.

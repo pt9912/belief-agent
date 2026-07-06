@@ -3,7 +3,7 @@
 **Abgeschlossen:** 2026-07-04. **Zielmeilenstein:** M1 — Belief-Kern lauffähig
 (**erreicht**).
 
-Verweis: [`welle-01-belief-kern`](../welle-01-belief-kern.md).
+Verweis: `welle-01-belief-kern` ([Roadmap](../in-progress/roadmap.md)).
 
 ---
 
