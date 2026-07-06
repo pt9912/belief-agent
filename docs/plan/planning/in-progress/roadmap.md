@@ -12,12 +12,11 @@ Wellen-Schätzung, nicht Treiber.
 
 `welle-04-voi-eskalation` (VoI + Eskalation) ist **aktiv** (gestartet 2026-07-06).
 
-- **Slices:** `slice-014` (VoI-Selektor) und `slice-015` (Eskalation-Zustand +
-  Bedingung + Budget) in `in-progress/` (geliefert, bleiben bis Welle-Closure);
-  `slice-016` (`beobachtung-waehlen`: VoI-Use-Case + Port + Fake) und `slice-017`
+- **Slices:** `slice-014` (VoI-Selektor), `slice-015` (Eskalation-Zustand +
+  Bedingung + Budget) und `slice-016` (`beobachtung-waehlen`: VoI-Use-Case + Port +
+  `voi-fake`) in `in-progress/` (geliefert, bleiben bis Welle-Closure); `slice-017`
   (`entscheidungszyklus`: Orchestrierung + E2E) in `open/` — der frühere
-  slice-016-`entscheidungszyklus` wurde nach `ARC-09`-Größenprüfung (Modul 5)
-  zerlegt.
+  slice-016-`entscheidungszyklus` wurde nach `ARC-09`-Größenprüfung (Modul 5) zerlegt.
 - **Start-Trigger:** welle-03 done (erfüllt 2026-07-05).
 - **Closure-Kriterien:** alle Slices in `done/`; `make gates` grün; E2E gegen Fakes
   zeigt den Entscheidungszyklus — **sammeln** bei hoher Unsicherheit statt zu
@@ -35,13 +34,13 @@ Freigabe für irreversible Aktionen) steht. Alternativ-Trigger **welle-05**
 **⇒ Resume-Punkt (2026-07-06):** `slice-014` (VoI-Selektor) und `slice-015`
 (Eskalation-Zustand + Bedingung + Budget in `hexagon:domain/eskalation`,
 `LH-FA-ESK-001`..`004`) **geliefert**, alle Gates grün — bleiben bis Welle-Closure
-in `in-progress/`. `ARC-09`-Größenprüfung (Modul 5) **durchgeführt**: der Zyklus
-war zu groß (neues Modul + Multi-Modul-Arch + E2E über mehrere Schichten) →
-**zerlegt** in `slice-016` (`beobachtung-waehlen`) + `slice-017`
-(`entscheidungszyklus`), Präzedenz slice-008. **Weiter mit `slice-016`**
-(`beobachtung-waehlen`: VoI-Use-Case + Auswahl-Port + `voi-fake`-Adapter — isoliert
-das Multi-Modul-/Build-Risiko zuerst). Danach `slice-017` (Zyklus + E2E) →
-Welle-04-Closure-Trigger (sammeln | handeln | eskalieren).
+in `in-progress/`. `slice-016` (`beobachtung-waehlen`: VoI-Use-Case + Auswahl-Port +
+neues `voi-fake`-Adapter-Modul, `LH-FA-VOI-002`) **geliefert** — das Multi-Modul-/
+Build-Risiko ist damit isoliert und retired (arch-check Multi-Modul über 7 Module
+grün). **Weiter mit `slice-017`** (`entscheidungszyklus`, `ARC-09`): reine
+Orchestrierung `beobachtung-waehlen` + Belief-Update + `AktionGaten` + Eskalation zu
+**sammeln | handeln | eskalieren** + E2E gegen Fakes → erfüllt den
+Welle-04-Closure-Trigger.
 **Offen im Blick:** **Schwellwert-Reconciliation** (aus Review slice-014/015 /
 `ADR-0007`): die Spec-Tabelle §3 (θ_rehyp/θ_esc = 0,30, θ_other_block = 0,10) driftet
 gegen Code/`ADR-0005` (`STANDARD_SCHWELLWERT` = 0,5, Gate-Sperre = 0,5) — eigener
@@ -132,3 +131,4 @@ flowchart LR
 | 2026-07-06 | `slice-015` `open → in-progress` **geliefert** (Eskalation-Zustand + Bedingung + Budget, neue Sub-Area `hexagon:domain/eskalation`, `LH-FA-ESK-001`..`004`); Resume-Punkt → `slice-016` | Domänen-Bausteine der Welle-04-Eskalation; θ_esc an θ_rehyp gekoppelt; `make gates` grün (domain 98,13 %), 21 neue Tests |
 | 2026-07-06 | `slice-016` **zerlegt** (Modul 5, `ARC-09`-Größenprüfung): `slice-016` (`beobachtung-waehlen`: VoI-Use-Case + Auswahl-Port + `voi-fake`) + `slice-017` (`entscheidungszyklus`: Orchestrierung + E2E) | Zyklus zu groß: neues Adapter-Modul + Multi-Modul-`arch-check` + E2E über mehrere Schichten → Schnitt nach Lieferwert, Modul-Risiko zuerst isolieren (Präzedenz slice-008); Architektur trennt `ARC-04`/`ARC-09` ohnehin |
 | 2026-07-06 | **Sequentielles Code-Review** slice-014/015 (Fail-safe, rollierend): 5 Befunde gefixt — Eskalations-Schwelle spec-konform (θ_esc **0,5→0,30**, `>`→`≥`, `ADR-0007`, entkoppelt von Gate-Sperre); `schwelle` fail-closed; `Eskalationsgrund` trägt `GateEntscheidung` statt String; `VoiSelektor` Kreuz-Multiplikation statt Float-Division | F1 war un-ADR'te Safety-Schwelle + Unter-Eskalation im Band [0,30…0,50]; Reviews der Sicherheitsfunktion früh; `make gates` grün; offen: `STANDARD_SCHWELLWERT`-Reconciliation |
+| 2026-07-06 | `slice-016` `open → in-progress` **geliefert** (`beobachtung-waehlen`: `BeobachtungsAuswahlPort` + Use-Case `BeobachtungWaehlen` + neues Adapter-Modul `adapters:outbound:voi-fake`, `LH-FA-VOI-002`); Resume-Punkt → `slice-017` | Erstes application-Slice der Welle; **Multi-Modul-/Build-Risiko isoliert & retired** (7 Module, arch-check grün); `make gates` grün (application/voi-fake 100 %), 4 neue Tests |

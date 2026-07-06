@@ -2,7 +2,7 @@
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
-**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](../in-progress/roadmap.md)).
+**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](roadmap.md)).
 
 **Bezug:** `LH-FA-VOI-002`, `LH-QA-03`; `ADR-0001`, `ADR-0003`, `ADR-0006`;
 `ARC-04`, `ARC-07`.
@@ -27,15 +27,16 @@ slice-008/009.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-VOI-002`: `beobachtung-waehlen` liefert aus den Port-Kandidaten die
-      `VoiSelektor`-Wahl bzw. **„keine"** bei leeren Kandidaten; Test (inkl.
-      Fake-Determinismus, `LH-QA-03`).
-- [ ] **Beobachtungs-Auswahl-Port** lokal beim Use-Case + deterministischer
-      `voi-fake`-Adapter; Kern importiert keinen Adapter (`arch-check` grün,
-      `ADR-0001`/`ADR-0003`).
-- [ ] Neues Adapter-Modul verdrahtet (`settings.gradle.kts`, `Dockerfile`,
-      `.a-check.yml`-Root `MR-005`, per-Modul-Coverage `ADR-0006`); Coverage ≥ 90 %;
-      `make gates` grün.
+- [x] `LH-FA-VOI-002`: `beobachtung-waehlen` liefert aus den Port-Kandidaten die
+      `VoiSelektor`-Wahl bzw. **„keine"** (`null`) bei leeren Kandidaten; Test
+      (`BeobachtungWaehlenTest` + Fake-Determinismus `FakeKandidatenquelleTest`, `LH-QA-03`).
+- [x] **Beobachtungs-Auswahl-Port** lokal beim Use-Case + deterministischer
+      `voi-fake`-Adapter (`FakeKandidatenquelle`); Kern importiert keinen Adapter
+      (`arch-check` grün — 0 Befunde, `ADR-0001`/`ADR-0003`).
+- [x] Neues Adapter-Modul `adapters:outbound:voi-fake` verdrahtet
+      (`settings.gradle.kts`, `Dockerfile` deps/koverLog/koverVerify, `.a-check.yml`-Root
+      `MR-005`, per-Modul-Coverage `ADR-0006`); Coverage application 100 % / voi-fake
+      100 % ≥ 90 %; `make gates` grün.
 - [ ] Closure-Notiz (bei Welle-04-Closure).
 
 ## 3. Plan (vor Code)
