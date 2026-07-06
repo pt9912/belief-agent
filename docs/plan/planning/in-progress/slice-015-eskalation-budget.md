@@ -70,7 +70,15 @@ Welle-04-Closure bei.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** Fail-safe-Bausteine — Eskalation als **definierter Zustand**
+(kein Fehler) mit Kontext, Bedingung (gdw), Budget als eigenständiger Trigger;
+durchgängig fail-closed. **Steering-Loop:** das Review fand die Eskalations-Schwelle
+θ_esc **un-ADR'd + spec-abweichend** (0,5 statt 0,30) und `>` statt `≥` →
+**`ADR-0007`** (θ_esc = 0,30/`≥`, bewusst **entkoppelt** von der Gate-Sperre 0,5).
+**Benannte Spec-Lücke:** `STANDARD_SCHWELLWERT`/θ_rehyp/θ_other_block driften gegen
+die Spec-Tabelle — eigener Reconciliation-Slice. **Regel geschärft:** Safety-Schwellen
+sind ADR-pflichtig **und** gegen die Spec abzugleichen; `require` fail-closed statt
+stiller NaN-Deaktivierung.
 
 ## 8. Sub-Area-Modus-Begründung
 

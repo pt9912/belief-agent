@@ -65,7 +65,14 @@ Welle-04-Closure bei.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** reine, deterministische Domänen-Regel (max Gewinn/Kosten
+über die Top-2-Trennung, deterministischer Tie-Break); die VoI-Diskriminierung trägt
+der Kandidat (Fake jetzt, LLM welle-05). **Steering-Loop:** das sequentielle Review
+fand die **Float-Division** als Sortier-Schlüssel fragil (Tie-Break bei ULP-nahen
+Ratios unerreichbar, Overflow bei winzigen Kosten) → **Kreuz-Multiplikation** statt
+Division. **Regel geschärft:** Verhältnisse nicht per Division vergleichen, sondern
+kreuz-multiplizieren (Nenner > 0 per Invariante). **Follow-up:** LLM-Diskriminierung
+(welle-05).
 
 ## 8. Sub-Area-Modus-Begründung
 

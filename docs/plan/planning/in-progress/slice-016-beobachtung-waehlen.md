@@ -67,7 +67,13 @@ auf der `slice-017` (Entscheidungszyklus) aufbaut.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** erstes application-Slice + neues Outbound-Adapter-Modul
+`voi-fake` in einem Zug verdrahtet (settings/Dockerfile/`.a-check.yml`); Multi-Modul-
+`arch-check` über 7 Module grün, per-Modul-Coverage 100 %. **Steering-Loop:** der
+`ARC-09`-Schnitt (Modul 5) — **zuerst das Modul-/Build-Risiko isolieren**, dann die
+Orchestrierung — hat sich bewährt (Präzedenz slice-008). **Regel bestätigt:** neues
+Adapter-Modul zuerst schneiden; application-Test hängt via In-Test-Port-Stub **nicht**
+am Adapter (Abhängigkeitsrichtung nach innen).
 
 ## 8. Sub-Area-Modus-Begründung
 

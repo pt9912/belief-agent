@@ -67,7 +67,16 @@ Zustand mit Kontext.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** der Zyklus verdrahtet **sammeln | handeln | eskalieren**,
+budget-garantiert terminierend; Rück-Mapping application-`Aktionsfreigabe` →
+Domänen-`GateEntscheidung` (Domäne kennt application nicht). **Steering-Loop:** das
+**Ketten-Review** fand zwei Kompositions-Bugs, die die Einzel-Slices verbargen:
+(F1) fehlende menschliche Freigabe wurde still **abgelehnt statt eskaliert** —
+behoben durch bindendes Honorieren der Gate-Eskalation (`Eskalationsgrund.GateEskalation`);
+(F4a) **Scheingewissheit** durch Wiederholung derselben Beobachtung — behoben durch
+Kandidaten-**Konsumption**. **Regel geschärft/bestätigt:** Ketten-Sicht findet
+Kompositions-Fehler, die Einzel-Slices verbergen (welle-03-Lehre). **Follow-up:**
+belief-**abhängige** Kandidaten-Generierung (F4b) = welle-05.
 
 ## 8. Sub-Area-Modus-Begründung
 
