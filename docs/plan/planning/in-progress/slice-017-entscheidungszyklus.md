@@ -2,7 +2,7 @@
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
-**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](../in-progress/roadmap.md)).
+**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](roadmap.md)).
 
 **Bezug:** `LH-FA-VOI-001`, `LH-QA-02`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`,
 `ADR-0003`, `ADR-0006`; `ARC-04`, `ARC-05`, `ARC-09`.
@@ -24,15 +24,17 @@ E2E im Testcode (produktiver cli-Composition-Root folgt).
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-VOI-001`: bei hoher Unsicherheit + teurer/irreversibler Aktion
+- [x] `LH-FA-VOI-001`: bei hoher Unsicherheit + teurer/irreversibler Aktion
       **sammelt** der Zyklus (via `beobachtung-waehlen`, slice-016) statt zu handeln;
-      Test.
-- [ ] Zyklus verdrahtet `beobachtung-waehlen` (016) + Belief-Update (welle-02) +
+      Test (`sammelt_dann_handelt_…` + Kontrast `handelt_sofort_…`).
+- [x] Zyklus verdrahtet `beobachtung-waehlen` (016) + Belief-Update (welle-02) +
       `AktionGaten` (welle-03) + Eskalation (015) zu **sammeln | handeln |
       eskalieren**; erschöpfte Beobachtungen **oder** Budget → **Eskalation mit
       Kontext** (slice-015); **garantierte Terminierung** über das Budget
-      (`LH-FA-ESK-004`, `LH-QA-02` fail-safe); E2E-Test gegen Fakes.
-- [ ] Coverage ≥ 90 % (application, `ADR-0006`); `make gates` grün.
+      (`LH-FA-ESK-004`, `LH-QA-02` fail-safe); E2E-Test gegen Fake-Ports (6 Fälle,
+      alle Ausgänge + beide Eskalations-Auslöser + Terminierung). Domäne kennt
+      `Aktionsfreigabe` nicht → Rück-Mapping auf `GateEntscheidung` für den Kontext.
+- [x] Coverage application 100 % ≥ 90 % (`ADR-0006`); `make gates` grün.
 - [ ] Closure-Notiz (bei Welle-04-Closure).
 
 ## 3. Plan (vor Code)
