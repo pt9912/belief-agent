@@ -1,8 +1,9 @@
 # Slice slice-019: LLM-Framework-Adapter — LangChain4j + Koog
 
-**Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
+**Status:** open → next → in-progress → done (siehe
+[Planning-README](../README.md)).
 
-**Welle:** `welle-05-llm-port` ([Roadmap](roadmap.md)).
+**Welle:** `welle-05-llm-port` ([Roadmap](../in-progress/roadmap.md)).
 
 **Bezug:** `LH-FA-LLM-001`, `LH-FA-LLM-002`, `LH-FA-LLM-003`,
 `LH-FA-LLM-004`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`, `ADR-0003`,
@@ -26,24 +27,24 @@ Integrationsrand; Gate und menschliche Freigabe bleiben im Core.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-LLM-001`/`004`: LangChain4j und Koog sind austauschbare
+- [x] `LH-FA-LLM-001`/`004`: LangChain4j und Koog sind austauschbare
       Outbound-Adapter hinter `LlmPort`; `hexagon:*` importiert keine
       Framework-Pakete (`arch-check` gruen).
-- [ ] `LH-FA-LLM-002`/`003`: Adapter fordern strukturierte
+- [x] `LH-FA-LLM-002`/`003`: Adapter fordern strukturierte
       `proHypothese`-/`resthypothese`-Likelihoods an, validieren exakt die
       bekannten Hypothesen und weisen unvollstaendige, unbekannte oder
       nicht-endliche Werte fail-closed zurueck.
-- [ ] LangChain4j-Adaptermodul `adapters:outbound:llm-langchain4j` mit
+- [x] LangChain4j-Adaptermodul `adapters:outbound:llm-langchain4j` mit
       `LangChain4jLlmPort.fromChatModel(...)`, JSON-Parser und lokalen Tests
       ohne Provider/API-Key.
-- [ ] Koog-Adaptermodul `adapters:outbound:llm-koog` mit
+- [x] Koog-Adaptermodul `adapters:outbound:llm-koog` mit
       `KoogLlmPort.fromLlmClient(...)` und `KoogLlmPort.fromPromptExecutor(...)`,
       JSON-Parser und lokalen Tests ohne Provider/API-Key.
-- [ ] Build-Metadaten verdrahtet (`settings.gradle.kts`, `Dockerfile`,
+- [x] Build-Metadaten verdrahtet (`settings.gradle.kts`, `Dockerfile`,
       `.a-check.yml`); per-Modul-Coverage-Gate fuer beide Adapter (`ADR-0006`).
-- [ ] Nutzer-Doku aktualisiert: `docs/user/integration.md` beschreibt
+- [x] Nutzer-Doku aktualisiert: `docs/user/integration.md` beschreibt
       LangChain4j und Koog als LLM-Adapter-Optionen; Beispielstatus bleibt klar.
-- [ ] `make gates` gruen.
+- [x] `make gates` gruen.
 
 ## 3. Plan (vor Code)
 
@@ -62,8 +63,7 @@ Integrationsrand; Gate und menschliche Freigabe bleiben im Core.
 
 ## 5. Closure-Trigger
 
-DoD vollstaendig + Closure-Notiz; Datei bleibt bis zur Welle-05-Closure in
-`in-progress/` und wandert danach nach `done/`.
+DoD vollstaendig + Closure-Notiz; Slice ist abgeschlossen und in `done/`.
 
 ## 6. Risiken und offene Punkte
 
@@ -78,7 +78,11 @@ DoD vollstaendig + Closure-Notiz; Datei bleibt bis zur Welle-05-Closure in
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+Am 2026-07-06 wurden beide Adapter-Module hinter `LlmPort` integriert, inklusive
+lokaler Tests, Parser/Fail-Closed-Verhalten für bekannte Hypothesen und
+Metadaten-Integration für Build/Coverage/Arch (`settings.gradle.kts`, `Dockerfile`,
+`.a-check.yml`). `docs/user/integration.md` wurde ergänzt, und `make gates` ist
+gruen gelaufen (inkl. per-Modul-Coverage-Gates und `a-check`).
 
 ## 8. Sub-Area-Modus-Begründung
 

@@ -10,22 +10,13 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**welle-05-llm-port ist aktiv** (seit 2026-07-06). `welle-04-voi-eskalation`
-ist **abgeschlossen** (2026-07-06;
-[Ergebnisse](../done/welle-04-voi-eskalation-results.md)) und der Korrektur-Slice
-`slice-018` (Schwellwert-Reconciliation, `ADR-0008` **supersedes** `ADR-0005`) ist
-**erledigt** ([done](../done/slice-018-schwellwert-reconciliation.md)) — die
-Gate-/Resthypothese-Schwellen sind jetzt spec-konform (verschärft: θ_other_block
-0,10, θ_repository 0,80, θ_extern 0,95, θ_rehyp 0,30).
+**Keine aktive Welle.** `slice-019` ist auf `done/` abgeschlossen
+([`slice-019-llm-framework-adapter`](../done/slice-019-llm-framework-adapter.md));
 
-**Aktiver Slice:** [`slice-019`](slice-019-llm-framework-adapter.md) — echte
-LangChain4j- und Koog-Adapter hinter dem bestehenden `LlmPort`; belief-agent
-orchestriert und gated, die LLM-Frameworks liefern strukturierte Likelihood-
-Einschaetzungen.
-
-**⇒ Resume-Punkt (2026-07-06):** `slice-019` abschliessen, danach Folge-Slices der
-Welle 05 schneiden: belief-abhaengige VoI-Kandidaten (F4b),
-Konfidenz-Externalisierung/Golden-Set und produktiver Composition-Root.
+`welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
+[Ergebnisse](../done/welle-04-voi-eskalation-results.md)). Der Folge-Resume
+für `welle-05-llm-port` bleibt bestehen: belief-abhaengige VoI-Kandidaten
+(F4b), Konfidenz-Externalisierung/Golden-Set und produktiver Composition-Root.
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
 Bereinigung. Tracked Follow-ups (welle-05): Executor darf nur
