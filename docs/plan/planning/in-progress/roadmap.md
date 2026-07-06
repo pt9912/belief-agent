@@ -10,19 +10,18 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktive Korrektur-Slice:** `slice-018` (Schwellwert-Reconciliation) in
-`in-progress/` — gleicht die Gate-/Resthypothese-Schwellen im Code an die
-Spezifikation §3 an (verschärft; `ADR-0008` **supersedes** `ADR-0005`). Vorgänger
+**Keine aktive Welle** (kein `slice-*` in `in-progress/`).
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
-[Ergebnisse](../done/welle-04-voi-eskalation-results.md), Slices `014`..`017` in
-`done/`) — der **Entscheidungszyklus** (`ARC-09`: sammeln | handeln | eskalieren)
-steht, review-gehärtet (10 Befunde gefixt).
+[Ergebnisse](../done/welle-04-voi-eskalation-results.md)) und der Korrektur-Slice
+`slice-018` (Schwellwert-Reconciliation, `ADR-0008` **supersedes** `ADR-0005`) ist
+**erledigt** ([done](../done/slice-018-schwellwert-reconciliation.md)) — die
+Gate-/Resthypothese-Schwellen sind jetzt spec-konform (verschärft: θ_other_block
+0,10, θ_repository 0,80, θ_extern 0,95, θ_rehyp 0,30).
 
-**⇒ Resume-Punkt (2026-07-06):** `slice-018` liefert (θ_repository 0,7→0,80,
-θ_extern 0,9→0,95, θ_other_block 0,5→0,10, θ_rehyp 0,5→0,30; `ADR-0008` Accepted) —
-Code + Tests spec-konform, `make gates` grün, dann Closure. **Danach:** **welle-05**
-(LLM-Port, Trigger „welle-03 done" erfüllt): echtes Sprachmodell hinter dem `LlmPort`,
-belief-abhängige VoI-Kandidaten (F4b), Konfidenz-Externalisierung.
+**⇒ Resume-Punkt (2026-07-06):** **welle-05** (LLM-Port, Trigger „welle-03 done"
+erfüllt): echtes Sprachmodell hinter dem `LlmPort`, belief-abhängige VoI-Kandidaten
+(F4b), Konfidenz-Externalisierung. Alle Schwellwert-Follow-ups aus `ADR-0007` sind
+mit `ADR-0008` **geschlossen**.
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
 Bereinigung. Tracked Follow-ups (welle-05): Executor darf nur
@@ -116,3 +115,4 @@ flowchart LR
 | 2026-07-06 | `slice-017` `open → in-progress` **geliefert** (`entscheidungszyklus`, `ARC-09`: `Entscheidungszyklus` + `Zyklusergebnis` verdrahten VoI + Belief-Update + Gate + Eskalation zu sammeln/handeln/eskalieren, `LH-FA-VOI-001`); **Welle-04-Closure-Trigger erfüllt** | Letztes Welle-Slice; E2E gegen Fake-Ports (6 Fälle, beide Eskalations-Auslöser, budget-garantierte Terminierung `LH-QA-02`); Aktionsfreigabe→GateEntscheidung-Rück-Mapping (Domäne kennt application nicht); `make gates` grün (application 100 %) |
 | 2026-07-06 | **Ketten-Review** slice-016/017 (VoI + Eskalation + Zyklus): 5 Befunde gefixt — fehlende Freigabe wird jetzt **eskaliert statt still abgelehnt** (F1, `LH-FA-POL-004`); Kandidaten-**Konsumption** gg. Scheingewissheit (F4a, `LH-FA-OBS-004`); `Eskalationsgrund.GateEskalation` (F2); Approval-Pfad-Test (F3); `ARC-09`-Diagramm reconcilt (F5) | Ketten-Sicht fand Kompositions-Fehler, die Einzel-Slices verbargen (welle-03-Lehre bestätigt); `make gates` grün; offen: belief-**abhängige** Kandidaten-Generierung (F4b) = welle-05 |
 | 2026-07-06 | `welle-04-voi-eskalation` **abgeschlossen** (Slices `014`..`017` → `done/`); „Aktuelle Welle" → Ruhe-Marker; Lerneintrag `done/welle-04-voi-eskalation-results.md` | Closure-Trigger erfüllt (Zyklus sammeln\|handeln\|eskalieren E2E, alle Gates grün); Resume → Schwellwert-Reconciliation **oder** welle-05 (LLM-Port) |
+| 2026-07-06 | `slice-018` (Schwellwert-Reconciliation) **erledigt** → `done/`: Schwellen spec-konform verschärft (θ_other_block 0,5→0,10, θ_repo 0,7→0,80, θ_extern 0,9→0,95, θ_rehyp 0,5→0,30); `ADR-0008` **supersedes** `ADR-0005`; Resume → welle-05 | Source Precedence: Spec (Rang 2) sticht ADR (Rang 4); ADR-0005 hatte Safety-Schwellen gelockert; nur 3 Grenzfall-Tests betroffen; `make gates` grün |
