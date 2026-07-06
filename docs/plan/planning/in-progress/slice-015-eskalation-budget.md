@@ -2,7 +2,7 @@
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
-**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](../in-progress/roadmap.md)).
+**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](roadmap.md)).
 
 **Bezug:** `LH-FA-ESK-001`, `LH-FA-ESK-002`, `LH-FA-ESK-003`, `LH-FA-ESK-004`,
 `LH-QA-03`; `ADR-0001`, `ADR-0003`; `ARC-05`.
@@ -24,17 +24,19 @@ Beobachtungen erschöpft **und** Resthypothese hoch **und** Gate geschlossen
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-ESK-002`: Eskalation ist ein **definierter Zustand** (kein
-      Fehlerstatus/Exception); Test belegt normalen Rückgabewert.
-- [ ] `LH-FA-ESK-003`: Eskalation trägt **Kontext** — Belief, gesammelte Evidenz,
-      Grund (Gate/Schwelle/Resthypothese-Stand); Test prüft alle drei.
-- [ ] `LH-FA-ESK-001`: Bedingung erfüllt **gdw.** Beobachtungen erschöpft **und**
+- [x] `LH-FA-ESK-002`: Eskalation ist ein **definierter Zustand** (kein
+      Fehlerstatus/Exception); Test belegt normalen Rückgabewert
+      (`eskalation_ist_definierter_zustand_kein_fehler`).
+- [x] `LH-FA-ESK-003`: Eskalation trägt **Kontext** — Belief, gesammelte Evidenz,
+      Grund (Gate/Schwelle/Resthypothese-Stand); Test prüft alle drei
+      (`eskalation_traegt_kontext_belief_evidenz_grund` + `grund_*`).
+- [x] `LH-FA-ESK-001`: Bedingung erfüllt **gdw.** Beobachtungen erschöpft **und**
       Resthypothese hoch **und** Gate geschlossen; Test mit jeder Teilbedingung
-      einzeln negativ.
-- [ ] `LH-FA-ESK-004`: Budget (Schritte/Kosten) → Erschöpfung löst **eigenständig**
-      Eskalation aus; Test.
-- [ ] Kern-lokal, framework-frei (`ADR-0001`/`ADR-0003`); Coverage ≥ 90 %
-      (`ADR-0004`/`ADR-0006`); `make gates` grün.
+      einzeln negativ (`EskalationsbedingungTest`, θ_esc=θ_rehyp).
+- [x] `LH-FA-ESK-004`: Budget (Schritte/Kosten) → Erschöpfung löst **eigenständig**
+      Eskalation aus (getrennter Pfad, nicht an Gate-Bedingung gekoppelt); Test.
+- [x] Kern-lokal (`hexagon:domain/eskalation`), framework-frei (`ADR-0001`/`ADR-0003`);
+      Coverage domain 98,13 % ≥ 90 % (`ADR-0004`/`ADR-0006`); `make gates` grün.
 - [ ] Closure-Notiz (bei Welle-04-Closure).
 
 ## 3. Plan (vor Code)
