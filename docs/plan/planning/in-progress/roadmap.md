@@ -46,7 +46,10 @@ gegen Code/`ADR-0005` (`STANDARD_SCHWELLWERT` = 0,5, Gate-Sperre = 0,5) — eige
 Slice/ADR (θ_esc ist mit `ADR-0007` bereits spec-konform). `B4` (M2-Formulierung in
 welle-02/03/04) optionale Konventions-Bereinigung. Tracked Follow-ups aus welle-03:
 Executor darf nur `Aktionsfreigabe.Freigegeben` (a-check-Regel, spätere Welle);
-echter Approval-Adapter mit Binding (welle-05).
+echter Approval-Adapter mit Binding (welle-05). Aus dem welle-04-Ketten-Review
+(F4b): **belief-abhängige Kandidaten-Generierung** — der Beobachtungs-Auswahl-Port
+liefert aktuell eine feste Menge; der LLM erzeugt die Kandidaten belief-abhängig
+(welle-05, `ADR-0001`).
 
 ## Nächste Wellen
 
@@ -132,3 +135,4 @@ flowchart LR
 | 2026-07-06 | **Sequentielles Code-Review** slice-014/015 (Fail-safe, rollierend): 5 Befunde gefixt — Eskalations-Schwelle spec-konform (θ_esc **0,5→0,30**, `>`→`≥`, `ADR-0007`, entkoppelt von Gate-Sperre); `schwelle` fail-closed; `Eskalationsgrund` trägt `GateEntscheidung` statt String; `VoiSelektor` Kreuz-Multiplikation statt Float-Division | F1 war un-ADR'te Safety-Schwelle + Unter-Eskalation im Band [0,30…0,50]; Reviews der Sicherheitsfunktion früh; `make gates` grün; offen: `STANDARD_SCHWELLWERT`-Reconciliation |
 | 2026-07-06 | `slice-016` `open → in-progress` **geliefert** (`beobachtung-waehlen`: `BeobachtungsAuswahlPort` + Use-Case `BeobachtungWaehlen` + neues Adapter-Modul `adapters:outbound:voi-fake`, `LH-FA-VOI-002`); Resume-Punkt → `slice-017` | Erstes application-Slice der Welle; **Multi-Modul-/Build-Risiko isoliert & retired** (7 Module, arch-check grün); `make gates` grün (application/voi-fake 100 %), 4 neue Tests |
 | 2026-07-06 | `slice-017` `open → in-progress` **geliefert** (`entscheidungszyklus`, `ARC-09`: `Entscheidungszyklus` + `Zyklusergebnis` verdrahten VoI + Belief-Update + Gate + Eskalation zu sammeln/handeln/eskalieren, `LH-FA-VOI-001`); **Welle-04-Closure-Trigger erfüllt** | Letztes Welle-Slice; E2E gegen Fake-Ports (6 Fälle, beide Eskalations-Auslöser, budget-garantierte Terminierung `LH-QA-02`); Aktionsfreigabe→GateEntscheidung-Rück-Mapping (Domäne kennt application nicht); `make gates` grün (application 100 %) |
+| 2026-07-06 | **Ketten-Review** slice-016/017 (VoI + Eskalation + Zyklus): 5 Befunde gefixt — fehlende Freigabe wird jetzt **eskaliert statt still abgelehnt** (F1, `LH-FA-POL-004`); Kandidaten-**Konsumption** gg. Scheingewissheit (F4a, `LH-FA-OBS-004`); `Eskalationsgrund.GateEskalation` (F2); Approval-Pfad-Test (F3); `ARC-09`-Diagramm reconcilt (F5) | Ketten-Sicht fand Kompositions-Fehler, die Einzel-Slices verbargen (welle-03-Lehre bestätigt); `make gates` grün; offen: belief-**abhängige** Kandidaten-Generierung (F4b) = welle-05 |

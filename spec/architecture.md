@@ -160,6 +160,22 @@ sequenceDiagram
     end
 ```
 
+Das `alt` oben zeigt den Kern (freigeben | sammeln | eskalieren). Der vollständige
+`ARC-09`-Zyklus terminiert in **einem von drei** Zuständen (Sammeln ist der
+Zwischenschritt):
+
+- **handeln** — Gate frei (Konfidenz + ggf. menschliche Freigabe `LH-FA-POL-004`).
+- **eskalieren** — an den Menschen mit Kontext, aus drei Gründen: das Gate selbst
+  eskaliert (Resthypothese-Sperre `LH-FA-POL-005` **oder** fehlende Freigabe
+  `LH-FA-POL-004`), **oder** günstige Beobachtungen erschöpft bei hoher Resthypothese
+  (`LH-FA-ESK-001`), **oder** — davon unabhängig — Budget erschöpft (`LH-FA-ESK-004`).
+- **ablehnen** — Gate abgelehnt (niedrige Erfolgswahrscheinlichkeit), Beobachtungen
+  erschöpft und Resthypothese unter der Eskalations-Schwelle (`LH-FA-POL-002.a`):
+  weder handeln noch eskalieren.
+
+Das Budget garantiert die Terminierung des Sammel-Loops (`LH-QA-02`); jede günstige
+Beobachtung wird höchstens **einmal** gezählt (kein `LH-FA-OBS-004`-Scheingewissheit).
+
 ## 5. Fehlermodelle und Resilienz
 
 | Fehlerquelle | Behandlung-Schicht | Logging |
