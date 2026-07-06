@@ -23,4 +23,4 @@ wandert mit dem ersten veröffentlichten `v0.1.0`.
 
 | Version | Datum | Stand |
 | --- | --- | --- |
-| `v0.1.0` <a id="v0.1.0"></a> | 2026-07-04 | in Entwicklung — welle-01..03 done (Belief-Kern; Evidenz + Audit; Aktionen + Konfidenz-Gate/Sicherheitsfunktion); Coverage-Gate auf alle Module (`ADR-0006`); welle-04 (VoI + Eskalation) aufgesetzt |
+| `v0.1.0` <a id="v0.1.0"></a> | 2026-07-04 | in Entwicklung — welle-01..04 done (Belief-Kern; Evidenz + Audit; Aktionen + Konfidenz-Gate/Sicherheitsfunktion; VoI + Eskalation + Entscheidungszyklus `ARC-09`); Coverage-Gate auf alle Module (`ADR-0006`); `ADR-0007` (θ_esc) Accepted |

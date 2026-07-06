@@ -2,7 +2,7 @@
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
-**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](roadmap.md)).
+**Welle:** `welle-04-voi-eskalation` ([Ergebnisse](welle-04-voi-eskalation-results.md)).
 
 **Bezug:** `LH-FA-VOI-002`, `LH-QA-03`; `ADR-0001`, `ADR-0003`, `ADR-0006`;
 `ARC-04`, `ARC-07`.
