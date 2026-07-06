@@ -2,6 +2,7 @@ package dev.beliefagent.domain.eskalation
 
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
+import dev.beliefagent.domain.belief.GateEntscheidung
 
 /**
  * Grund einer [Eskalation] (`LH-FA-ESK-003`): **warum** eskaliert wurde. Versiegelt,
@@ -11,15 +12,16 @@ import dev.beliefagent.domain.belief.Beobachtung
  */
 sealed interface Eskalationsgrund {
     /**
-     * `LH-FA-ESK-001`: günstige Beobachtungen erschöpft, [resthypothese] echt über
-     * der [schwelle] und das Aktions-Gate geschlossen ([gateGrund] beschreibt die
-     * Gate-Entscheidung). Trägt Schwelle und Resthypothese-Stand als Kontext
-     * (`LH-FA-ESK-003`: „welches Gate, welche Schwelle, Stand der Resthypothese").
+     * `LH-FA-ESK-001`: günstige Beobachtungen erschöpft, [resthypothese] ≥ der
+     * [schwelle] und das Aktions-Gate geschlossen — [gate] trägt die **volle**
+     * [GateEntscheidung] (Ablehnung/Eskalation, nicht vor-gestringt), sodass der
+     * Grund den Gate-Typ behält. Deckt `LH-FA-ESK-003` („welches Gate, welche
+     * Schwelle, Stand der Resthypothese") mit gate + schwelle + resthypothese ab.
      */
     data class BeobachtungenErschoepft(
         val resthypothese: Double,
         val schwelle: Double,
-        val gateGrund: String,
+        val gate: GateEntscheidung,
     ) : Eskalationsgrund
 
     /** `LH-FA-ESK-004`: das [budget] der Informationssammlung ist erschöpft (eigenständiger Auslöser). */

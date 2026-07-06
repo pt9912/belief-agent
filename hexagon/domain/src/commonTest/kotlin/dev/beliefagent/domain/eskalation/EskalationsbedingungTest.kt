@@ -6,6 +6,7 @@ import dev.beliefagent.domain.belief.Hypothese
 import dev.beliefagent.domain.belief.HypotheseId
 import dev.beliefagent.domain.belief.Resthypothese
 import kotlin.test.Test
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 
@@ -34,7 +35,8 @@ class EskalationsbedingungTest {
 
     @Test
     fun resthypothese_nicht_hoch_keine_eskalation() { // LH-FA-ESK-001 (Teilbedingung 2 negativ)
-        assertFalse(Eskalationsbedingung.erfuellt(beobachtungenErschoepft = true, belief = belief(0.3), gate = zu))
+        // 0,2 < θ_esc (0,30, ADR-0007) -> nicht hoch.
+        assertFalse(Eskalationsbedingung.erfuellt(beobachtungenErschoepft = true, belief = belief(0.2), gate = zu))
     }
 
     @Test
@@ -43,8 +45,8 @@ class EskalationsbedingungTest {
     }
 
     @Test
-    fun resthypothese_genau_auf_schwelle_eskaliert_nicht() { // Grenzfall: echt > (nicht >=)
-        assertFalse(Eskalationsbedingung.erfuellt(beobachtungenErschoepft = true, belief = belief(0.5), gate = zu))
+    fun resthypothese_genau_auf_schwelle_eskaliert() { // LH-FA-POL-002.a: p_other >= θ_esc (Grenzfall, ADR-0007)
+        assertTrue(Eskalationsbedingung.erfuellt(beobachtungenErschoepft = true, belief = belief(0.30), gate = zu))
     }
 
     @Test
@@ -57,8 +59,18 @@ class EskalationsbedingungTest {
     fun schwelle_ist_konfigurierbar() {
         // Strengere Schwelle 0,7: rest 0,6 gilt nicht mehr als "hoch".
         assertFalse(Eskalationsbedingung.erfuellt(true, belief(0.6), zu, schwelle = 0.7))
-        // θ_esc-Default an θ_rehyp gekoppelt.
-        assertTrue(Eskalationsbedingung.STANDARD_ESKALATIONS_SCHWELLE == 0.5)
+        // θ_esc-Default spec-konform 0,30 (ADR-0007).
+        assertTrue(Eskalationsbedingung.STANDARD_ESKALATIONS_SCHWELLE == 0.30)
+    }
+
+    @Test
+    fun ungueltige_schwelle_wird_abgewiesen() { // F2: fail-closed statt Eskalation still zu deaktivieren
+        assertFailsWith<IllegalArgumentException> {
+            Eskalationsbedingung.erfuellt(true, belief(0.6), zu, schwelle = Double.NaN)
+        }
+        assertFailsWith<IllegalArgumentException> {
+            Eskalationsbedingung.erfuellt(true, belief(0.6), zu, schwelle = 1.5)
+        }
     }
 
     @Test

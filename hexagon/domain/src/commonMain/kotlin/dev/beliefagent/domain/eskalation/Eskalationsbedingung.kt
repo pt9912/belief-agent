@@ -2,7 +2,6 @@ package dev.beliefagent.domain.eskalation
 
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.GateEntscheidung
-import dev.beliefagent.domain.belief.ReHypothesenAusloeser
 
 /**
  * Eskalationsbedingung als reine Domänen-Regel (`ARC-05`, `LH-FA-ESK-001`): das
@@ -10,33 +9,37 @@ import dev.beliefagent.domain.belief.ReHypothesenAusloeser
  * zugleich gelten:
  *  1. die verfügbaren **günstigen Beobachtungen erschöpft** sind
  *     ([beobachtungenErschoepft]),
- *  2. die **Resthypothese hoch** bleibt (echt über der [schwelle]) und
+ *  2. die **Resthypothese hoch** bleibt (**≥** der [schwelle], `LH-FA-POL-002.a`) und
  *  3. das **Aktions-Gate geschlossen** bleibt (die [gate]-Entscheidung ist **keine**
  *     [GateEntscheidung.Freigabe]).
  *
  * Fehlt eine der drei, wird **nicht** eskaliert (dann sammeln oder handeln —
- * slice-016). Deterministisch (`LH-QA-03`), framework-frei.
+ * slice-017). Deterministisch (`LH-QA-03`), framework-frei.
  *
- * Die [schwelle] ist θ_esc; ihr Startwert ist an θ_rehyp gekoppelt
- * ([ReHypothesenAusloeser.STANDARD_SCHWELLWERT], Spezifikation §3): Eskalation
- * greift dort, wo Re-Hypothesenbildung indiziert wäre, die günstigen Beobachtungen
- * aber erschöpft sind.
+ * Die [schwelle] ist **θ_esc = 0,30** (`ADR-0007`, spec-konform, `spezifikation.md`
+ * §3), **entkoppelt** von der Gate-Sperre (`ADR-0005`, 0,5) — die Eskalation soll den
+ * Menschen **früher** holen als die Irreversibel-Sperre blockiert. Bewusst **nicht**
+ * über [dev.beliefagent.domain.belief.ReHypothesenAusloeser] wiederverwendet: dessen
+ * `STANDARD_SCHWELLWERT` (0,5) driftet selbst vom Spec-θ_rehyp (0,30) und nutzt
+ * striktes `>` — eine Reconciliation von θ_rehyp ist ein offener Follow-up (`ADR-0007`).
  *
  * Der **Budget-Auslöser** (`LH-FA-ESK-004`) ist bewusst **nicht** Teil dieser
  * Bedingung — er ist ein getrennter Pfad ([Budget.erschoepft]).
  */
 object Eskalationsbedingung {
 
-    /** θ_esc — Startwert an θ_rehyp gekoppelt (Spezifikation §3, `LH-FA-ESK-001`). */
-    const val STANDARD_ESKALATIONS_SCHWELLE: Double = ReHypothesenAusloeser.STANDARD_SCHWELLWERT
+    /** θ_esc = 0,30 (`ADR-0007`, spec-konform, `spezifikation.md` §3); Vergleich `≥` (`LH-FA-POL-002.a`). */
+    const val STANDARD_ESKALATIONS_SCHWELLE: Double = 0.30
 
     fun erfuellt(
         beobachtungenErschoepft: Boolean,
         belief: BeliefState,
         gate: GateEntscheidung,
         schwelle: Double = STANDARD_ESKALATIONS_SCHWELLE,
-    ): Boolean =
-        beobachtungenErschoepft &&
-            belief.resthypothese.wahrscheinlichkeit > schwelle &&
+    ): Boolean {
+        require(schwelle in 0.0..1.0) { "Eskalations-Schwelle muss in [0,1] liegen: $schwelle" }
+        return beobachtungenErschoepft &&
+            belief.resthypothese.wahrscheinlichkeit >= schwelle &&
             gate !is GateEntscheidung.Freigabe
+    }
 }

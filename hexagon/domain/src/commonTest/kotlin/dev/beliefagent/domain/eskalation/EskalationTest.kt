@@ -3,6 +3,7 @@ package dev.beliefagent.domain.eskalation
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
 import dev.beliefagent.domain.belief.Evidenz
+import dev.beliefagent.domain.belief.GateEntscheidung
 import dev.beliefagent.domain.belief.Hypothese
 import dev.beliefagent.domain.belief.HypotheseId
 import dev.beliefagent.domain.belief.Quelle
@@ -28,7 +29,7 @@ class EskalationTest {
 
     /** Modellhaft: der Zyklus liefert eine Eskalation als **normalen Rückgabewert** (LH-FA-ESK-002). */
     private fun eskaliere(): Eskalation =
-        Eskalation(belief, evidenz, Eskalationsgrund.BeobachtungenErschoepft(0.6, 0.5, "Ablehnung: unter Schwelle"))
+        Eskalation(belief, evidenz, Eskalationsgrund.BeobachtungenErschoepft(0.6, 0.30, GateEntscheidung.Ablehnung("unter Schwelle")))
 
     @Test
     fun eskalation_ist_definierter_zustand_kein_fehler() { // LH-FA-ESK-002
@@ -48,8 +49,8 @@ class EskalationTest {
     fun grund_beobachtungen_erschoepft_traegt_gate_schwelle_resthypothese() { // LH-FA-ESK-003
         val grund = eskaliere().grund as Eskalationsgrund.BeobachtungenErschoepft
         assertEquals(0.6, grund.resthypothese, 1e-12)
-        assertEquals(0.5, grund.schwelle, 1e-12)
-        assertTrue("Ablehnung" in grund.gateGrund)
+        assertEquals(0.30, grund.schwelle, 1e-12)
+        assertTrue(grund.gate is GateEntscheidung.Ablehnung)
     }
 
     @Test
