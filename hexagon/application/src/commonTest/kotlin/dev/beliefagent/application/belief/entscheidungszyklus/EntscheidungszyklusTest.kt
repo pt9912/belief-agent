@@ -23,14 +23,14 @@ import dev.beliefagent.domain.eskalation.Budget
 import dev.beliefagent.domain.eskalation.Eskalationsgrund
 import dev.beliefagent.domain.voi.VoiKandidat
 import kotlin.test.Test
-import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
  * E2E-Tests des Entscheidungszyklus (ARC-09, LH-FA-VOI-001, LH-FA-ESK, LH-QA-02/03)
- * gegen **Fake-Ports**: alle drei Ausgänge sammeln|handeln|eskalieren, beide
- * Eskalations-Auslöser (Beobachtungen erschöpft / Budget) und die garantierte
- * Terminierung.
+ * gegen **Fake-Ports**: alle Ausgänge sammeln|handeln|eskalieren|ablehnen, alle drei
+ * Eskalations-Gründe (Gate-Eskalation inkl. fehlende Freigabe / Beobachtungen
+ * erschöpft / Budget) und die garantierte Terminierung. Jeder Kandidat wird
+ * höchstens **einmal** beobachtet (keine Scheingewissheit).
  */
 class EntscheidungszyklusTest {
 
@@ -39,9 +39,10 @@ class EntscheidungszyklusTest {
         BeliefState.of(listOf(Hypothese(HypotheseId("A"), a)), Resthypothese(rest))
     private fun aktion(klasse: Wirkungsklasse, erfolg: Double) =
         Aktion("test", klasse, Erfolgswahrscheinlichkeit(erfolg), listOf(beobachtung("stuetzt")))
+    private fun kandidat(text: String, disk: Double) = VoiKandidat(beobachtung(text), disk, kosten = 1.0)
 
-    // Fake-LLM: Beobachtung, deren Text die Hypothesen-id enthält, bekommt hohe
-    // Likelihood (verschiebt Masse zur Hypothese, senkt die Resthypothese).
+    // Fake-LLM: Beobachtung, deren Text die Hypothesen-id ("a") enthält, verschiebt
+    // Masse zur Hypothese (senkt die Resthypothese); sonst bleibt der Belief gleich.
     private val llm = object : LlmPort {
         override fun likelihoods(beobachtung: Beobachtung, prior: BeliefState): Likelihoods {
             val text = beobachtung.evidenz.beschreibung.lowercase()
@@ -77,68 +78,58 @@ class EntscheidungszyklusTest {
 
     @Test
     fun sammelt_dann_handelt_bei_hoher_unsicherheit_und_irreversibler_aktion() { // LH-FA-VOI-001
-        // Start: Resthypothese hoch (0,95) -> Gate zu (irreversibel). Beobachtung "a"
-        // senkt die Resthypothese, bis das Gate freigibt -> gesammelt, dann gehandelt.
-        val kandidatA = VoiKandidat(beobachtung("a"), erwarteteDiskriminierung = 0.5, kosten = 1.0)
-        val ergebnis = zyklus(auswahl(kandidatA), approvalOk = true).entscheide(
-            aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95),
-            belief(a = 0.05, rest = 0.95),
-            Budget(maxSchritte = 5),
-        )
+        // Resthypothese hoch (0,95) -> Gate zu. Zwei **verschiedene** "a"-Beobachtungen
+        // senken sie, bis das Gate freigibt -> gesammelt, dann gehandelt.
+        val ergebnis = zyklus(
+            auswahl(kandidat("a1", disk = 0.5), kandidat("a2", disk = 0.4), kandidat("a3", disk = 0.3)),
+            approvalOk = true,
+        ).entscheide(aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95), belief(a = 0.05, rest = 0.95), Budget(maxSchritte = 5))
         assertTrue(ergebnis is Zyklusergebnis.Gehandelt, "sollte nach Sammeln handeln")
-        assertTrue(
-            ergebnis.belief.resthypothese.wahrscheinlichkeit < 0.95,
-            "der Zyklus hat vor dem Handeln Information gesammelt (Resthypothese gesenkt)",
-        )
+        assertTrue(ergebnis.belief.resthypothese.wahrscheinlichkeit < 0.95, "Information gesammelt (Resthypothese gesenkt)")
     }
 
     @Test
-    fun eskaliert_bei_erschoepftem_budget_unabhaengig() { // LH-FA-ESK-004
-        // Beobachtung "x" verschiebt nichts -> Gate bleibt zu -> Budget (2 Schritte) läuft aus.
-        val kandidatX = VoiKandidat(beobachtung("x"), erwarteteDiskriminierung = 0.5, kosten = 1.0)
-        val ergebnis = zyklus(auswahl(kandidatX)).entscheide(
-            aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95),
-            belief(a = 0.05, rest = 0.95),
-            Budget(maxSchritte = 2),
+    fun eskaliert_bei_erschoepften_beobachtungen_und_resthypothese_sperre() { // LH-FA-ESK-001 / POL-005
+        // Uninformative Beobachtungen ("x") senken die Resthypothese nicht -> Gate bleibt
+        // per Resthypothese-Sperre eskaliert; nach Verbrauch aller Kandidaten -> Eskalation.
+        val ergebnis = zyklus(auswahl(kandidat("x1", 0.5), kandidat("x2", 0.4))).entscheide(
+            aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95), belief(a = 0.05, rest = 0.95), Budget(maxSchritte = 5),
         )
-        assertTrue(ergebnis is Zyklusergebnis.Eskaliert)
-        assertTrue(ergebnis.eskalation.grund is Eskalationsgrund.BudgetErschoepft)
+        assertTrue(ergebnis is Zyklusergebnis.Eskaliert && ergebnis.eskalation.grund is Eskalationsgrund.GateEskalation)
     }
 
     @Test
-    fun eskaliert_bei_erschoepften_beobachtungen_und_hoher_resthypothese() { // LH-FA-ESK-001
-        val ergebnis = zyklus(auswahl()).entscheide( // keine Kandidaten
-            aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95),
-            belief(a = 0.05, rest = 0.95),
-            Budget(),
+    fun eskaliert_bei_fehlender_menschlicher_freigabe_trotz_niedriger_resthypothese() { // F1: LH-FA-POL-004
+        // Konfidenz bestanden (Resthypothese 0,1), aber keine Freigabe -> Gate eskaliert.
+        // Darf NICHT still abgelehnt werden, obwohl die Resthypothese unter θ_esc liegt.
+        val ergebnis = zyklus(auswahl(), approvalOk = false).entscheide(
+            aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95), belief(a = 0.9, rest = 0.1), Budget(),
         )
-        assertTrue(ergebnis is Zyklusergebnis.Eskaliert)
-        val grund = ergebnis.eskalation.grund
-        assertTrue(grund is Eskalationsgrund.BeobachtungenErschoepft && grund.resthypothese == 0.95)
+        assertTrue(ergebnis is Zyklusergebnis.Eskaliert && ergebnis.eskalation.grund is Eskalationsgrund.GateEskalation)
+    }
+
+    @Test
+    fun eskaliert_bei_erschoepften_beobachtungen_und_hoher_resthypothese_nach_ablehnung() { // LH-FA-ESK-001
+        val ergebnis = zyklus(auswahl()).entscheide( // keine Kandidaten; Gate lehnt ab (reversibel, Erfolg unter Schwelle)
+            aktion(Wirkungsklasse.ARBEITSBEREICH_LOKAL, erfolg = 0.3), belief(a = 0.4, rest = 0.6), Budget(),
+        )
+        assertTrue(ergebnis is Zyklusergebnis.Eskaliert && ergebnis.eskalation.grund is Eskalationsgrund.BeobachtungenErschoepft)
     }
 
     @Test
     fun lehnt_ab_bei_erschoepften_beobachtungen_und_niedriger_resthypothese() { // LH-FA-POL-002.a
-        // Reversible Aktion, Erfolg unter Schwelle -> Gate lehnt ab; keine Beobachtung;
-        // Resthypothese niedrig (0,1 < θ_esc) -> weder handeln noch eskalieren.
         val ergebnis = zyklus(auswahl()).entscheide(
-            aktion(Wirkungsklasse.ARBEITSBEREICH_LOKAL, erfolg = 0.3),
-            belief(a = 0.9, rest = 0.1),
-            Budget(),
+            aktion(Wirkungsklasse.ARBEITSBEREICH_LOKAL, erfolg = 0.3), belief(a = 0.9, rest = 0.1), Budget(),
         )
         assertTrue(ergebnis is Zyklusergebnis.Abgelehnt)
     }
 
     @Test
-    fun terminiert_garantiert_ueber_das_budget() { // LH-QA-02 (kein Endlos-Sammeln)
-        // Gate nie frei (approval verweigert für irreversibel), Kandidat immer vorhanden:
-        // nur das Budget beendet den Lauf.
-        val kandidatA = VoiKandidat(beobachtung("a"), erwarteteDiskriminierung = 0.5, kosten = 1.0)
-        val ergebnis = zyklus(auswahl(kandidatA), approvalOk = false).entscheide(
-            aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.99),
-            belief(a = 0.05, rest = 0.95),
-            Budget(maxSchritte = 3),
+    fun eskaliert_und_terminiert_bei_erschoepftem_budget() { // LH-FA-ESK-004 / LH-QA-02
+        // Mehr Kandidaten als Budget, Gate nie frei -> nur das Budget beendet den Lauf.
+        val ergebnis = zyklus(auswahl(kandidat("x1", 0.5), kandidat("x2", 0.4), kandidat("x3", 0.3))).entscheide(
+            aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95), belief(a = 0.05, rest = 0.95), Budget(maxSchritte = 2),
         )
-        assertEquals(true, ergebnis is Zyklusergebnis.Eskaliert)
+        assertTrue(ergebnis is Zyklusergebnis.Eskaliert && ergebnis.eskalation.grund is Eskalationsgrund.BudgetErschoepft)
     }
 }

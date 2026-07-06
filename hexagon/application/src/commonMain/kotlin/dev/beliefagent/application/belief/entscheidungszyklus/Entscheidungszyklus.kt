@@ -13,6 +13,7 @@ import dev.beliefagent.domain.eskalation.Budget
 import dev.beliefagent.domain.eskalation.Eskalation
 import dev.beliefagent.domain.eskalation.Eskalationsbedingung
 import dev.beliefagent.domain.eskalation.Eskalationsgrund
+import dev.beliefagent.domain.voi.VoiKandidat
 
 /**
  * Terminales Ergebnis des Entscheidungszyklus (`ARC-09`): genau **eines von drei**.
@@ -67,6 +68,7 @@ class Entscheidungszyklus(
         var belief = prior
         var restbudget = budget
         val gesammelt = mutableListOf<Beobachtung>()
+        val gewaehlt = mutableSetOf<VoiKandidat>() // verbrauchte Kandidaten -> keine Wiederholung
         while (true) {
             // 1. Gate (nicht umgehbar, LH-FA-POL-006): freigegeben -> handeln. Sonst
             //    die geschlossene Entscheidung als Domänen-GateEntscheidung festhalten.
@@ -81,9 +83,11 @@ class Entscheidungszyklus(
                     Eskalation(belief, gesammelt.toList(), Eskalationsgrund.BudgetErschoepft(restbudget)),
                 )
             }
-            // 3. Sammeln: die informativste günstige Beobachtung wählen (LH-FA-VOI-001/002).
-            //    Keine mehr -> erschöpft: eskalieren oder ablehnen (LH-FA-ESK-001).
-            val kandidat = beobachtungWaehlen.waehle()
+            // 3. Sammeln: die informativste **noch nicht verbrauchte** günstige Beobachtung
+            //    wählen (LH-FA-VOI-001/002). Keine mehr -> erschöpft: eskalieren oder
+            //    ablehnen (LH-FA-ESK-001). Der Ausschluss verhindert, dieselbe Beobachtung
+            //    mehrfach zu zählen (Scheingewissheit, LH-FA-OBS-004).
+            val kandidat = beobachtungWaehlen.waehle(gewaehlt)
                 ?: return abschlussOhneBeobachtung(belief, gesammelt.toList(), gate)
             // beobachten -> Belief fortschreiben -> Budget verbrauchen -> Zyklus wiederholen.
             belief = beliefAktualisieren.ausfuehren(
@@ -91,35 +95,51 @@ class Entscheidungszyklus(
             ).belief
             restbudget = restbudget.verbrauche(kandidat.kosten)
             gesammelt += kandidat.beobachtung
+            gewaehlt += kandidat
         }
     }
 
     /**
-     * Günstige Beobachtungen erschöpft (`LH-FA-ESK-001`): bei hoher Resthypothese +
-     * geschlossenem Gate eskalieren mit Kontext, sonst ablehnen (Resthypothese unter
-     * θ_esc — nicht handeln, nicht eskalieren).
+     * Günstige Beobachtungen erschöpft — Abschluss je nach **Grund** der
+     * Gate-Schließung:
+     *  - Das Gate hat **selbst eskaliert** (Resthypothese-Sperre `LH-FA-POL-005`
+     *    **oder** fehlende menschliche Freigabe `LH-FA-POL-004`) → bindend
+     *    eskalieren, **nicht** über die Resthypothese neu bewerten. Sonst würde eine
+     *    konfident-fertige, aber unfreigegebene irreversible Aktion still abgelehnt,
+     *    statt an den Menschen zu gehen.
+     *  - Das Gate hat **abgelehnt** (niedrige Erfolgswahrscheinlichkeit) →
+     *    `LH-FA-ESK-001`: eskalieren nur bei hoher Resthypothese (zu unsicher), sonst
+     *    ablehnen (nicht handeln, nicht eskalieren).
      */
     private fun abschlussOhneBeobachtung(
         belief: BeliefState,
         gesammelt: List<Beobachtung>,
         gate: GateEntscheidung,
-    ): Zyklusergebnis =
-        if (Eskalationsbedingung.erfuellt(beobachtungenErschoepft = true, belief, gate, eskalationsSchwelle)) {
-            Zyklusergebnis.Eskaliert(
-                Eskalation(
-                    belief,
-                    gesammelt,
-                    Eskalationsgrund.BeobachtungenErschoepft(
-                        resthypothese = belief.resthypothese.wahrscheinlichkeit,
-                        schwelle = eskalationsSchwelle,
-                        gate = gate,
+    ): Zyklusergebnis = when (gate) {
+        is GateEntscheidung.Eskalation ->
+            Zyklusergebnis.Eskaliert(Eskalation(belief, gesammelt, Eskalationsgrund.GateEskalation(gate)))
+
+        is GateEntscheidung.Ablehnung ->
+            if (Eskalationsbedingung.erfuellt(beobachtungenErschoepft = true, belief, gate, eskalationsSchwelle)) {
+                Zyklusergebnis.Eskaliert(
+                    Eskalation(
+                        belief,
+                        gesammelt,
+                        Eskalationsgrund.BeobachtungenErschoepft(
+                            resthypothese = belief.resthypothese.wahrscheinlichkeit,
+                            schwelle = eskalationsSchwelle,
+                            gate = gate,
+                        ),
                     ),
-                ),
-            )
-        } else {
-            Zyklusergebnis.Abgelehnt(
-                "günstige Beobachtungen erschöpft, Resthypothese unter θ_esc — kein günstiger Zug",
-                belief,
-            )
-        }
+                )
+            } else {
+                Zyklusergebnis.Abgelehnt(
+                    "günstige Beobachtungen erschöpft, Resthypothese unter θ_esc — kein günstiger Zug",
+                    belief,
+                )
+            }
+
+        // Freigabe wird bereits in Schritt 1 (am Gate) behandelt und erreicht diese Stelle nie.
+        is GateEntscheidung.Freigabe -> error("Freigabe wird am Gate behandelt, nicht bei Erschöpfung")
+    }
 }

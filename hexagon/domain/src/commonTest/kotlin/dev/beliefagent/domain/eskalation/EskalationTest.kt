@@ -66,4 +66,12 @@ class EskalationTest {
         val e = Eskalation(belief, emptyList(), Eskalationsgrund.BudgetErschoepft(Budget()))
         assertTrue(e.evidenz.isEmpty())
     }
+
+    @Test
+    fun grund_gate_eskalation_traegt_die_gate_entscheidung() { // Gate-verlangte Eskalation (POL-004/005)
+        val gate = GateEntscheidung.Eskalation("irreversible Aktion ohne menschliche Freigabe")
+        val e = Eskalation(belief, evidenz, Eskalationsgrund.GateEskalation(gate))
+        val grund = e.grund as Eskalationsgrund.GateEskalation
+        assertTrue(grund.gate is GateEntscheidung.Eskalation)
+    }
 }

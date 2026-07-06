@@ -13,16 +13,25 @@ import dev.beliefagent.domain.belief.GateEntscheidung
 sealed interface Eskalationsgrund {
     /**
      * `LH-FA-ESK-001`: günstige Beobachtungen erschöpft, [resthypothese] ≥ der
-     * [schwelle] und das Aktions-Gate geschlossen — [gate] trägt die **volle**
-     * [GateEntscheidung] (Ablehnung/Eskalation, nicht vor-gestringt), sodass der
-     * Grund den Gate-Typ behält. Deckt `LH-FA-ESK-003` („welches Gate, welche
-     * Schwelle, Stand der Resthypothese") mit gate + schwelle + resthypothese ab.
+     * [schwelle] und das Gate **abgelehnt** (niedrige Erfolgswahrscheinlichkeit) —
+     * der Zustand ist zu unsicher, um die Ablehnung hinzunehmen, aber nicht mehr
+     * verbesserbar. [gate] trägt die volle [GateEntscheidung] (nicht vor-gestringt).
+     * Deckt `LH-FA-ESK-003` („welches Gate, welche Schwelle, Stand der Resthypothese").
      */
     data class BeobachtungenErschoepft(
         val resthypothese: Double,
         val schwelle: Double,
         val gate: GateEntscheidung,
     ) : Eskalationsgrund
+
+    /**
+     * Das **Gate selbst** hat Eskalation verlangt — Resthypothese-Sperre für
+     * irreversible Aktionen (`LH-FA-POL-005`) **oder** fehlende menschliche Freigabe
+     * (`LH-FA-POL-004`). Unabhängig von der Beobachtungs-Erschöpfung: [gate] trägt
+     * die Gate-Entscheidung samt Grund. Wird **nicht** über die Resthypothese neu
+     * bewertet — die Gate-Forderung nach einem Menschen ist bindend.
+     */
+    data class GateEskalation(val gate: GateEntscheidung) : Eskalationsgrund
 
     /** `LH-FA-ESK-004`: das [budget] der Informationssammlung ist erschöpft (eigenständiger Auslöser). */
     data class BudgetErschoepft(val budget: Budget) : Eskalationsgrund

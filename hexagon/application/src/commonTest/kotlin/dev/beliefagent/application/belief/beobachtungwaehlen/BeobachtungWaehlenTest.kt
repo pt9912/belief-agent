@@ -43,4 +43,14 @@ class BeobachtungWaehlenTest {
         val useCase = BeobachtungWaehlen(port(kandidat(0.2, 2.0), kandidat(0.6, 2.0)))
         assertEquals(useCase.waehle(), useCase.waehle())
     }
+
+    @Test
+    fun schliesst_bereits_gewaehlte_kandidaten_aus() { // Konsumption: keine Wiederholung (Scheingewissheit)
+        val a = kandidat(diskriminierung = 0.6, kosten = 1.0)
+        val b = kandidat(diskriminierung = 0.4, kosten = 1.0)
+        val useCase = BeobachtungWaehlen(port(a, b))
+        assertSame(a, useCase.waehle())
+        assertSame(b, useCase.waehle(bereitsGewaehlt = setOf(a)))
+        assertNull(useCase.waehle(bereitsGewaehlt = setOf(a, b)))
+    }
 }
