@@ -50,3 +50,11 @@ coverage: ## Test-Coverage messen (Kover; Report)
 .PHONY: coverage-gate
 coverage-gate: ## Coverage-Schwelle pruefen (Kover koverVerify; Schwelle ADR-0004)
 	docker build --target coverage-gate -t $(IMAGE):coverage-gate .
+
+.PHONY: example-langchain
+example-langchain: ## Lauffaehiges LangChain4j-Integrationsbeispiel
+	docker build --target example-langchain -t $(IMAGE):example-langchain .
+
+.PHONY: example-koog
+example-koog: ## Lauffaehiges Koog-Integrationsbeispiel
+	docker build --target example-koog -t $(IMAGE):example-koog .

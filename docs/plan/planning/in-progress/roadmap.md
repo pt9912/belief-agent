@@ -10,18 +10,22 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle** (kein `slice-*` in `in-progress/`).
-`welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
+**welle-05-llm-port ist aktiv** (seit 2026-07-06). `welle-04-voi-eskalation`
+ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)) und der Korrektur-Slice
 `slice-018` (Schwellwert-Reconciliation, `ADR-0008` **supersedes** `ADR-0005`) ist
 **erledigt** ([done](../done/slice-018-schwellwert-reconciliation.md)) — die
 Gate-/Resthypothese-Schwellen sind jetzt spec-konform (verschärft: θ_other_block
 0,10, θ_repository 0,80, θ_extern 0,95, θ_rehyp 0,30).
 
-**⇒ Resume-Punkt (2026-07-06):** **welle-05** (LLM-Port, Trigger „welle-03 done"
-erfüllt): echtes Sprachmodell hinter dem `LlmPort`, belief-abhängige VoI-Kandidaten
-(F4b), Konfidenz-Externalisierung. Alle Schwellwert-Follow-ups aus `ADR-0007` sind
-mit `ADR-0008` **geschlossen**.
+**Aktiver Slice:** [`slice-019`](slice-019-llm-framework-adapter.md) — echte
+LangChain4j- und Koog-Adapter hinter dem bestehenden `LlmPort`; belief-agent
+orchestriert und gated, die LLM-Frameworks liefern strukturierte Likelihood-
+Einschaetzungen.
+
+**⇒ Resume-Punkt (2026-07-06):** `slice-019` abschliessen, danach Folge-Slices der
+Welle 05 schneiden: belief-abhaengige VoI-Kandidaten (F4b),
+Konfidenz-Externalisierung/Golden-Set und produktiver Composition-Root.
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
 Bereinigung. Tracked Follow-ups (welle-05): Executor darf nur
@@ -32,8 +36,7 @@ produktiver cli-Composition-Root (`ARC-09`-Verdrahtung).
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-04-voi-eskalation | welle-03 done | VoI-Selektor, Eskalations-Manager, Budget (`LH-FA-VOI`, `LH-FA-ESK`) | M |
-| welle-05-llm-port | welle-03 done | LLM-Port + erster Adapter, Konfidenz-Externalisierung (`LH-FA-LLM`) | L |
+| welle-05-llm-port | welle-03 done (erfüllt) | LLM-Port-Adapter, belief-abhaengige VoI-Kandidaten, Konfidenz-Externalisierung (`LH-FA-LLM`) | L |
 
 ## Meilensteine
 
@@ -116,3 +119,4 @@ flowchart LR
 | 2026-07-06 | **Ketten-Review** slice-016/017 (VoI + Eskalation + Zyklus): 5 Befunde gefixt — fehlende Freigabe wird jetzt **eskaliert statt still abgelehnt** (F1, `LH-FA-POL-004`); Kandidaten-**Konsumption** gg. Scheingewissheit (F4a, `LH-FA-OBS-004`); `Eskalationsgrund.GateEskalation` (F2); Approval-Pfad-Test (F3); `ARC-09`-Diagramm reconcilt (F5) | Ketten-Sicht fand Kompositions-Fehler, die Einzel-Slices verbargen (welle-03-Lehre bestätigt); `make gates` grün; offen: belief-**abhängige** Kandidaten-Generierung (F4b) = welle-05 |
 | 2026-07-06 | `welle-04-voi-eskalation` **abgeschlossen** (Slices `014`..`017` → `done/`); „Aktuelle Welle" → Ruhe-Marker; Lerneintrag `done/welle-04-voi-eskalation-results.md` | Closure-Trigger erfüllt (Zyklus sammeln\|handeln\|eskalieren E2E, alle Gates grün); Resume → Schwellwert-Reconciliation **oder** welle-05 (LLM-Port) |
 | 2026-07-06 | `slice-018` (Schwellwert-Reconciliation) **erledigt** → `done/`: Schwellen spec-konform verschärft (θ_other_block 0,5→0,10, θ_repo 0,7→0,80, θ_extern 0,9→0,95, θ_rehyp 0,5→0,30); `ADR-0008` **supersedes** `ADR-0005`; Resume → welle-05 | Source Precedence: Spec (Rang 2) sticht ADR (Rang 4); ADR-0005 hatte Safety-Schwellen gelockert; nur 3 Grenzfall-Tests betroffen; `make gates` grün |
+| 2026-07-06 | **welle-05 gestartet**; `slice-019` in `in-progress/` angelegt (LangChain4j + Koog als echte LLM-Framework-Adapter hinter `LlmPort`) | Resume-Punkt nach `slice-018`; Multi-Adapter-Schnitt isoliert Framework-/Build-Risiko vor Modellkalibrierung und produktivem Composition-Root |
