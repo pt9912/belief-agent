@@ -61,7 +61,7 @@ Welle-04-Closure bei.
   deterministischer Kandidat/Fake die Schätzung; das LLM externalisiert sie in
   welle-05 (`ADR-0001`, `LH-FA-LLM`). Der Selektor bleibt rein rechnend.
 - Grenzfälle: gleich-gute Kandidaten (deterministischer Tie-Break), leere
-  Kandidatenliste (kein günstiger Zug → Signal an den Zyklus/Eskalation, slice-016).
+  Kandidatenliste (kein günstiger Zug → Signal an den Zyklus/Eskalation, slice-017).
 
 ## 7. Closure-Notiz (nach `done/`)
 

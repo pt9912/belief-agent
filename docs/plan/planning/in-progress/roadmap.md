@@ -14,7 +14,10 @@ Wellen-Schätzung, nicht Treiber.
 
 - **Slices:** `slice-014` (VoI-Selektor) und `slice-015` (Eskalation-Zustand +
   Bedingung + Budget) in `in-progress/` (geliefert, bleiben bis Welle-Closure);
-  `slice-016` (Entscheidungszyklus) in `open/`.
+  `slice-016` (`beobachtung-waehlen`: VoI-Use-Case + Port + Fake) und `slice-017`
+  (`entscheidungszyklus`: Orchestrierung + E2E) in `open/` — der frühere
+  slice-016-`entscheidungszyklus` wurde nach `ARC-09`-Größenprüfung (Modul 5)
+  zerlegt.
 - **Start-Trigger:** welle-03 done (erfüllt 2026-07-05).
 - **Closure-Kriterien:** alle Slices in `done/`; `make gates` grün; E2E gegen Fakes
   zeigt den Entscheidungszyklus — **sammeln** bei hoher Unsicherheit statt zu
@@ -32,10 +35,13 @@ Freigabe für irreversible Aktionen) steht. Alternativ-Trigger **welle-05**
 **⇒ Resume-Punkt (2026-07-06):** `slice-014` (VoI-Selektor) und `slice-015`
 (Eskalation-Zustand + Bedingung + Budget in `hexagon:domain/eskalation`,
 `LH-FA-ESK-001`..`004`) **geliefert**, alle Gates grün — bleiben bis Welle-Closure
-in `in-progress/`. **Weiter mit `slice-016`** (Entscheidungszyklus, application):
-**zuerst `ARC-09`-Größe prüfen** — `slice-016` ist Teilungs-Kandidat, ggf.
-`beobachtung-waehlen` + `entscheidungszyklus` trennen. Danach ist der
-Welle-04-Closure-Trigger dran (E2E gegen Fakes: sammeln | handeln | eskalieren).
+in `in-progress/`. `ARC-09`-Größenprüfung (Modul 5) **durchgeführt**: der Zyklus
+war zu groß (neues Modul + Multi-Modul-Arch + E2E über mehrere Schichten) →
+**zerlegt** in `slice-016` (`beobachtung-waehlen`) + `slice-017`
+(`entscheidungszyklus`), Präzedenz slice-008. **Weiter mit `slice-016`**
+(`beobachtung-waehlen`: VoI-Use-Case + Auswahl-Port + `voi-fake`-Adapter — isoliert
+das Multi-Modul-/Build-Risiko zuerst). Danach `slice-017` (Zyklus + E2E) →
+Welle-04-Closure-Trigger (sammeln | handeln | eskalieren).
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale
 Konventions-Bereinigung. Tracked Follow-ups aus welle-03: Executor darf nur
 `Aktionsfreigabe.Freigegeben` (a-check-Regel, spätere Welle); echter
@@ -121,3 +127,4 @@ flowchart LR
 | 2026-07-06 | **welle-04 gestartet**; `slice-014` `open → in-progress`, Ruhe-Marker aufgelöst; `slice-014` geliefert (VoI-Selektor + `VoiKandidat`, neue Sub-Area `hexagon:domain/voi`, `LH-FA-VOI-002`/`003`/`004`); Resume-Punkt → `slice-015` | Start-Trigger „welle-03 done" erfüllt; reine Domänen-Regel als kleiner Einstieg; `make gates` grün (doc-check/build/test/coverage-gate/arch-check 0 Befunde, domain 97,81 %), 14 neue Tests |
 | 2026-07-06 | Planungs-Konvention: **keine eigenständigen Wellen-Dateien** mehr (`MR-009`); `welle-01..04-*.md` + `welle.template.md` entfernt, Wellen nur als Roadmap-Eintrag + `done/…-results.md` | Referenz-Projekt-Modell (`lab/example`); 23 Verweise umgebogen; `make doc-check` grün |
 | 2026-07-06 | `slice-015` `open → in-progress` **geliefert** (Eskalation-Zustand + Bedingung + Budget, neue Sub-Area `hexagon:domain/eskalation`, `LH-FA-ESK-001`..`004`); Resume-Punkt → `slice-016` | Domänen-Bausteine der Welle-04-Eskalation; θ_esc an θ_rehyp gekoppelt; `make gates` grün (domain 98,13 %), 21 neue Tests |
+| 2026-07-06 | `slice-016` **zerlegt** (Modul 5, `ARC-09`-Größenprüfung): `slice-016` (`beobachtung-waehlen`: VoI-Use-Case + Auswahl-Port + `voi-fake`) + `slice-017` (`entscheidungszyklus`: Orchestrierung + E2E) | Zyklus zu groß: neues Adapter-Modul + Multi-Modul-`arch-check` + E2E über mehrere Schichten → Schnitt nach Lieferwert, Modul-Risiko zuerst isolieren (Präzedenz slice-008); Architektur trennt `ARC-04`/`ARC-09` ohnehin |
