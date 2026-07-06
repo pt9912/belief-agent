@@ -78,11 +78,14 @@ DoD vollstaendig + Closure-Notiz; Slice ist abgeschlossen und in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-Am 2026-07-06 wurden beide Adapter-Module hinter `LlmPort` integriert, inklusive
-lokaler Tests, Parser/Fail-Closed-Verhalten für bekannte Hypothesen und
-Metadaten-Integration für Build/Coverage/Arch (`settings.gradle.kts`, `Dockerfile`,
-`.a-check.yml`). `docs/user/integration.md` wurde ergänzt, und `make gates` ist
-gruen gelaufen (inkl. per-Modul-Coverage-Gates und `a-check`).
+**Closure-Trigger (erfüllt):** `make gates` grün; beide Adapter-Modules
+(`llm-langchain4j`, `llm-koog`) vollständig hinter `LlmPort` mit lokalen Tests,
+Fail-Closed-Mapping und Parser-Validierung für bekannte Hypothesen.
+
+**Drift-Notiz:** `welle-05-llm-port` war aktiv bis `slice-019` in `done/`
+lief. Nach Abschluss wurde sie auf „keine aktive Welle“ gesetzt; die Folge-Slice-
+Prioritäten in Welle 05 (VoI-Kandidaten, Konfidenz-Externalisierung/Golden-Set,
+productiver Composition-Root) sind im Roadmap-Restore vermerkt.
 
 ## 8. Sub-Area-Modus-Begründung
 
