@@ -95,6 +95,41 @@ class KoogLlmPortTest {
     }
 
     @Test
+    fun factory_nutzt_llm_client_mit_provider_daten() {
+        val client = CapturingLlmClient(
+            """{"proHypothese":{"regression":0.85,"flaky":0.15},"resthypothese":0.2}""",
+        )
+        val port = KoogLlmPort.fromLlmClient(
+            client = client,
+            providerId = "acme-llm",
+            providerName = "ACME",
+            modelId = "acme-fast-1",
+        )
+
+        val likelihoods = port.likelihoods(beobachtung(), prior())
+
+        assertEquals("belief-agent-likelihoods", client.promptId)
+        assertEquals("acme-fast-1", client.modelId)
+        assertEquals(0.85, likelihoods.proHypothese[HypotheseId("regression")])
+    }
+
+    @Test
+    fun factory_liest_klassenamen_fuer_client() {
+        val port = KoogLlmPort.fromLlmClient(
+            clientClass = "dev.beliefagent.adapter.llm.koog.CapturingKoogLlmClientClassName",
+            providerId = "acme-llm",
+            providerName = "ACME",
+            modelId = "acme-fast-2",
+        )
+
+        val likelihoods = port.likelihoods(beobachtung(), prior())
+
+        assertEquals(0.85, likelihoods.proHypothese[HypotheseId("regression")])
+        assertEquals(0.15, likelihoods.proHypothese[HypotheseId("flaky")])
+        assertEquals(0.2, likelihoods.resthypothese)
+    }
+
+    @Test
     fun weist_fehlende_hypothese_zurueck() {
         val port = KoogLlmPort(
             runner = KoogPromptRunner {
@@ -235,7 +270,7 @@ class KoogLlmPortTest {
         override fun close() = Unit
     }
 
-    private class CapturingLlmClient(
+private class CapturingLlmClient(
         private val response: String,
     ) : LLMClient() {
         var promptId: String? = null
@@ -258,4 +293,22 @@ class KoogLlmPortTest {
 
         override fun close() = Unit
     }
+
+private class CapturingKoogLlmClientClassName : LLMClient() {
+    override fun llmProvider(): LLMProvider = LLMProvider("acme-llm", "ACME")
+
+    override suspend fun execute(
+        prompt: Prompt,
+        model: LLModel,
+        tools: List<ToolDescriptor>,
+    ): Message.Assistant = Message.Assistant(
+        """{"proHypothese":{"regression":0.85,"flaky":0.15},"resthypothese":0.2}""",
+        ResponseMetaInfo.Empty,
+    )
+
+    override suspend fun moderate(prompt: Prompt, model: LLModel): ModerationResult =
+        ModerationResult(isHarmful = false, categories = emptyMap())
+
+    override fun close() = Unit
+}
 }

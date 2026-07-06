@@ -1,0 +1,14 @@
+{
+  "beobachtung": {
+    "quelle": "LOG",
+    "zeitstempel": 2,
+    "evidenz": "regression confirmed by checkout error log"
+  },
+  "prior": {
+    "hypothesen": {
+      "regression": 0.4,
+      "flaky": 0.4
+    },
+    "resthypothese": 0.2
+  }
+}

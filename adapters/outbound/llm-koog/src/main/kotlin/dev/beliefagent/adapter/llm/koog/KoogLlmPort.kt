@@ -9,6 +9,7 @@ import ai.koog.prompt.dsl.prompt
 import ai.koog.prompt.executor.clients.LLMClient
 import ai.koog.prompt.executor.model.PromptExecutor
 import ai.koog.prompt.llm.LLModel
+import ai.koog.prompt.llm.LLMProvider
 import dev.beliefagent.application.belief.aktualisieren.ports.LlmPort
 import dev.beliefagent.domain.belief.Beobachtung
 import dev.beliefagent.domain.belief.BeliefState
@@ -57,6 +58,53 @@ class KoogLlmPort(
             promptFactory = promptFactory,
             parser = parser,
         )
+
+        fun fromLlmClient(
+            client: LLMClient,
+            providerId: String,
+            providerName: String,
+            modelId: String,
+            promptFactory: KoogLikelihoodPromptFactory = KoogLikelihoodPromptFactory(),
+            parser: KoogLikelihoodParser = StrictKoogLikelihoodParser(),
+        ): KoogLlmPort = fromLlmClient(
+            client = client,
+            model = LLModel(LLMProvider(providerId, providerName), modelId),
+            promptFactory = promptFactory,
+            parser = parser,
+        )
+
+        fun fromLlmClient(
+            clientClass: String,
+            providerId: String,
+            providerName: String,
+            modelId: String,
+            promptFactory: KoogLikelihoodPromptFactory = KoogLikelihoodPromptFactory(),
+            parser: KoogLikelihoodParser = StrictKoogLikelihoodParser(),
+        ): KoogLlmPort = fromLlmClient(
+            client = instantiateLlmClient(clientClass),
+            providerId = providerId,
+            providerName = providerName,
+            modelId = modelId,
+            promptFactory = promptFactory,
+            parser = parser,
+        )
+
+        private fun instantiateLlmClient(clientClass: String): LLMClient {
+            val loadedClass = runCatching { Class.forName(clientClass) as Class<*> }
+                .getOrElse { cause -> throw IllegalArgumentException("Could not load KOOG_CLIENT_CLASS='$clientClass'.", cause) }
+
+            require(LLMClient::class.java.isAssignableFrom(loadedClass)) {
+                "KOOG_CLIENT_CLASS='$clientClass' is not an ai.koog.prompt.executor.clients.LLMClient."
+            }
+
+            val ctor = runCatching { loadedClass.getDeclaredConstructor() }
+                .getOrElse { cause ->
+                    throw IllegalArgumentException("KOOG_CLIENT_CLASS='$clientClass' needs a public no-arg constructor.", cause)
+                }
+
+            return runCatching { ctor.newInstance() as LLMClient }
+                .getOrElse { cause -> throw IllegalArgumentException("Could not instantiate KOOG_CLIENT_CLASS='$clientClass'.", cause) }
+        }
     }
 
     override fun likelihoods(beobachtung: Beobachtung, prior: BeliefState): Likelihoods {

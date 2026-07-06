@@ -1,0 +1,7 @@
+{
+  "proHypothese": {
+    "regression": 0.85,
+    "flaky": 0.15
+  },
+  "resthypothese": 0.05
+}
