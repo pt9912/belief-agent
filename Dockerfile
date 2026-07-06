@@ -19,7 +19,8 @@ COPY adapters/outbound/llm-fake/build.gradle.kts ./adapters/outbound/llm-fake/bu
 COPY adapters/outbound/observation-fake/build.gradle.kts ./adapters/outbound/observation-fake/build.gradle.kts
 COPY adapters/outbound/audit-memory/build.gradle.kts ./adapters/outbound/audit-memory/build.gradle.kts
 COPY adapters/outbound/approval-fake/build.gradle.kts ./adapters/outbound/approval-fake/build.gradle.kts
-RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:approval-fake:dependencies
+COPY adapters/outbound/voi-fake/build.gradle.kts ./adapters/outbound/voi-fake/build.gradle.kts
+RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:approval-fake:dependencies :adapters:outbound:voi-fake:dependencies
 
 # --- build: Quellcode kompilieren (alle Module) ----------------------------
 FROM deps AS build
@@ -37,7 +38,8 @@ FROM build AS coverage
 RUN gradle --no-daemon --console=plain \
     :hexagon:domain:koverLog :hexagon:application:koverLog \
     :adapters:outbound:llm-fake:koverLog :adapters:outbound:observation-fake:koverLog \
-    :adapters:outbound:audit-memory:koverLog :adapters:outbound:approval-fake:koverLog
+    :adapters:outbound:audit-memory:koverLog :adapters:outbound:approval-fake:koverLog \
+    :adapters:outbound:voi-fake:koverLog
 
 # --- coverage-gate: Kover Schwellen-Verifikation (ADR-0004/ADR-0006) --------
 # Gate über domain + application + alle Adapter (Schwellen je Modul, ADR-0006).
@@ -45,4 +47,5 @@ FROM build AS coverage-gate
 RUN gradle --no-daemon --console=plain \
     :hexagon:domain:koverVerify :hexagon:application:koverVerify \
     :adapters:outbound:llm-fake:koverVerify :adapters:outbound:observation-fake:koverVerify \
-    :adapters:outbound:audit-memory:koverVerify :adapters:outbound:approval-fake:koverVerify
+    :adapters:outbound:audit-memory:koverVerify :adapters:outbound:approval-fake:koverVerify \
+    :adapters:outbound:voi-fake:koverVerify
