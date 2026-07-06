@@ -2,7 +2,7 @@
 
 **Status:** open → next → in-progress → done (siehe [Planning-README](../README.md)).
 
-**Welle:** [`welle-04-voi-eskalation`](../welle-04-voi-eskalation.md).
+**Welle:** `welle-04-voi-eskalation` (aktiv, siehe [Roadmap](roadmap.md)).
 
 **Bezug:** `LH-FA-VOI-002`, `LH-FA-VOI-003`, `LH-FA-VOI-004`, `LH-QA-03`;
 `ADR-0001`, `ADR-0003`; `ARC-04`.
@@ -23,15 +23,18 @@ welle-04 liefert ein Fake diese Schätzung, welle-05 externalisiert sie ans LLM.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-VOI-002`: wählt aus mehreren Kandidaten die Beobachtung, die die zwei
+- [x] `LH-FA-VOI-002`: wählt aus mehreren Kandidaten die Beobachtung, die die zwei
       wahrscheinlichsten Hypothesen am stärksten trennt (erwartete Diskriminierung);
-      Test.
-- [ ] `LH-FA-VOI-003`: Abwägung **Gewinn je Kosten** (nicht roher Gewinn); Test mit
-      teuer-aber-informativer vs. günstig-aber-schwacher Beobachtung.
-- [ ] `LH-FA-VOI-004`: lokal/heuristisch, deterministisch; keine global-optimale
-      Policy; im KDoc explizit als heuristisch deklariert.
-- [ ] Kern-lokal (`hexagon:domain`), framework-frei (`ADR-0001`/`ADR-0003`);
-      Coverage ≥ 90 % (`ADR-0004`/`ADR-0006`); `make gates` grün.
+      Test (`waehlt_bei_gleichen_kosten_die_staerkste_top2_trennung`).
+- [x] `LH-FA-VOI-003`: Abwägung **Gewinn je Kosten** (nicht roher Gewinn); Test mit
+      teuer-aber-informativer vs. günstig-aber-schwacher Beobachtung
+      (`waegt_gewinn_je_kosten_ab_nicht_rohen_gewinn`).
+- [x] `LH-FA-VOI-004`: lokal/heuristisch, deterministisch; keine global-optimale
+      Policy; im KDoc von `VoiSelektor` explizit als heuristisch deklariert; Tie-Break
+      + Reihenfolge-Unabhängigkeit getestet.
+- [x] Kern-lokal (`hexagon:domain/voi`), framework-frei (`ADR-0001`/`ADR-0003`);
+      Coverage domain 97,81 % ≥ 90 % (`ADR-0004`/`ADR-0006`); `make gates` grün
+      (doc-check 0/build/test/coverage-gate/arch-check 0 Befunde).
 - [ ] Closure-Notiz (bei Welle-04-Closure).
 
 ## 3. Plan (vor Code)

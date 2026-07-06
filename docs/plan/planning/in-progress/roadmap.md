@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-07-05.
+**Status:** Aktiv. **Letzte Änderung:** 2026-07-06.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,25 +10,34 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle** (kein `slice-*` in `in-progress/`).
-`welle-03-aktionen-gates` ist **abgeschlossen** (2026-07-05;
+`welle-04-voi-eskalation` (VoI + Eskalation) ist **aktiv** (gestartet 2026-07-06).
+
+- **Slices:** `slice-014` (VoI-Selektor, reine Domänen-Regel) in `in-progress/`;
+  `slice-015` (Eskalation-Zustand + Budget) und `slice-016` (Entscheidungszyklus)
+  in `open/`.
+- **Start-Trigger:** welle-03 done (erfüllt 2026-07-05).
+- **Closure-Kriterien:** alle Slices in `done/`; `make gates` grün; E2E gegen Fakes
+  zeigt den Entscheidungszyklus — **sammeln** bei hoher Unsicherheit statt zu
+  handeln (`LH-FA-VOI-001`), **eskalieren** als definierten Zustand mit Kontext bei
+  erschöpften günstigen Beobachtungen + hoher Resthypothese + geschlossenem Gate
+  **oder** erschöpftem Budget (`LH-FA-ESK-001`/`002`/`003`/`004`); Lerneintrag in
+  `done/welle-04-voi-eskalation-results.md`.
+
+Vorgänger `welle-03-aktionen-gates` ist **abgeschlossen** (2026-07-05;
 [Ergebnisse](../done/welle-03-aktionen-gates-results.md), Slices `011`..`013` in
 `done/`) — die **Sicherheitsfunktion** (`MR-003`: Konfidenz-Gate + menschliche
-Freigabe für irreversible Aktionen) steht.
+Freigabe für irreversible Aktionen) steht. Alternativ-Trigger **welle-05**
+(LLM-Port), ebenfalls „welle-03 done", bleibt offen.
 
-**Aufgesetzt, noch nicht gestartet:**
-[`welle-04-voi-eskalation`](../welle-04-voi-eskalation.md) (VoI + Eskalation) —
-Plan + `slice-014`/`015`/`016` liegen in `open/`. **Start** = `slice-014` nach
-`in-progress` (dann Ruhe-Marker weg). Alternativ-Trigger: **welle-05** (LLM-Port),
-ebenfalls „welle-03 done".
-
-**⇒ Resume-Punkt (2026-07-06):** welle-04 **starten** — `slice-014` (VoI-Selektor,
-reine Domänen-Regel, kleiner Einstieg) `open → next → in-progress` nehmen, dann
-Ruhe-Marker auflösen. **Offen im Blick:** `slice-016` ist Teilungs-Kandidat
-(`ARC-09`-Größe **vor** Umsetzung prüfen, ggf. `beobachtung-waehlen` + `entscheidungszyklus`
-trennen); `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-Bereinigung.
-Tracked Follow-ups aus welle-03: Executor darf nur `Aktionsfreigabe.Freigegeben`
-(a-check-Regel, spätere Welle); echter Approval-Adapter mit Binding (welle-05).
+**⇒ Resume-Punkt (2026-07-06):** `slice-014` **geliefert** (VoI-Selektor +
+`VoiKandidat` in `hexagon:domain/voi`, alle Gates grün) — bleibt bis Welle-Closure
+in `in-progress/`. **Weiter mit `slice-015`** (Eskalation-Zustand + Bedingung +
+Budget, `LH-FA-ESK-001`..`004`). **Offen im Blick:** `slice-016` ist
+Teilungs-Kandidat (`ARC-09`-Größe **vor** Umsetzung prüfen, ggf.
+`beobachtung-waehlen` + `entscheidungszyklus` trennen); `B4` (M2-Formulierung in
+welle-02/03/04) optionale Konventions-Bereinigung. Tracked Follow-ups aus
+welle-03: Executor darf nur `Aktionsfreigabe.Freigegeben` (a-check-Regel, spätere
+Welle); echter Approval-Adapter mit Binding (welle-05).
 
 ## Nächste Wellen
 
@@ -76,9 +85,9 @@ flowchart LR
 
 | Welle | Abgeschlossen | Ergebnis |
 |---|---|---|
-| [`welle-01-belief-kern`](../welle-01-belief-kern.md) | 2026-07-04 | M1 erreicht; 30 Tests, 94,83 % Coverage; [Ergebnisse](../done/welle-01-belief-kern-results.md). Rest: `CO-001` (arch-check). |
-| [`welle-02-evidenz-audit`](../welle-02-evidenz-audit.md) | 2026-07-05 | Evidenz→Belief→Audit E2E; 71 Tests, 97,37 % Coverage (domain); [Ergebnisse](../done/welle-02-evidenz-audit-results.md). a-check v0.11.0 (Multi-Modul), Regelwerk v1.4.0 vendored. |
-| [`welle-03-aktionen-gates`](../welle-03-aktionen-gates.md) | 2026-07-05 | Sicherheitsfunktion (`MR-003`): Wirkungsklassen + Konfidenz-Gate + menschliche Freigabe; 102 Tests, 97,65 % Coverage (domain); [Ergebnisse](../done/welle-03-aktionen-gates-results.md). 2 Code-Reviews (7 Safety-Befunde fail-closed gefixt), `ADR-0005` Accepted. |
+| `welle-01-belief-kern` | 2026-07-04 | M1 erreicht; 30 Tests, 94,83 % Coverage; [Ergebnisse](../done/welle-01-belief-kern-results.md). Rest: `CO-001` (arch-check). |
+| `welle-02-evidenz-audit` | 2026-07-05 | Evidenz→Belief→Audit E2E; 71 Tests, 97,37 % Coverage (domain); [Ergebnisse](../done/welle-02-evidenz-audit-results.md). a-check v0.11.0 (Multi-Modul), Regelwerk v1.4.0 vendored. |
+| `welle-03-aktionen-gates` | 2026-07-05 | Sicherheitsfunktion (`MR-003`): Wirkungsklassen + Konfidenz-Gate + menschliche Freigabe; 102 Tests, 97,65 % Coverage (domain); [Ergebnisse](../done/welle-03-aktionen-gates-results.md). 2 Code-Reviews (7 Safety-Befunde fail-closed gefixt), `ADR-0005` Accepted. |
 
 ## Historische Trigger-Verschiebungen
 
@@ -107,3 +116,4 @@ flowchart LR
 | 2026-07-05 | Coverage-Gate auf `application` + Adapter erweitert (`ADR-0006`, per-Modul kover, kein zentraler Block); Sicherheitskern `AktionGaten` jetzt gate-erzwungen | `make gates` grün; Ist-Coverage application + Adapter 100 %, domain 97,65 % → 90 %-Floor |
 | 2026-07-05 | `welle-04-voi-eskalation` **aufgesetzt** (Plan + `slice-014`/`015`/`016` in `open/`); noch nicht gestartet (Ruhe-Marker bleibt) | Trigger „welle-03 done" erfüllt; Slice-Anlage Welle für Welle (Modul 6) |
 | 2026-07-05 | **Tagesabschluss** — Resume-Punkt: welle-04 starten via `slice-014` | 3 Wellen done + Coverage-Scope (`ADR-0006`) + welle-04 aufgesetzt; alle Gates grün, Working Tree sauber |
+| 2026-07-06 | **welle-04 gestartet**; `slice-014` `open → in-progress`, Ruhe-Marker aufgelöst; `slice-014` geliefert (VoI-Selektor + `VoiKandidat`, neue Sub-Area `hexagon:domain/voi`, `LH-FA-VOI-002`/`003`/`004`); Resume-Punkt → `slice-015` | Start-Trigger „welle-03 done" erfüllt; reine Domänen-Regel als kleiner Einstieg; `make gates` grün (doc-check/build/test/coverage-gate/arch-check 0 Befunde, domain 97,81 %), 14 neue Tests |
