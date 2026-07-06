@@ -32,13 +32,13 @@ nun mit θ_rehyp (Spec: „θ_esc Startwert = θ_rehyp").
 
 ## 2. Definition of Done
 
-- [ ] `ADR-0008` **Accepted**, `Supersedes ADR-0005`; ADR-Index aktualisiert.
-- [ ] Code spec-konform: `STANDARD_SCHWELLWERT` = 0,30; `GateSchwellen`-Defaults
+- [x] `ADR-0008` **Accepted**, `Supersedes ADR-0005`; ADR-Index aktualisiert.
+- [x] Code spec-konform: `STANDARD_SCHWELLWERT` = 0,30; `GateSchwellen`-Defaults
       0,0/0,50/0,80/0,95; `resthypotheseSperrschwelle` = 0,10 (entkoppelt); KDocs
-      nachgezogen.
-- [ ] Tests an die neuen Schwellen angepasst; **kein** Verlust an Negativ-/Grenzfall-
-      Abdeckung; Coverage ≥ 90 %; `make gates` grün.
-- [ ] Closure-Notiz.
+      (`KonfidenzGate`/`ReHypothesenAusloeser`/`Eskalationsbedingung`) nachgezogen.
+- [x] Tests angepasst (3 Domänen-Grenzfälle: Gate-Sperre-Grenze 0,10, θ_rehyp 0,30);
+      **kein** Deckungsverlust; Coverage domain 98,2 % ≥ 90 %; `make gates` grün.
+- [x] Closure-Notiz (unten).
 
 ## 3. Plan (vor Code)
 
@@ -69,7 +69,15 @@ DoD vollständig + Closure-Notiz; Datei nach `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss füllen. -->
+**Was funktionierte:** die Verschärfung war chirurgisch — nur **3 Domänen-Grenzfall-
+Tests** brauchten Anpassung (Gate-Sperre-Grenze 0,5→0,10, θ_rehyp 0,5→0,30); Aktion-
+Gaten- und Zyklus-Tests passten unverändert (ihre Werte lagen ohnehin klar über/unter
+den neuen Schwellen). **Steering-Loop:** eine **Accepted-ADR (`ADR-0005`) durfte
+superseded werden**, ohne sie zu mutieren (Hard Rule 3.5) — `ADR-0008` trägt
+`Supersedes`, `ADR-0005` bleibt file-seitig „Accepted" (matrix-Regel trippt nicht).
+**Regel geschärft:** bei Spec↔ADR-Konflikt sticht die **Source Precedence** (Spec Rang
+2 > ADR Rang 4); eine ADR, die die Spec *lockert* statt schärft, ist ein Fehler —
+gefunden nur, weil `ADR-0007` den Abgleich als benannte Spec-Lücke tracked hat.
 
 ## 8. Sub-Area-Modus-Begründung
 
