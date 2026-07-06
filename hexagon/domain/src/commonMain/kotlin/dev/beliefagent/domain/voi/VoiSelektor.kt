@@ -17,25 +17,31 @@ package dev.beliefagent.domain.voi
  * Mehrdeutigkeit schneller auf), danach die stabile Eingabe-Reihenfolge (erster
  * Kandidat gewinnt).
  *
+ * Der Effizienz-Vergleich läuft über **Kreuz-Multiplikation**
+ * (`diskA·kostenB` vs. `diskB·kostenA`, Kosten `> 0` per [VoiKandidat]-Invariante)
+ * statt über die Division [VoiKandidat.gewinnJeKosten]: kein Divisions-Rundungsfehler
+ * (der den Tie-Break bei mathematisch gleicher Effizienz unterlaufen könnte) und kein
+ * Overflow bei winzigen Kosten. [VoiKandidat.gewinnJeKosten] bleibt als lesbare Kennzahl.
+ *
  * Rein rechnend und framework-frei (`ADR-0001`/`ADR-0003`): die Schätzung der
  * erwarteten Diskriminierung trägt der [VoiKandidat] (welle-04 Fake, welle-05 LLM),
  * nicht diese Regel.
  */
 object VoiSelektor {
 
+    // Größter Gewinn/Kosten via Kreuz-Multiplikation; bei Gleichstand größte absolute
+    // Diskriminierung. maxWithOrNull liefert das Maximum und hält bei vollem
+    // Gleichstand den zuerst gesehenen Kandidaten (stabile Eingabe-Reihenfolge).
+    private val vergleich: Comparator<VoiKandidat> = Comparator { a, b ->
+        val kreuz = (a.erwarteteDiskriminierung * b.kosten).compareTo(b.erwarteteDiskriminierung * a.kosten)
+        if (kreuz != 0) kreuz else a.erwarteteDiskriminierung.compareTo(b.erwarteteDiskriminierung)
+    }
+
     /**
      * Wählt den informativsten Kandidaten oder `null`, wenn keiner vorliegt —
      * erschöpfte/leere Kandidaten bedeuten „kein günstiger Zug" und sind ein Signal
-     * an den Entscheidungszyklus/die Eskalation (slice-016, `LH-FA-ESK-001`), kein
+     * an den Entscheidungszyklus/die Eskalation (slice-017, `LH-FA-ESK-001`), kein
      * Fehler dieser Regel.
      */
-    fun waehle(kandidaten: List<VoiKandidat>): VoiKandidat? =
-        kandidaten.maxWithOrNull(
-            // maxWithOrNull liefert das größte Element dieser Ordnung und hält bei
-            // vollem Gleichstand den zuerst gesehenen Kandidaten (aktualisiert nur bei
-            // echt größer) -> stabile Eingabe-Reihenfolge als letzter Tie-Break.
-            // Beide Schlüssel aufsteigend: größter Gewinn/Kosten, bei Gleichstand
-            // größte absolute Diskriminierung = das Maximum.
-            compareBy<VoiKandidat> { it.gewinnJeKosten }.thenBy { it.erwarteteDiskriminierung },
-        )
+    fun waehle(kandidaten: List<VoiKandidat>): VoiKandidat? = kandidaten.maxWithOrNull(vergleich)
 }
