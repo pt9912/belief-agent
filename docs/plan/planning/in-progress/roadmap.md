@@ -42,10 +42,13 @@ war zu groß (neues Modul + Multi-Modul-Arch + E2E über mehrere Schichten) →
 (`beobachtung-waehlen`: VoI-Use-Case + Auswahl-Port + `voi-fake`-Adapter — isoliert
 das Multi-Modul-/Build-Risiko zuerst). Danach `slice-017` (Zyklus + E2E) →
 Welle-04-Closure-Trigger (sammeln | handeln | eskalieren).
-**Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale
-Konventions-Bereinigung. Tracked Follow-ups aus welle-03: Executor darf nur
-`Aktionsfreigabe.Freigegeben` (a-check-Regel, spätere Welle); echter
-Approval-Adapter mit Binding (welle-05).
+**Offen im Blick:** **Schwellwert-Reconciliation** (aus Review slice-014/015 /
+`ADR-0007`): die Spec-Tabelle §3 (θ_rehyp/θ_esc = 0,30, θ_other_block = 0,10) driftet
+gegen Code/`ADR-0005` (`STANDARD_SCHWELLWERT` = 0,5, Gate-Sperre = 0,5) — eigener
+Slice/ADR (θ_esc ist mit `ADR-0007` bereits spec-konform). `B4` (M2-Formulierung in
+welle-02/03/04) optionale Konventions-Bereinigung. Tracked Follow-ups aus welle-03:
+Executor darf nur `Aktionsfreigabe.Freigegeben` (a-check-Regel, spätere Welle);
+echter Approval-Adapter mit Binding (welle-05).
 
 ## Nächste Wellen
 
@@ -128,3 +131,4 @@ flowchart LR
 | 2026-07-06 | Planungs-Konvention: **keine eigenständigen Wellen-Dateien** mehr (`MR-009`); `welle-01..04-*.md` + `welle.template.md` entfernt, Wellen nur als Roadmap-Eintrag + `done/…-results.md` | Referenz-Projekt-Modell (`lab/example`); 23 Verweise umgebogen; `make doc-check` grün |
 | 2026-07-06 | `slice-015` `open → in-progress` **geliefert** (Eskalation-Zustand + Bedingung + Budget, neue Sub-Area `hexagon:domain/eskalation`, `LH-FA-ESK-001`..`004`); Resume-Punkt → `slice-016` | Domänen-Bausteine der Welle-04-Eskalation; θ_esc an θ_rehyp gekoppelt; `make gates` grün (domain 98,13 %), 21 neue Tests |
 | 2026-07-06 | `slice-016` **zerlegt** (Modul 5, `ARC-09`-Größenprüfung): `slice-016` (`beobachtung-waehlen`: VoI-Use-Case + Auswahl-Port + `voi-fake`) + `slice-017` (`entscheidungszyklus`: Orchestrierung + E2E) | Zyklus zu groß: neues Adapter-Modul + Multi-Modul-`arch-check` + E2E über mehrere Schichten → Schnitt nach Lieferwert, Modul-Risiko zuerst isolieren (Präzedenz slice-008); Architektur trennt `ARC-04`/`ARC-09` ohnehin |
+| 2026-07-06 | **Sequentielles Code-Review** slice-014/015 (Fail-safe, rollierend): 5 Befunde gefixt — Eskalations-Schwelle spec-konform (θ_esc **0,5→0,30**, `>`→`≥`, `ADR-0007`, entkoppelt von Gate-Sperre); `schwelle` fail-closed; `Eskalationsgrund` trägt `GateEntscheidung` statt String; `VoiSelektor` Kreuz-Multiplikation statt Float-Division | F1 war un-ADR'te Safety-Schwelle + Unter-Eskalation im Band [0,30…0,50]; Reviews der Sicherheitsfunktion früh; `make gates` grün; offen: `STANDARD_SCHWELLWERT`-Reconciliation |
