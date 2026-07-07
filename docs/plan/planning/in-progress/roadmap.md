@@ -10,10 +10,10 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-`welle-05-llm-port` ist mit `slice-026` aktiv:
-[`slice-026-llm-hypothesen-fake-adapter`](slice-026-llm-hypothesen-fake-adapter.md).
-Der Slice liefert den deterministischen Fake-Adapter hinter dem
-application-lokalen Hypothesen-Port.
+**Keine aktive Welle.** `slice-026` ist als gezielter Follow-up auf `done/`
+abgeschlossen
+([`slice-026-llm-hypothesen-fake-adapter`](../done/slice-026-llm-hypothesen-fake-adapter.md)).
+Echte Hypothesen-Provider bleiben Folge-Slices.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
@@ -117,3 +117,4 @@ flowchart LR
 | 2026-07-07 | `slice-021` nach Planning-Harness re-geschnitten: Domain-Kandidaten/Übernahme-Regel bleibt `slice-021`; Application-Port/Flow wird `slice-025`; Fake-Adapter/Build-Integration wird `slice-026` | Ursprünglicher Slice hatte >3 DoD-Punkte und mehrere Schichten (Domain, Application, Adapter, Build/Arch) → nicht in einer Sitzung liefer- und reviewbar |
 | 2026-07-07 | `slice-021` **in `done/` abgeschlossen**: Domain-Kandidaten, explizite Kandidaten-Scores, Evidenzreferenzen und konservative Übernahme aus Resthypothesen-Masse | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-025` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-025` **in `done/` abgeschlossen**: application-lokaler Hypothesen-Port, Re-Hypothesen-Auslösung im `BeliefAktualisieren`-Flow und Architektur-Schärfung für getrennte LLM-Ports | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-026` oder priorisierte Welle-05-Folge |
+| 2026-07-07 | `slice-026` **in `done/` abgeschlossen**: deterministischer `llm-hypothesen-fake` Adapter hinter `HypothesenPort`, Fake-Guards, explizite Scores/Evidenz und Build-/Arch-Integration | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Hypothesen-Provider nur nach separatem Planning-Slice |
