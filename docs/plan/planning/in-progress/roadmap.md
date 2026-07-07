@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-07-07.
+**Status:** Ruhe. **Letzte Änderung:** 2026-07-07.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,9 +10,9 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktiv:** `slice-029` ist als gezielter Follow-up zu `slice-024`
-in Arbeit
-([`slice-029-example-reconciliation-cli-root`](slice-029-example-reconciliation-cli-root.md)).
+**Keine aktive Welle.** `slice-029` ist als gezielter Follow-up zu
+`slice-024` auf `done/` abgeschlossen
+([`slice-029-example-reconciliation-cli-root`](../done/slice-029-example-reconciliation-cli-root.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
@@ -122,3 +122,4 @@ flowchart LR
 | 2026-07-07 | `slice-028` **in `done/` abgeschlossen**: externalisierte Konfidenz im Entscheidungszyklus/Gate-Pfad gebunden, ohne `AktionGaten` zu erweitern | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-023`, `slice-024` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-023` **in `done/` abgeschlossen**: `AktionsVorschlagsPort`, `AktionsVorschlagen` und deterministischer `llm-action-fake` Adapter liefern gate-freie, konfidenzgebundene Aktionsabsichten | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-024` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-024` **in `done/` abgeschlossen**: Koin-basierter `adapters:inbound:cli` Composition-Root, Executor-Grenze nur ueber `Aktionsfreigabe.Freigegeben`, netzfreies CLI-E2E | `make gates` grün; `make cli-demo` gibt `terminal=gehandelt` aus; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
+| 2026-07-07 | `slice-029` **in `done/` abgeschlossen**: `example:langchain` und `example:koog` bleiben LLM-Framework-Adapter-Demos, verweisen aber auf `adapters:inbound:cli` als produktiven Composition-Root und zeigen die `freigabe.aktion`-Executor-Grenze | `make gates` grün; `make example-langchain` und `make example-koog` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
