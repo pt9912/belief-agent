@@ -17,8 +17,8 @@ Adapter-Modulen:
 | Modul | Rolle |
 |---|---|
 | `hexagon:domain` | fachliche Typen und reine Regeln: `BeliefState`, `BayesUpdate`, `KonfidenzGate`, `Budget`, `VoiSelektor` |
-| `hexagon:application` | Use Cases und Ports: `BeliefAktualisieren`, `AktionGaten`, `BeobachtungWaehlen`, `Entscheidungszyklus`, `KonfidenzgebundenerEntscheidungszyklus` |
-| `adapters:outbound:*` | Beispiel-/Fake-Adapter fuer LLM, Beobachtung, Audit, Approval, VoI-Kandidaten und Konfidenz-Replay |
+| `hexagon:application` | Use Cases und Ports: `BeliefAktualisieren`, `AktionsVorschlagen`, `AktionGaten`, `BeobachtungWaehlen`, `Entscheidungszyklus`, `KonfidenzgebundenerEntscheidungszyklus` |
+| `adapters:outbound:*` | Beispiel-/Fake-Adapter fuer LLM, Aktionsvorschlaege, Beobachtung, Audit, Approval, VoI-Kandidaten und Konfidenz-Replay |
 | `adapters:outbound:llm-langchain4j` | JVM-Adapter fuer LangChain4j `ChatModel` hinter `LlmPort` |
 | `adapters:outbound:llm-koog` | JVM-Adapter fuer Koog `LLMClient` oder `PromptExecutor` hinter `LlmPort` |
 
@@ -56,6 +56,7 @@ dependencies {
     implementation(project(":adapters:outbound:audit-memory"))
     implementation(project(":adapters:outbound:voi-fake"))
     implementation(project(":adapters:outbound:konfidenz-memory"))
+    implementation(project(":adapters:outbound:llm-action-fake"))
 
     // Optional: echte LLM-Framework-Adapter. Provider-Konfiguration bleibt extern.
     implementation(project(":adapters:outbound:llm-langchain4j"))
@@ -74,6 +75,7 @@ Adapter binden an diese Ports:
 | Port | Zweck |
 |---|---|
 | `LlmPort` | schaetzt Likelihoods `P(Evidenz | Hypothese)` fuer die Update-Pipeline |
+| `AktionsVorschlagsPort` | liefert strukturierte rohe Aktionsvorschlaege fuer bekannte Hypothesen |
 | `BeobachtungsPort` | liefert Beobachtungen aus Tests, Build, Logs, Mensch oder Repo |
 | `BeobachtungsAuswahlPort` | liefert belief-abhaengige VoI-Kandidaten fuer die naechste Beobachtung |
 | `KonfidenzPort` | speichert und laedt append-only Modell-Konfidenzen fuer eine fachliche Referenz |
@@ -118,6 +120,15 @@ den normalen `Entscheidungszyklus` mit `AktionGaten` auf. Fehlt eine gueltige
 externalisierte Konfidenz, ist die Aktion nicht gate-faehig; der Zyklus
 handelt fail-safe nicht. Das ersetzt keinen Aktionsvorschlags-Port und
 erweitert `AktionGaten` nicht um LLM- oder Adapterwissen.
+
+`AktionsVorschlagsPort` ist eine eigene LLM-Aufgabe. Ein Adapter liefert rohe
+Vorschlaege mit Beschreibung, bekannter Hypothese, Wirkungsklasse,
+`p_success`, Konfidenzreferenz und Evidenzreferenzen. `AktionsVorschlagen`
+validiert diese Werte gegen den aktuellen `BeliefState` und einen
+Evidenzindex, externalisiert `p_success` ueber `KonfidenzPort` und gibt nur
+`KonfidenzgebundeneAktion`en zurueck. Der Use Case ruft kein Gate auf, erzeugt
+keine `Aktionsfreigabe` und fuehrt nichts aus; kaputte oder unvollstaendige
+Vorschlaege werden verworfen.
 
 ## 4. Core Verdrahten
 
@@ -255,7 +266,7 @@ Geeignete Rollen fuer ein LangChain-basiertes Tool:
 | Likelihood-Schaetzung | `LlmPort` | `Likelihoods` je Hypothese plus Resthypothese |
 | Evidenzsammlung | `BeobachtungsPort` | `List<Beobachtung>` |
 | Auswahl naechster Beobachtungen | `BeobachtungsAuswahlPort` | `BeliefState -> List<VoiKandidat>` |
-| Aktionsvorschlag | eigener Adapter/Use-Case-Rand | `Aktion`-Vorschlag, niemals Ausfuehrung |
+| Aktionsvorschlag | `AktionsVorschlagsPort` + `AktionsVorschlagen` | `KonfidenzgebundeneAktion`, niemals Freigabe oder Ausfuehrung |
 
 Das Tool sollte strukturierte Daten liefern. Freitext wird am Adapter-Rand
 validiert und erst danach in Domänentypen uebersetzt.

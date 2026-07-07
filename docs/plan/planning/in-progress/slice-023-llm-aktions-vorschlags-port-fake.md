@@ -25,33 +25,33 @@ deterministisch mit `llm-action-fake` als nicht-produktivem Adapter.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-LLM-002` erfüllt: der neue Port ist auf `Aktion`-Vorschläge begrenzt
+- [x] `LH-FA-LLM-002` erfüllt: der neue Port ist auf `Aktion`-Vorschläge begrenzt
   und führt keine Entscheidung, kein Update und keine Aktionsausführung aus.
-- [ ] `LH-FA-LLM-003` erfüllt: `p_success`/Konfidenz aus dem Modell wird über den
+- [x] `LH-FA-LLM-003` erfüllt: `p_success`/Konfidenz aus dem Modell wird über den
   in `slice-022` gelieferten Konfidenz-/Audit-Contract externalisiert,
   protokollierbar und überschreibbar gemacht; ohne externalisierte Konfidenz
   entsteht kein gate-fähiger Aktionsvorschlag.
-- [ ] `LH-FA-ACT-001`/`002` erfüllt: jeder Vorschlag wird genau einer
+- [x] `LH-FA-ACT-001`/`002` erfüllt: jeder Vorschlag wird genau einer
   `Wirkungsklasse` nach Seiteneffekt-Reichweite zugeordnet; unbekannte oder
   mehrdeutige Klassen werden verworfen.
-- [ ] `LH-FA-ACT-003` erfüllt: jeder gate-fähige Vorschlag trägt eine eigene
+- [x] `LH-FA-ACT-003` erfüllt: jeder gate-fähige Vorschlag trägt eine eigene
   Erfolgswahrscheinlichkeit `P(Aktion erreicht Ziel | aktueller Belief)`,
   getrennt von Hypothesenwahrscheinlichkeiten.
-- [ ] `LH-FA-ACT-004` erfüllt: jeder gate-fähige Vorschlag referenziert
+- [x] `LH-FA-ACT-004` erfüllt: jeder gate-fähige Vorschlag referenziert
   stützende Evidenz; Vorschläge ohne Evidenz werden verworfen.
-- [ ] `LH-QA-03` erfüllt: deterministische Tests für leere Rückgaben, kaputte
+- [x] `LH-QA-03` erfüllt: deterministische Tests für leere Rückgaben, kaputte
   Felder, Konsistenz zu bekannten Hypothesen, externe Konfidenzbindung,
   Wirkungsklassen-Zuordnung, Evidenzpflicht + Fake-Determinismus.
-- [ ] `LH-QA-04` erfüllt: neuer `ports/`-Vertrag + `aktions-vorschlags`-Use-Case-Rand ist
+- [x] `LH-QA-04` erfüllt: neuer `ports/`-Vertrag + `aktions-vorschlags`-Use-Case-Rand ist
   strukturell nachvollziehbar verdrahtbar (ohne Kernlogik-Leak); der
   gemeinsam genutzte Konfidenz-Contract liegt nicht unter einem fremden lokalen
   Use-Case-Port.
-- [ ] `spec/architecture.md` ist auf den neuen Aktionsvorschlags-Port und dessen
+- [x] `spec/architecture.md` ist auf den neuen Aktionsvorschlags-Port und dessen
   Abgrenzung vom bestehenden Likelihood-`LlmPort` aktualisiert.
-- [ ] `make gates` grün.
-- [ ] Doku-Update in `docs/user/integration.md` für vorgeschlagene Aktionen als
+- [x] `make gates` grün.
+- [x] Doku-Update in `docs/user/integration.md` für vorgeschlagene Aktionen als
   eigenständige LLM-Aufgabe, ohne Ausführungsverantwortung.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -106,11 +106,23 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Schnitt ueber einen lokalen
+`AktionsVorschlagsPort` und den Use Case `AktionsVorschlagen` hielt die
+LLM-Aufgabe klar vor dem Gate: Rohvorschlaege werden gegen bekannte
+Hypothesen, Wirkungsklassen und Evidenz normalisiert, `p_success` wird ueber
+den bestehenden Konfidenz-Contract externalisiert, und erst daraus entsteht
+eine `KonfidenzgebundeneAktion`. Der Fake-Adapter liess sich analog zu den
+Hypothesen-/Konfidenz-Fakes klein und gate-frei halten.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Produktive Provider-Prompts, echte
+Aktionsausfuehrung und die CLI-/Composition-Root-Verdrahtung bleiben bewusst
+ausserhalb dieses Slice. Die Ausfuehrungsgrenze bleibt bei
+`Aktionsfreigabe.Freigegeben` und wird in `slice-024` verdrahtet.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Modellabgeleitete Aktionswerte brauchen immer eine stabile,
+eindeutige Konfidenzreferenz pro Vorschlag. Doppelte Referenzen werden jetzt
+fail-safe verworfen; kuenftige Provider-Adapter muessen dieselbe Eindeutigkeit
+vor Prompt-/Parser-Erweiterungen testen.
 
 **Folge-Slices:** Produktiver `ARC-09`-Composition-Root (slice-024) für das
   Vorschlags- und Ausführungs-Flussmuster.

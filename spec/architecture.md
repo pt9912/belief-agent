@@ -32,7 +32,7 @@ flowchart LR
             GATE["aktion-gaten (ARC-03)"]
             VOI["beobachtung-waehlen (ARC-04)"]
             ESK["eskalieren (ARC-05)"]
-            PORTS["ports: LLM-Likelihood · LLM-Hypothesen · Konfidenz · Human-Approval · Beobachtung · Audit (ARC-06/07)"]
+            PORTS["ports: LLM-Likelihood · LLM-Hypothesen · LLM-Aktion · Konfidenz · Human-Approval · Beobachtung · Audit (ARC-06/07)"]
         end
         subgraph DOM["domain (ARC-01)"]
             D["Hypothese · BeliefState · Resthypothese<br/>Evidenz · Beobachtung · Wirkungsklasse · Ereignis"]
@@ -75,6 +75,8 @@ hexagon/
                                #   Aktion/VoI/Eskalation (ARC-09-Orchestrierung)
       belief-aktualisieren/    # Bayes-Update, Normierung, Dedup, Unsicherheitsmaße (ARC-02)
         ports/                 #   → LLM-Likelihood-Port + Hypothesen-Port (lokal)
+      aktionsvorschlag/        # LLM-Aktionsvorschlaege normalisieren (ARC-07)
+        ports/                 #   → Aktionsvorschlags-Port (lokal)
       aktion-gaten/            # Konfidenz-Gate / Policy (ARC-03)
         ports/                 #   → Human-Approval-Port (lokal)
       beobachtung-waehlen/     # VoI-Selektor (ARC-04)
@@ -85,7 +87,7 @@ adapters/
   inbound/
     cli/                       # ruft Use Cases auf; Composition Root / DI (ARC-09-Wiring)
   outbound/
-    llm/                       # LLM-Provider → implementiert LLM-Port (ARC-08)
+    llm/                       # LLM-Provider → implementiert LLM-Aufgaben-Ports (ARC-08)
     observation/               # Test/Build/Log/Mensch/Repo → Beobachtungs-Ports (ARC-08)
     audit/                     # Event-Log-Persistenz → Audit-Port (ARC-06/08)
 ```
@@ -96,7 +98,7 @@ Rollen und erlaubte Importe (a-check-Rollen in Klammern):
 |---|---|---|---|
 | Domain (domain), `ARC-01` | Hypothese, Belief State (inkl. Resthypothese), Evidenz, Beobachtung, Aktion, Wirkungsklasse, Eskalations-Zustand, Ereignis — pur | — (nur sich selbst) | Application, Ports, Adapter |
 | Application-Slice (app), `ARC-02`–`ARC-05`, `ARC-09` (Orchestrierung) | Use Case je Slice: command/query · handler · validator · result. Bayes-Update, Gate, VoI, Eskalation, Entscheidungszyklus | Domain, (lokale) Ports | Adapter, Infrastruktur |
-| Ports (port), `ARC-07`/`ARC-06` | Verträge, die der Use Case braucht/anbietet: LLM-, Konfidenz-, Human-Approval-, Beobachtungs-, Audit-Port — so lokal wie möglich, so geteilt wie nötig | Domain | Adapter, Application-Handler |
+| Ports (port), `ARC-07`/`ARC-06` | Verträge, die der Use Case braucht/anbietet: LLM-, Aktionsvorschlags-, Konfidenz-, Human-Approval-, Beobachtungs-, Audit-Port — so lokal wie möglich, so geteilt wie nötig | Domain | Adapter, Application-Handler |
 | Inbound-Adapter (adapter, driving), `ARC-09` (Wiring) | Ruft Use Cases auf; Composition Root / DI-Verdrahtung | Application, Domain, Ports | fremder Adapter |
 | Outbound-Adapter (adapter, driven), `ARC-08` | Implementiert Ports: LLM-Provider, Beobachtungsquellen, Audit-Persistenz | Ports, Domain | Application-Interna, fremder Adapter (außer gemeinsamer Adapter-Senke) |
 
@@ -112,20 +114,24 @@ erhält keinen Pfad, der das Gate auslässt.
 über (lokale) Ports nach außen, importieren aber **nie** einen konkreten
 Adapter. Der Slice *belief-aktualisieren* schätzt Likelihoods über den
 LLM-Likelihood-Port und fordert neue/verfeinerte Hypothesen über einen
-getrennten Hypothesen-Port an; die Zyklus-Orchestrierung kann externalisierte
+getrennten Hypothesen-Port an; *aktionsvorschlag* holt strukturierte
+Aktionsvorschlaege ueber einen getrennten Aktionsvorschlags-Port, validiert
+Hypothesen-/Evidenzbezug, externalisiert `p_success` ueber den Konfidenz-Port
+und erzeugt nur eine konfidenzgebundene Aktionsabsicht, keine Freigabe und
+keine Ausfuehrung; die Zyklus-Orchestrierung kann externalisierte
 Modell-Konfidenz über den Konfidenz-Port laden und vor dem Gate in eine
 gate-faehige Erfolgswahrscheinlichkeit übersetzen; *aktion-gaten* holt bei
-extern-wirksamen Aktionen die menschliche Freigabe über den
-Human-Approval-Port ein (`LH-FA-POL-004`), bevor es freigibt;
-*beobachtung-waehlen* liest die Beobachtungs-Ports zur Aufzählung verfügbarer
-Kandidaten. Der Inbound-Adapter (`cli`) verdrahtet die Outbound-Adapter an die
-Ports (DI) und stößt den Entscheidungszyklus an.
+extern-wirksamen Aktionen die menschliche Freigabe über den Human-Approval-Port
+ein (`LH-FA-POL-004`), bevor es freigibt; *beobachtung-waehlen* liest die
+Beobachtungs-Ports zur Aufzählung verfügbarer Kandidaten. Der Inbound-Adapter
+(`cli`) verdrahtet die Outbound-Adapter an die Ports (DI) und stößt den
+Entscheidungszyklus an.
 
 ## 3. Externe Abhängigkeiten
 
 | System | Rolle | Substituierbarkeit |
 |---|---|---|
-| Sprachmodell-Anbieter | Hypothesen erzeugen/verfeinern, Likelihoods schätzen, Aktionen vorschlagen (über abgegrenzte LLM-Ports) | austauschbar (Port); kein Anbieter-Lock-in (`LH-FA-LLM-004`) |
+| Sprachmodell-Anbieter | Hypothesen erzeugen/verfeinern, Likelihoods schätzen, Aktionen vorschlagen (über getrennte, abgegrenzte LLM-Aufgaben-Ports) | austauschbar (Port); kein Anbieter-Lock-in (`LH-FA-LLM-004`) |
 | Versionskontrolle (Repo) | Beobachtungsquelle und Checkpoint-Substrat für Wirkungsklassen | vorausgesetzt (`LH-RB-02`) |
 | Beobachtungsquellen | Test-/Build-Ergebnisse, Logs, menschliches Feedback, Repo-Inspektion | austauschbar (Ports, `LH-FA-OBS-001`) |
 

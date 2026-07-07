@@ -24,9 +24,10 @@ COPY adapters/outbound/approval-fake/build.gradle.kts ./adapters/outbound/approv
 COPY adapters/outbound/voi-fake/build.gradle.kts ./adapters/outbound/voi-fake/build.gradle.kts
 COPY adapters/outbound/llm-hypothesen-fake/build.gradle.kts ./adapters/outbound/llm-hypothesen-fake/build.gradle.kts
 COPY adapters/outbound/konfidenz-memory/build.gradle.kts ./adapters/outbound/konfidenz-memory/build.gradle.kts
+COPY adapters/outbound/llm-action-fake/build.gradle.kts ./adapters/outbound/llm-action-fake/build.gradle.kts
 COPY example/langchain/build.gradle.kts ./example/langchain/build.gradle.kts
 COPY example/koog/build.gradle.kts ./example/koog/build.gradle.kts
-RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:llm-langchain4j:dependencies :adapters:outbound:llm-koog:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:approval-fake:dependencies :adapters:outbound:voi-fake:dependencies :adapters:outbound:llm-hypothesen-fake:dependencies :adapters:outbound:konfidenz-memory:dependencies :example:langchain:dependencies :example:koog:dependencies
+RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:llm-langchain4j:dependencies :adapters:outbound:llm-koog:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:approval-fake:dependencies :adapters:outbound:voi-fake:dependencies :adapters:outbound:llm-hypothesen-fake:dependencies :adapters:outbound:konfidenz-memory:dependencies :adapters:outbound:llm-action-fake:dependencies :example:langchain:dependencies :example:koog:dependencies
 
 # --- build: Quellcode kompilieren (alle Module) ----------------------------
 FROM deps AS build
@@ -51,7 +52,7 @@ RUN gradle --no-daemon --console=plain \
     :adapters:outbound:llm-koog:koverLog :adapters:outbound:observation-fake:koverLog \
     :adapters:outbound:audit-memory:koverLog :adapters:outbound:approval-fake:koverLog \
     :adapters:outbound:voi-fake:koverLog :adapters:outbound:llm-hypothesen-fake:koverLog \
-    :adapters:outbound:konfidenz-memory:koverLog
+    :adapters:outbound:konfidenz-memory:koverLog :adapters:outbound:llm-action-fake:koverLog
 
 # --- coverage-gate: Kover Schwellen-Verifikation (ADR-0004/ADR-0006) --------
 # Gate über domain + application + alle Adapter (Schwellen je Modul, ADR-0006).
@@ -62,7 +63,7 @@ RUN gradle --no-daemon --console=plain \
     :adapters:outbound:llm-koog:koverVerify :adapters:outbound:observation-fake:koverVerify \
     :adapters:outbound:audit-memory:koverVerify :adapters:outbound:approval-fake:koverVerify \
     :adapters:outbound:voi-fake:koverVerify :adapters:outbound:llm-hypothesen-fake:koverVerify \
-    :adapters:outbound:konfidenz-memory:koverVerify
+    :adapters:outbound:konfidenz-memory:koverVerify :adapters:outbound:llm-action-fake:koverVerify
 
 # --- example-langchain: lauffaehiges Integrationsbeispiel -------------------
 FROM build AS example-langchain
