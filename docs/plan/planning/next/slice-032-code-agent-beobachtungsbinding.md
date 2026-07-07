@@ -59,8 +59,11 @@ Kontrakt reproduzierbar.
 ## 4. Trigger
 
 `slice-031` ist in `done/` und liefert `observation-build-report` sowie
-`observation-git-local`; `slice-034` ist in `done/` und hat die Git-Source-
-Strategie fuer Fixture/CLI/JVM-Library ohne stillen Fallback festgelegt.
+`observation-git-local`; `slice-034` ist in `done/` und hat
+`GitSourceConfig`/`GitStatusQuellenFactory` als konsumierbaren Vertrag fuer
+`fixture|cli|jgit` ohne stillen Fallback festgelegt. `slice-032` nutzt fuer
+die Demo-Bindung diesen Vertrag und implementiert keine eigene Git-Strategie-
+Auswahl.
 
 ## 5. Closure-Trigger
 

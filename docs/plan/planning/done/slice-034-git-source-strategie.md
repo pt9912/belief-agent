@@ -19,27 +19,27 @@ Strategien hinter derselben `GitStatusQuelle`-Boundary, ohne stillen Fallback.
 
 ## 2. Definition of Done
 
-- [ ] `observation-git-local` bietet eine explizite Source-Auswahl
+- [x] `observation-git-local` bietet eine explizite Source-Auswahl
   `fixture|cli|jgit`: jede Strategie erzeugt denselben `GitStatusSnapshot`-
   Vertrag fuer HEAD, Branch, Dirty-Status und geaenderte Dateien; unbekannte
   Modi und fehlende Voraussetzungen enden fail-closed.
-- [ ] Die oeffentliche Konfigurationsflaeche ist festgelegt und getestet:
+- [x] Die oeffentliche Konfigurationsflaeche ist festgelegt und getestet:
   `GitSourceConfig` + Factory (oder aequivalenter benannter Contract) definiert
   `source=fixture|cli|jgit`, Default `fixture`, Pflichtparameter pro Modus
   (`fixturePath`, `repoRoot`, optional `gitBinary`) und die Fehlerform fuer
   ungueltige/fehlende Parameter. `slice-032` kann diesen Contract ohne eigene
   Git-Strategie-Logik konsumieren.
-- [ ] Runtime-/Dependency-Vertrag ist reproduzierbar: die JVM-Git-Library ist
+- [x] Runtime-/Dependency-Vertrag ist reproduzierbar: die JVM-Git-Library ist
   in `build.gradle.kts` versionsgepinnt; der CLI-Pfad prueft die lokale
   `git --version` und macht sie ueber einen festgelegten Diagnosekanal sichtbar
   (`GitStatusSnapshot`-Metadaten, Beobachtungs-Evidenz oder separates
   Diagnose-Ergebnis mit Testassertion). Der Contract dokumentiert, dass dieser
   Pfad ein installiertes Git-Tool im Image/Host voraussetzt.
-- [ ] Tests decken Moduswahl, keinen stillen Fallback, CLI-unavailable,
+- [x] Tests decken Moduswahl, keinen stillen Fallback, CLI-unavailable,
   JGit-Erfolgspfad, Fixture-Erfolgspfad und einen gemeinsamen Contract-Satz fuer
   clean, dirty, detached HEAD und rename ab; `make build`, `make test`,
   `make coverage-gate`, `make arch-check` und `make gates` bleiben gruen.
-- [ ] Closure-Notiz mit Lerneintrag vorhanden.
+- [x] Closure-Notiz mit Lerneintrag vorhanden.
 
 ## 3. Plan (vor Code)
 
@@ -78,7 +78,27 @@ verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Wird nach `done/` ergaenzt.**
+**Was funktionierte:** Der vorhandene `GitStatusQuelle`-Port war die richtige
+Schnittkante: `GitSourceConfig` und `GitStatusQuellenFactory` konnten
+Fixture, CLI und JGit hinter demselben `GitStatusSnapshot`-Vertrag kapseln,
+ohne `BeobachtungsPort` oder den Kern zu veraendern. Der Default bleibt
+`fixture`; `cli` und `jgit` sind explizite Opt-ins.
+
+**Was ging anders als geplant:** Die JGit-Rename-Paritaet brauchte einen
+expliziten Diff-Pfad mit Rename-Detection, weil der reine JGit-Status sonst
+Delete/Add statt `newPath` liefern kann. Der Slice haelt deshalb den
+Minimalvertrag bewusst klein: HEAD, Branch, Dirty-Status und geaenderte
+Dateien.
+
+**Steering-Loop:** Runtime-Abhaengigkeiten brauchen im Adapter selbst einen
+sichtbaren Diagnosekanal. Der CLI-Pfad prueft `git --version` und traegt die
+Version in `GitStatusDiagnose`; JGit ist als gepinnte Gradle-Dependency
+reproduzierbar.
+
+**Review/Verification:** Der Abschluss ist mit
+`docs/reviews/2026-07-07-slice-034-code-review.md` und
+`docs/verifications/2026-07-07-slice-034-verification.md` gegen Modul 10 und
+Modul 11 dokumentiert.
 
 ## 8. Sub-Area-Modus-Begründung
 

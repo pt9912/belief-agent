@@ -13,6 +13,7 @@ kotlin {
 dependencies {
     implementation(project(":hexagon:domain"))
     implementation(project(":hexagon:application"))
+    implementation("org.eclipse.jgit:org.eclipse.jgit:7.3.0.202506031305-r")
 
     testImplementation(kotlin("test"))
 }
