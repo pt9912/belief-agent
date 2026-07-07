@@ -80,6 +80,8 @@ edges:
   - {from: examples, to: outbound_llm_hypothesen_fake}
   - {from: examples, to: outbound_konfidenz_memory}
   - {from: examples, to: outbound_llm_action_fake}
+  - {from: examples, to: outbound_observation_build_report}
+  - {from: examples, to: outbound_observation_git_local}
 
 resolution:
   kotlin:
@@ -103,6 +105,7 @@ resolution:
       - "adapters/inbound/cli/src/main/kotlin/dev/beliefagent"
       - "example/langchain/src/main/kotlin/dev/beliefagent"
       - "example/koog/src/main/kotlin/dev/beliefagent"
+      - "example/code-agent/src/main/kotlin/dev/beliefagent"
 
 # Framework/DI gehören nur an den Adapter-Rand (ADR-0001/0003). Ein Import im
 # Kern (domain/application) ist ein tech-leak — greift auch schon bei einem

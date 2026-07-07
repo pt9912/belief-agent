@@ -1,0 +1,4 @@
+status=FAILED
+task=:example:code-agent:test
+summary=deterministic regression signal from build fixture
+durationMillis=4242

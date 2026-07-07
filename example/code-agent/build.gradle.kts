@@ -16,6 +16,8 @@ dependencies {
     implementation(project(":adapters:outbound:llm-fake"))
     implementation(project(":adapters:outbound:konfidenz-memory"))
     implementation(project(":adapters:outbound:audit-memory"))
+    implementation(project(":adapters:outbound:observation-build-report"))
+    implementation(project(":adapters:outbound:observation-git-local"))
 }
 
 application {

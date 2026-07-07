@@ -1,0 +1,4 @@
+head=abc123fixture
+branch=main
+dirty=true
+changedFiles=src/regression/Payment.kt,README.md

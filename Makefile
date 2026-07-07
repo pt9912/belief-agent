@@ -34,6 +34,8 @@ arch-check: a-check ## Architektur: Kern importiert kein Adapter/Framework (a-ch
 # AGENTS.md §3.1). arch-check folgt, sobald a-check verdrahtet ist.
 IMAGE ?= belief-agent
 CODE_AGENT_APPROVAL_APPROVED ?= false
+CODE_AGENT_BUILD_FIXTURE ?= example/code-agent/fixtures/build.fixture
+CODE_AGENT_REPO_FIXTURE ?= example/code-agent/fixtures/repo.fixture
 
 .PHONY: build
 build: ## Reproduzierbarer Build aller Module (Dockerfile-Stage build)
@@ -64,6 +66,8 @@ example-koog: ## Lauffaehiges Koog-Integrationsbeispiel
 example-code-agent: ## Lauffaehiges Code-Agent-Composition-Beispiel
 	docker build --target example-code-agent \
 		--build-arg CODE_AGENT_APPROVAL_APPROVED=$(CODE_AGENT_APPROVAL_APPROVED) \
+		--build-arg CODE_AGENT_BUILD_FIXTURE=$(CODE_AGENT_BUILD_FIXTURE) \
+		--build-arg CODE_AGENT_REPO_FIXTURE=$(CODE_AGENT_REPO_FIXTURE) \
 		-t $(IMAGE):example-code-agent .
 
 .PHONY: cli-demo

@@ -20,36 +20,36 @@ Kontrakt reproduzierbar.
 
 ## 2. Definition of Done
 
-- [ ] `example/code-agent` ersetzt seine statischen Seed-Observations durch die
+- [x] `example/code-agent` ersetzt seine statischen Seed-Observations durch die
   Build-/Git-Beobachtungen aus `observation-build-report` und
   `observation-git-local`; Demo-Ausgabe zeigt Quelle, Zeitstempel, `scenario`,
   `terminal` und `executed` deterministisch.
-- [ ] `make example-code-agent` ist ausfuehrbar spezifiziert und umgesetzt:
+- [x] `make example-code-agent` ist ausfuehrbar spezifiziert und umgesetzt:
   `Makefile` setzt repo-relative Default-Fixture-Pfade und reicht
   `CODE_AGENT_BUILD_FIXTURE` / `CODE_AGENT_REPO_FIXTURE` als Docker-Build-Args weiter;
   `Dockerfile` uebernimmt diese Args als Env fuer `:example:code-agent:run`.
-- [ ] `make example-code-agent` erzeugt ein direkt ausfuehrbares Runtime-Image
+- [x] `make example-code-agent` erzeugt ein direkt ausfuehrbares Runtime-Image
   `$(IMAGE):example-code-agent`; `docker run --rm $(IMAGE):example-code-agent`
   startet die Demo ohne Netz und nutzt die im Image enthaltenen Default-Fixtures,
   sofern keine expliziten Fixture-Env-Overrides gesetzt sind. Diese Defaults sind
   als nicht-leere `CODE_AGENT_BUILD_FIXTURE` / `CODE_AGENT_REPO_FIXTURE` im Image
   gebacken; der normale Runtime-Pfad gilt daher nicht als `fixture_env_missing`.
-- [ ] Architekturregeln erlauben die neue Example-Bindung explizit:
+- [x] Architekturregeln erlauben die neue Example-Bindung explizit:
   `.a-check.yml` enthaelt die noetigen Kanten von `example/code-agent` zu
   `observation-build-report` und `observation-git-local`, ohne produktive
   Composition-Routen (`adapters/inbound/cli`) zu erweitern.
-- [ ] `example/code-agent/README.md` dokumentiert Default-Pfade, explizite Override-Pfade,
+- [x] `example/code-agent/README.md` dokumentiert Default-Pfade, explizite Override-Pfade,
   Offline-Annahme und die Abgrenzung zu Fehlerklassen aus `slice-033`.
-- [ ] `make example-code-agent`, `docker run --rm $(IMAGE):example-code-agent`,
+- [x] `make example-code-agent`, `docker run --rm $(IMAGE):example-code-agent`,
   `make doc-check` und `make gates` laufen gruen.
-- [ ] Closure-Notiz mit Lerneintrag vorhanden.
+- [x] Closure-Notiz mit Lerneintrag vorhanden.
 
 ## 3. Plan (vor Code)
 
 | Datei / Komponente | Änderungs-Art | Begründung |
 |---|---|---|
 | `example/code-agent/src/main/kotlin/dev/beliefagent/example/codeagent/*.kt` | update | Demo-Komposition auf Build-/Repo-Beobachtungsadapter umstellen, ohne Gate-/Executor-Policy zu verschieben. |
-| `example/code-agent/fixtures/*.json` | neu | Stabile Default-Fixtures fuer `make example-code-agent` bereitstellen. |
+| `example/code-agent/fixtures/*.fixture` | neu | Stabile Default-Fixtures fuer `make example-code-agent` bereitstellen; Format folgt den Adapter-Parsern aus `slice-031`/`slice-034`. |
 | `example/code-agent/build.gradle.kts` | update | Dependencies auf `observation-build-report` und `observation-git-local` aufnehmen. |
 | `.a-check.yml` | update | Example-zu-Adapter-Kanten fuer `example/code-agent` erlauben, ohne produktive Composition-Routen zu erweitern. |
 | `Makefile` | update | Default-Fixture-Pfade setzen, Build-Args an `docker build --target example-code-agent` weiterreichen und das Runtime-Image unter `$(IMAGE):example-code-agent` erzeugen. |
@@ -86,7 +86,29 @@ verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Wird nach `done/` ergaenzt.**
+**Was funktionierte:** `example/code-agent` nutzt jetzt konkrete Build- und
+Repo-Beobachtungsadapter als Demo-Eingang. Der Build-Pfad liest
+`BuildReportBeobachter` aus `CODE_AGENT_BUILD_FIXTURE`, der Repo-Pfad nutzt
+`GitStatusQuellenFactory(source=fixture)` aus `CODE_AGENT_REPO_FIXTURE`; die
+Demo-Ausgabe zeigt `source`, `timestamp`, `scenario`, `terminal` und
+`executed`.
+
+**Was ging anders als geplant:** Die Fixture-Dateien sind `.fixture` statt
+`.json`, weil die gelieferten Adapter aus `slice-031`/`slice-034` bewusst
+key-value-Fixtures als stabilen Contract verwenden. Ausserdem musste die App
+repo-relative Fixture-Pfade gegen den Gradle-Modul-Working-Directory-Kontext
+auflosen, damit Make-Defaults und Runtime-Image denselben Vertrag nutzen.
+
+**Steering-Loop:** Runtime-Image-Faehigkeit braucht einen separaten Sensor:
+`make example-code-agent` beweist den Build-Run, `docker run --rm
+belief-agent:example-code-agent` beweist `ENTRYPOINT` und gebackene Default-ENV.
+Beide Pfade bleiben von `fixture_env_missing` aus `slice-033` abgegrenzt, weil
+die positiven Defaults nicht leer im Image liegen.
+
+**Review/Verification:** Der Abschluss ist mit
+`docs/reviews/2026-07-07-slice-032-code-review.md` und
+`docs/verifications/2026-07-07-slice-032-verification.md` gegen Modul 10 und
+Modul 11 dokumentiert.
 
 ## 8. Sub-Area-Modus-Begründung
 

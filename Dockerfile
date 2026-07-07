@@ -94,5 +94,10 @@ RUN gradle --no-daemon --console=plain :example:koog:run
 # --- example-code-agent: lauffaehiges Code-Agent-Composition-Beispiel -----
 FROM build AS example-code-agent
 ARG CODE_AGENT_APPROVAL_APPROVED=false
+ARG CODE_AGENT_BUILD_FIXTURE=example/code-agent/fixtures/build.fixture
+ARG CODE_AGENT_REPO_FIXTURE=example/code-agent/fixtures/repo.fixture
 ENV CODE_AGENT_APPROVAL_APPROVED=${CODE_AGENT_APPROVAL_APPROVED}
+ENV CODE_AGENT_BUILD_FIXTURE=${CODE_AGENT_BUILD_FIXTURE}
+ENV CODE_AGENT_REPO_FIXTURE=${CODE_AGENT_REPO_FIXTURE}
 RUN gradle --no-daemon --console=plain :example:code-agent:run
+ENTRYPOINT ["gradle", "--no-daemon", "--console=plain", ":example:code-agent:run"]

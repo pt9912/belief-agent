@@ -3,6 +3,11 @@ package dev.beliefagent.example.codeagent
 import dev.beliefagent.adapter.audit.MemoryAudit
 import dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort
 import dev.beliefagent.adapter.llm.FakeLlm
+import dev.beliefagent.adapter.observation.buildreport.BuildReportBeobachter
+import dev.beliefagent.adapter.observation.buildreport.BuildReportDateiQuelle
+import dev.beliefagent.adapter.observation.gitlocal.GitSourceConfig
+import dev.beliefagent.adapter.observation.gitlocal.GitStatusBeobachter
+import dev.beliefagent.adapter.observation.gitlocal.GitStatusQuellenFactory
 import dev.beliefagent.application.belief.aktualisieren.BeliefAktualisieren
 import dev.beliefagent.application.belief.aktualisieren.BeliefAktualisierenBefehl
 import dev.beliefagent.application.belief.aktualisieren.ports.BeobachtungsPort
@@ -13,11 +18,11 @@ import dev.beliefagent.application.belief.aktionsvorschlag.AktionsVorschlagen
 import dev.beliefagent.application.belief.aktionsvorschlag.AktionsVorschlagenBefehl
 import dev.beliefagent.application.belief.aktionsvorschlag.dto.AktionsVorschlag
 import dev.beliefagent.application.belief.aktionsvorschlag.ports.AktionsVorschlagsPort
+import dev.beliefagent.application.belief.beobachtungwaehlen.BeobachtungWaehlen
+import dev.beliefagent.application.belief.beobachtungwaehlen.ports.BeobachtungsAuswahlPort
 import dev.beliefagent.application.belief.entscheidungszyklus.Entscheidungszyklus
 import dev.beliefagent.application.belief.entscheidungszyklus.KonfidenzgebundenerEntscheidungszyklus
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
-import dev.beliefagent.application.belief.beobachtungwaehlen.BeobachtungWaehlen
-import dev.beliefagent.application.belief.beobachtungwaehlen.ports.BeobachtungsAuswahlPort
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.application.belief.ports.KonfidenzPort
@@ -25,7 +30,6 @@ import dev.beliefagent.application.ports.AuditPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
-import dev.beliefagent.domain.belief.Evidenz
 import dev.beliefagent.domain.belief.EvidenzReferenz
 import dev.beliefagent.domain.belief.Hypothese
 import dev.beliefagent.domain.belief.HypotheseId
@@ -37,7 +41,12 @@ import dev.beliefagent.domain.belief.Zeitstempel
 import dev.beliefagent.domain.eskalation.Budget
 import dev.beliefagent.domain.eskalation.Eskalation
 import dev.beliefagent.domain.voi.VoiKandidat
+import java.nio.file.Files
+import java.nio.file.Path
 import java.util.Locale
+
+private const val BUILD_FIXTURE_ENV = "CODE_AGENT_BUILD_FIXTURE"
+private const val REPO_FIXTURE_ENV = "CODE_AGENT_REPO_FIXTURE"
 
 fun main() {
     println("belief-agent code-agent example")
@@ -52,14 +61,14 @@ fun main() {
         Resthypothese(0.1),
     )
 
-    val evidence = seedEvidence()
+    val observations = codeAgentObservations()
     val uhr = MonotoneDemoClock(start = 1L)
 
-    val beobachtungsPort = StaticBeobachtungsPort(evidence.map { it.beobachtung })
+    val beobachtungsPort = StaticBeobachtungsPort(observations)
     val voePort = StaticBeobachtungsAuswahlPort(
         candidates = listOf(
             VoiKandidat(
-                observationsForVoi(evidence).first(),
+                observationsForVoi(observations).first(),
                 erwarteteDiskriminierung = 0.8,
                 kosten = 1.0,
             ),
@@ -88,7 +97,6 @@ fun main() {
         beobachtungsPort = beobachtungsPort,
         aktionsvorschlaege = aktionsVorschlagen,
         konfidenzEntscheidungsZyklus = konfidenzEntscheidungsZyklus,
-        evidenzIndex = evidence.associate { it.referenz to it.beobachtung },
         budget = Budget(maxSchritte = 3),
         uhr = uhr,
         audit = audit,
@@ -99,8 +107,27 @@ fun main() {
     val result = controller.step(prior)
 
     println("scenario=code-agent")
+    printObservations(observations)
     printResult(result, approvalFreigegeben)
     println("audit_events=${audit.lade().groesse}")
+}
+
+private fun codeAgentObservations(): List<Beobachtung> {
+    val beobachtungsZeit = MonotoneDemoClock(start = 10L)
+    val build = BuildReportBeobachter(
+        quelle = BuildReportDateiQuelle(requiredEnvPath(BUILD_FIXTURE_ENV)),
+        zeitstempel = beobachtungsZeit::jetzt,
+    )
+    val repo = GitStatusBeobachter(
+        quelle = GitStatusQuellenFactory.create(
+            GitSourceConfig(
+                source = "fixture",
+                fixturePath = requiredEnvPath(REPO_FIXTURE_ENV),
+            ),
+        ),
+        zeitstempel = beobachtungsZeit::jetzt,
+    )
+    return build.lies() + repo.lies()
 }
 
 private class CodeAgentController(
@@ -108,7 +135,6 @@ private class CodeAgentController(
     private val beobachtungsPort: BeobachtungsPort,
     private val aktionsvorschlaege: AktionsVorschlagen,
     private val konfidenzEntscheidungsZyklus: KonfidenzgebundenerEntscheidungszyklus,
-    private val evidenzIndex: Map<EvidenzReferenz, Beobachtung>,
     private val budget: Budget,
     private val uhr: UhrPort,
     private val audit: AuditPort,
@@ -123,7 +149,7 @@ private class CodeAgentController(
         val vorschlaege = aktionsvorschlaege.ausfuehren(
             AktionsVorschlagenBefehl(
                 belief = updated.belief,
-                bekannteEvidenz = evidenzIndex,
+                bekannteEvidenz = evidenceIndex(beobachtungen),
                 zeitstempel = uhr.jetzt(),
             ),
         )
@@ -146,30 +172,6 @@ private class CodeAgentController(
     }
 }
 
-private data class EvidenceSeed(
-    val referenz: EvidenzReferenz,
-    val beobachtung: Beobachtung,
-)
-
-private fun seedEvidence() = listOf(
-    EvidenceSeed(
-        EvidenzReferenz("code-agent:evidence:build"),
-        Beobachtung(
-            Quelle.BUILD,
-            Zeitstempel(10L),
-            Evidenz("build test output: regression suspicion"),
-        ),
-    ),
-    EvidenceSeed(
-        EvidenzReferenz("code-agent:evidence:repo"),
-        Beobachtung(
-            Quelle.REPO,
-            Zeitstempel(11L),
-            Evidenz("commit touches regression-prone code"),
-        ),
-    ),
-)
-
 private fun seedActionSuggestions() = listOf(
     StaticActionSuggestionConfig(
         beschreibung = "Release-Branch stoppen",
@@ -181,8 +183,17 @@ private fun seedActionSuggestions() = listOf(
     ),
 )
 
-private fun observationsForVoi(evidence: List<EvidenceSeed>): List<Beobachtung> =
-    evidence.map { it.beobachtung }.distinctBy { it.hashCode() }
+private fun observationsForVoi(observations: List<Beobachtung>): List<Beobachtung> =
+    observations.distinctBy { it.quelle to it.evidenz.beschreibung }
+
+private fun evidenceIndex(observations: List<Beobachtung>): Map<EvidenzReferenz, Beobachtung> =
+    observations.associateBy { evidenceReferenceFor(it.quelle) }
+
+private fun evidenceReferenceFor(quelle: Quelle): EvidenzReferenz = when (quelle) {
+    Quelle.BUILD -> EvidenzReferenz("code-agent:evidence:build")
+    Quelle.REPO -> EvidenzReferenz("code-agent:evidence:repo")
+    else -> EvidenzReferenz("code-agent:evidence:${quelle.name.lowercase(Locale.ROOT)}")
+}
 
 private data class StaticActionSuggestionConfig(
     val beschreibung: String,
@@ -253,6 +264,15 @@ private class MonotoneDemoClock(start: Long = 1L) : UhrPort {
     override fun jetzt(): Zeitstempel = Zeitstempel(now++)
 }
 
+private fun printObservations(observations: List<Beobachtung>) {
+    observations.forEach { beobachtung ->
+        println(
+            "observation source=${beobachtung.quelle.name}; timestamp=${beobachtung.zeitstempel.epochMillis}; " +
+                "evidence=${beobachtung.evidenz.beschreibung}",
+        )
+    }
+}
+
 private fun printResult(result: Zyklusergebnis, approvalFreigegeben: Boolean) {
     when (result) {
         is Zyklusergebnis.Gehandelt -> {
@@ -284,6 +304,23 @@ private fun eskalationsGrund(eskalation: Eskalation): String = when (val grund =
     is dev.beliefagent.domain.eskalation.Eskalationsgrund.BeobachtungenErschoepft -> "BeobachtungenErschoepft"
     is dev.beliefagent.domain.eskalation.Eskalationsgrund.GateEskalation -> "GateEskalation"
     is dev.beliefagent.domain.eskalation.Eskalationsgrund.BudgetErschoepft -> "BudgetErschoepft"
+}
+
+private fun requiredEnvPath(name: String): Path {
+    val value = System.getenv(name)?.trim()
+    require(!value.isNullOrEmpty()) { "$name muss auf eine nicht-leere Fixture-Datei zeigen" }
+    val configured = Path.of(value)
+    if (configured.isAbsolute) {
+        return configured
+    }
+    val fromWorkingDirectory = Path.of("").toAbsolutePath().resolve(configured).normalize()
+    if (Files.exists(fromWorkingDirectory)) {
+        return fromWorkingDirectory
+    }
+    val repoRoot = generateSequence(Path.of("").toAbsolutePath()) { it.parent }
+        .firstOrNull { Files.exists(it.resolve("settings.gradle.kts")) }
+        ?: Path.of("").toAbsolutePath()
+    return repoRoot.resolve(configured).normalize()
 }
 
 private fun format(value: Double): String = String.format(Locale.ROOT, "%.6f", value)
