@@ -5,7 +5,8 @@
 
 **Welle:** Roadmap-Follow-up zu `welle-05-llm-port`
 ([Roadmap](../in-progress/roadmap.md)); gezielter Follow-up nach
-`slice-022`, `slice-027` und `slice-023`.
+`slice-022` und `slice-027`; `slice-023` bleibt als separater
+Aktionsvorschlags-Port-Slice offen.
 
 **Bezug:** `LH-FA-LLM-003`, `LH-FA-AUD-001`, `LH-FA-AUD-003`,
 `LH-FA-POL-006`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`, `ADR-0003`;
@@ -23,19 +24,19 @@ Gate-/Freigabe-Logik in den LLM-Konfidenz-Contract zu verschieben.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-LLM-003` ist im Entscheidungsfluss sichtbar: gate-fähige
+- [x] `LH-FA-LLM-003` ist im Entscheidungsfluss sichtbar: gate-fähige
   Modell-Konfidenz wird nur über den externalisierten Contract konsumiert.
-- [ ] Die Bindung läuft über `Entscheidungszyklus`/Application-Wiring und nicht
+- [x] Die Bindung läuft über `Entscheidungszyklus`/Application-Wiring und nicht
   über direkte Adapter- oder LLM-Abhängigkeiten in `AktionGaten`.
-- [ ] Overrides bleiben append-only auditierbar; der Zyklus konsumiert die
+- [x] Overrides bleiben append-only auditierbar; der Zyklus konsumiert die
   neueste gültige externalisierte Konfidenz, ohne alte Einträge zu mutieren.
-- [ ] `spec/architecture.md` dokumentiert Port-/Mapping-Grenze sprach- und
+- [x] `spec/architecture.md` dokumentiert Port-/Mapping-Grenze sprach- und
   meilensteinfrei; `docs/user/integration.md` dokumentiert den
   Integrationskontext für Konfidenz-Override.
-- [ ] Deterministische Tests belegen normalen Pfad, Override-Pfad und fail-safe
+- [x] Deterministische Tests belegen normalen Pfad, Override-Pfad und fail-safe
   bei fehlender/ungueltiger externalisierter Konfidenz.
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] `make gates` grün.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -49,9 +50,10 @@ Gate-/Freigabe-Logik in den LLM-Konfidenz-Contract zu verschieben.
 
 ## 4. Trigger
 
-`slice-022` und `slice-027` liegen in `done/`. Falls die Bindung an
-Aktionsvorschläge erfolgt, muss zusätzlich `slice-023` in `done/` liegen;
-andernfalls wird dieser Slice vor Code erneut geschnitten.
+`slice-022` und `slice-027` liegen in `done/`. Die Bindung erfolgt nicht an
+Aktionsvorschläge, sondern an eine explizite `KonfidenzgebundeneAktion` am
+Application-Rand; `slice-023` ist deshalb keine Vorbedingung fuer diesen
+Slice.
 
 ## 5. Closure-Trigger
 
@@ -69,11 +71,22 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Wrapper am `ARC-09`-Rand hielt den Scope klein:
+Externalisierte Konfidenz wird vor dem bestehenden Gate auf
+`Erfolgswahrscheinlichkeit` gemappt, ohne `AktionGaten` oder
+`KonfidenzGate` zu erweitern. Der vorhandene `KonfidenzPort` aus
+`slice-022`/`slice-027` reichte fuer normale Historien, Overrides und
+fail-safe Negativpfade aus.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Es gibt weiterhin keinen
+LLM-Aktionsvorschlags-Port in diesem Slice; `slice-023` bleibt dafuer der
+separate Schnitt. Die produktive Verdrahtung im CLI-/Composition-Root bleibt
+bei `slice-024`.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Bei neuen modellabgeleiteten Gate-Eingaben zuerst den
+Application-Wiring-Pfad inklusive ungueltiger Historie testen, bevor Gate-API
+oder Adapter erweitert werden. Das verhindert, dass Modell-Konfidenz als
+implizite Gate-Freigabe missverstanden wird.
 
 **Folge-Slices:** Produktiver `ARC-09`-Composition-Root (`slice-024`).
 

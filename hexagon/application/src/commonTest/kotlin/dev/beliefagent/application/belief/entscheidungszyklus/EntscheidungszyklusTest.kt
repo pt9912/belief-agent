@@ -7,6 +7,13 @@ import dev.beliefagent.application.belief.beobachtungwaehlen.BeobachtungWaehlen
 import dev.beliefagent.application.belief.beobachtungwaehlen.ports.BeobachtungsAuswahlPort
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
+import dev.beliefagent.application.belief.ports.ExternalisierteKonfidenz
+import dev.beliefagent.application.belief.ports.KonfidenzPort
+import dev.beliefagent.application.belief.ports.KonfidenzQuelle
+import dev.beliefagent.application.belief.ports.KonfidenzReferenz
+import dev.beliefagent.application.belief.ports.KonfidenzVersion
+import dev.beliefagent.application.belief.ports.ModellKonfidenz
+import dev.beliefagent.application.belief.ports.OverrideBegruendung
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
@@ -23,6 +30,8 @@ import dev.beliefagent.domain.eskalation.Budget
 import dev.beliefagent.domain.eskalation.Eskalationsgrund
 import dev.beliefagent.domain.voi.VoiKandidat
 import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertIs
 import kotlin.test.assertTrue
 
 /**
@@ -40,6 +49,8 @@ class EntscheidungszyklusTest {
     private fun aktion(klasse: Wirkungsklasse, erfolg: Double) =
         Aktion("test", klasse, Erfolgswahrscheinlichkeit(erfolg), listOf(beobachtung("stuetzt")))
     private fun kandidat(text: String, disk: Double) = VoiKandidat(beobachtung(text), disk, kosten = 1.0)
+    private val konfidenzReferenz = KonfidenzReferenz("fake:konfidenz:aktion")
+    private val konfidenzQuelle = KonfidenzQuelle("zyklus-test")
 
     // Fake-LLM: Beobachtung, deren Text die Hypothesen-id ("a") enthält, verschiebt
     // Masse zur Hypothese (senkt die Resthypothese); sonst bleibt der Belief gleich.
@@ -65,6 +76,31 @@ class EntscheidungszyklusTest {
         BeliefAktualisieren(llm, uhr),
         AktionGaten(approval(approvalOk)),
     )
+
+    private fun konfidenzgebundenerZyklus(
+        vararg eintraege: ExternalisierteKonfidenz,
+        approvalOk: Boolean = true,
+    ) = KonfidenzgebundenerEntscheidungszyklus(
+        zyklus(auswahl(), approvalOk),
+        SpeichernderKonfidenzPort(eintraege.toList()),
+    )
+
+    private fun konfidenz(wert: Double, version: Int, begruendung: String? = null) =
+        ExternalisierteKonfidenz(
+            referenz = konfidenzReferenz,
+            wert = ModellKonfidenz(wert),
+            quelle = konfidenzQuelle,
+            version = KonfidenzVersion(version),
+            overrideBegruendung = begruendung?.let { OverrideBegruendung(it) },
+        )
+
+    private fun konfidenzgebundeneAktion(klasse: Wirkungsklasse = Wirkungsklasse.ARBEITSBEREICH_LOKAL) =
+        KonfidenzgebundeneAktion(
+            beschreibung = "konfidenzgebundene Aktion",
+            wirkungsklasse = klasse,
+            stuetzendeEvidenz = listOf(beobachtung("stuetzt")),
+            konfidenzReferenz = konfidenzReferenz,
+        )
 
     @Test
     fun handelt_sofort_wenn_das_gate_schon_frei_ist() { // Kontrast zu VOI-001: kein Sammeln nötig
@@ -131,5 +167,70 @@ class EntscheidungszyklusTest {
             aktion(Wirkungsklasse.EXTERN_WIRKSAM, erfolg = 0.95), belief(a = 0.05, rest = 0.95), Budget(maxSchritte = 2),
         )
         assertTrue(ergebnis is Zyklusergebnis.Eskaliert && ergebnis.eskalation.grund is Eskalationsgrund.BudgetErschoepft)
+    }
+
+    @Test
+    fun externalisierte_konfidenz_wird_im_gate_pfad_konsumiert() { // LH-FA-LLM-003 / POL-006
+        val ergebnis = konfidenzgebundenerZyklus(konfidenz(0.8, 1)).entscheide(
+            konfidenzgebundeneAktion(),
+            belief(a = 0.9, rest = 0.1),
+            Budget(),
+        )
+
+        val gehandelt = assertIs<Zyklusergebnis.Gehandelt>(ergebnis)
+        assertEquals(0.8, gehandelt.freigabe.aktion.erfolgswahrscheinlichkeit.wert)
+    }
+
+    @Test
+    fun override_steuert_den_neuesten_gate_wert_ohne_historie_zu_mutieren() { // LH-FA-AUD-001/003
+        val port = SpeichernderKonfidenzPort(
+            listOf(
+                konfidenz(0.9, 1),
+                konfidenz(0.3, 2, "Golden-Set-Korrektur"),
+            ),
+        )
+        val ergebnis = KonfidenzgebundenerEntscheidungszyklus(zyklus(auswahl()), port).entscheide(
+            konfidenzgebundeneAktion(),
+            belief(a = 0.9, rest = 0.1),
+            Budget(),
+        )
+
+        assertTrue(ergebnis is Zyklusergebnis.Abgelehnt)
+        assertEquals(listOf(konfidenz(0.9, 1), konfidenz(0.3, 2, "Golden-Set-Korrektur")), port.lade(konfidenzReferenz))
+    }
+
+    @Test
+    fun fehlende_externalisierte_konfidenz_ist_fail_safe_nicht_gate_faehig() { // LH-FA-LLM-003
+        val ergebnis = konfidenzgebundenerZyklus().entscheide(
+            konfidenzgebundeneAktion(),
+            belief(a = 0.9, rest = 0.1),
+            Budget(),
+        )
+
+        val abgelehnt = assertIs<Zyklusergebnis.Abgelehnt>(ergebnis)
+        assertTrue(abgelehnt.grund.contains("externalisierte Konfidenz fehlt"))
+    }
+
+    @Test
+    fun ungueltige_konfidenz_historie_ist_fail_safe_nicht_gate_faehig() { // LH-FA-AUD-001
+        val ergebnis = konfidenzgebundenerZyklus(konfidenz(0.9, 2)).entscheide(
+            konfidenzgebundeneAktion(),
+            belief(a = 0.9, rest = 0.1),
+            Budget(),
+        )
+
+        val abgelehnt = assertIs<Zyklusergebnis.Abgelehnt>(ergebnis)
+        assertTrue(abgelehnt.grund.contains("nicht append-only gueltig"))
+    }
+
+    private class SpeichernderKonfidenzPort(
+        private val eintraege: List<ExternalisierteKonfidenz>,
+    ) : KonfidenzPort {
+        override fun anhaengen(konfidenz: ExternalisierteKonfidenz) {
+            error("Zyklusbindung darf Konfidenzen nicht mutieren")
+        }
+
+        override fun lade(referenz: KonfidenzReferenz): List<ExternalisierteKonfidenz> =
+            eintraege.filter { it.referenz == referenz }
     }
 }

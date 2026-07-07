@@ -1,6 +1,6 @@
 # Integration — belief-agent
 
-**Status:** v0, intern. **Letzte Änderung:** 2026-07-06.
+**Status:** v0, intern. **Letzte Änderung:** 2026-07-07.
 
 Diese Seite beschreibt, wie der aktuell vorhandene Core von `belief-agent` in
 einem Kotlin-Multiplatform-Build eingebaut wird. Sie ist kein Release- oder
@@ -17,8 +17,8 @@ Adapter-Modulen:
 | Modul | Rolle |
 |---|---|
 | `hexagon:domain` | fachliche Typen und reine Regeln: `BeliefState`, `BayesUpdate`, `KonfidenzGate`, `Budget`, `VoiSelektor` |
-| `hexagon:application` | Use Cases und Ports: `BeliefAktualisieren`, `AktionGaten`, `BeobachtungWaehlen`, `Entscheidungszyklus` |
-| `adapters:outbound:*` | Beispiel-/Fake-Adapter fuer LLM, Beobachtung, Audit, Approval und VoI-Kandidaten |
+| `hexagon:application` | Use Cases und Ports: `BeliefAktualisieren`, `AktionGaten`, `BeobachtungWaehlen`, `Entscheidungszyklus`, `KonfidenzgebundenerEntscheidungszyklus` |
+| `adapters:outbound:*` | Beispiel-/Fake-Adapter fuer LLM, Beobachtung, Audit, Approval, VoI-Kandidaten und Konfidenz-Replay |
 | `adapters:outbound:llm-langchain4j` | JVM-Adapter fuer LangChain4j `ChatModel` hinter `LlmPort` |
 | `adapters:outbound:llm-koog` | JVM-Adapter fuer Koog `LLMClient` oder `PromptExecutor` hinter `LlmPort` |
 
@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":adapters:outbound:approval-fake"))
     implementation(project(":adapters:outbound:audit-memory"))
     implementation(project(":adapters:outbound:voi-fake"))
+    implementation(project(":adapters:outbound:konfidenz-memory"))
 
     // Optional: echte LLM-Framework-Adapter. Provider-Konfiguration bleibt extern.
     implementation(project(":adapters:outbound:llm-langchain4j"))
@@ -75,6 +76,7 @@ Adapter binden an diese Ports:
 | `LlmPort` | schaetzt Likelihoods `P(Evidenz | Hypothese)` fuer die Update-Pipeline |
 | `BeobachtungsPort` | liefert Beobachtungen aus Tests, Build, Logs, Mensch oder Repo |
 | `BeobachtungsAuswahlPort` | liefert belief-abhaengige VoI-Kandidaten fuer die naechste Beobachtung |
+| `KonfidenzPort` | speichert und laedt append-only Modell-Konfidenzen fuer eine fachliche Referenz |
 | `HumanApprovalPort` | holt menschliche Freigabe fuer irreversible Aktionen ein |
 | `AuditPort` | persistiert das append-only `EreignisProtokoll` |
 | `UhrPort` | liefert monotone Zeitstempel fuer deterministische Ereignisse |
@@ -101,6 +103,21 @@ VoI-Entscheidung selbst bleibt im Core: der Adapter liefert Beobachtung,
 deterministisch ueber den Domain-Selektor. LLM-beeinflusste Werte muessen
 explizit als Zahlen im Kandidaten stehen und duerfen keine stillen Defaults
 verwenden.
+
+`KonfidenzPort` ist der Contract fuer `LH-FA-LLM-003`: Modell-Konfidenz wird
+als expliziter Zahlenwert mit Referenz, Quelle und Version externalisiert.
+Overrides ueberschreiben keine alten Werte, sondern erscheinen als neue
+append-only Versionen mit Begruendung. Ein Adapter muss beim Laden eine
+konsistente Historie fuer die angefragte Referenz liefern; ungueltige Fixtures
+oder Luecken duerfen nicht still korrigiert werden.
+
+`KonfidenzgebundenerEntscheidungszyklus` konsumiert diese Historie am
+Application-Rand. Er verwendet die neueste gueltige Version als
+`Erfolgswahrscheinlichkeit` einer `KonfidenzgebundeneAktion` und ruft danach
+den normalen `Entscheidungszyklus` mit `AktionGaten` auf. Fehlt eine gueltige
+externalisierte Konfidenz, ist die Aktion nicht gate-faehig; der Zyklus
+handelt fail-safe nicht. Das ersetzt keinen Aktionsvorschlags-Port und
+erweitert `AktionGaten` nicht um LLM- oder Adapterwissen.
 
 ## 4. Core Verdrahten
 

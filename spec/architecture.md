@@ -32,7 +32,7 @@ flowchart LR
             GATE["aktion-gaten (ARC-03)"]
             VOI["beobachtung-waehlen (ARC-04)"]
             ESK["eskalieren (ARC-05)"]
-            PORTS["ports: LLM-Likelihood · LLM-Hypothesen · Human-Approval · Beobachtung · Audit (ARC-06/07)"]
+            PORTS["ports: LLM-Likelihood · LLM-Hypothesen · Konfidenz · Human-Approval · Beobachtung · Audit (ARC-06/07)"]
         end
         subgraph DOM["domain (ARC-01)"]
             D["Hypothese · BeliefState · Resthypothese<br/>Evidenz · Beobachtung · Wirkungsklasse · Ereignis"]
@@ -80,7 +80,7 @@ hexagon/
       beobachtung-waehlen/     # VoI-Selektor (ARC-04)
         ports/                 #   → Beobachtungs-Port (lokal)
       eskalieren/              # Eskalations-Manager (ARC-05)
-    ports/                     # anwendungsweit: Audit/Event-Log-Port (ARC-06)
+    ports/                     # anwendungsweit: Audit/Event-Log-Port und Konfidenz-Port (ARC-06/07)
 adapters/
   inbound/
     cli/                       # ruft Use Cases auf; Composition Root / DI (ARC-09-Wiring)
@@ -96,7 +96,7 @@ Rollen und erlaubte Importe (a-check-Rollen in Klammern):
 |---|---|---|---|
 | Domain (domain), `ARC-01` | Hypothese, Belief State (inkl. Resthypothese), Evidenz, Beobachtung, Aktion, Wirkungsklasse, Eskalations-Zustand, Ereignis — pur | — (nur sich selbst) | Application, Ports, Adapter |
 | Application-Slice (app), `ARC-02`–`ARC-05`, `ARC-09` (Orchestrierung) | Use Case je Slice: command/query · handler · validator · result. Bayes-Update, Gate, VoI, Eskalation, Entscheidungszyklus | Domain, (lokale) Ports | Adapter, Infrastruktur |
-| Ports (port), `ARC-07`/`ARC-06` | Verträge, die der Use Case braucht/anbietet: LLM-, Human-Approval-, Beobachtungs-, Audit-Port — so lokal wie möglich, so geteilt wie nötig | Domain | Adapter, Application-Handler |
+| Ports (port), `ARC-07`/`ARC-06` | Verträge, die der Use Case braucht/anbietet: LLM-, Konfidenz-, Human-Approval-, Beobachtungs-, Audit-Port — so lokal wie möglich, so geteilt wie nötig | Domain | Adapter, Application-Handler |
 | Inbound-Adapter (adapter, driving), `ARC-09` (Wiring) | Ruft Use Cases auf; Composition Root / DI-Verdrahtung | Application, Domain, Ports | fremder Adapter |
 | Outbound-Adapter (adapter, driven), `ARC-08` | Implementiert Ports: LLM-Provider, Beobachtungsquellen, Audit-Persistenz | Ports, Domain | Application-Interna, fremder Adapter (außer gemeinsamer Adapter-Senke) |
 
@@ -112,11 +112,14 @@ erhält keinen Pfad, der das Gate auslässt.
 über (lokale) Ports nach außen, importieren aber **nie** einen konkreten
 Adapter. Der Slice *belief-aktualisieren* schätzt Likelihoods über den
 LLM-Likelihood-Port und fordert neue/verfeinerte Hypothesen über einen
-getrennten Hypothesen-Port an; *aktion-gaten* holt bei extern-wirksamen Aktionen die
-menschliche Freigabe über den Human-Approval-Port ein (`LH-FA-POL-004`), bevor
-es freigibt; *beobachtung-waehlen* liest die Beobachtungs-Ports zur Aufzählung
-verfügbarer Kandidaten. Der Inbound-Adapter (`cli`) verdrahtet die
-Outbound-Adapter an die Ports (DI) und stößt den Entscheidungszyklus an.
+getrennten Hypothesen-Port an; die Zyklus-Orchestrierung kann externalisierte
+Modell-Konfidenz über den Konfidenz-Port laden und vor dem Gate in eine
+gate-faehige Erfolgswahrscheinlichkeit übersetzen; *aktion-gaten* holt bei
+extern-wirksamen Aktionen die menschliche Freigabe über den
+Human-Approval-Port ein (`LH-FA-POL-004`), bevor es freigibt;
+*beobachtung-waehlen* liest die Beobachtungs-Ports zur Aufzählung verfügbarer
+Kandidaten. Der Inbound-Adapter (`cli`) verdrahtet die Outbound-Adapter an die
+Ports (DI) und stößt den Entscheidungszyklus an.
 
 ## 3. Externe Abhängigkeiten
 
@@ -134,6 +137,7 @@ Outbound-Adapter an die Ports (DI) und stößt den Entscheidungszyklus an.
 sequenceDiagram
     participant Runtime as ARC-09 Entscheidungszyklus
     participant Engine as ARC-02 belief-aktualisieren
+    participant Conf as Konfidenz-Port
     participant VoI as ARC-04 beobachtung-waehlen
     participant Gate as ARC-03 aktion-gaten
     participant Appr as Human-Approval-Port
@@ -143,6 +147,10 @@ sequenceDiagram
     Runtime->>Engine: Beobachtung einspeisen
     Engine->>Engine: Bayes-Update + Normierung (inkl. Resthypothese)
     Engine->>Audit: Ereignis "Belief aktualisiert"
+    opt Modell-Konfidenz liegt externalisiert vor (LH-FA-LLM-003)
+        Runtime->>Conf: neueste gueltige Konfidenz laden
+        Conf-->>Runtime: append-only Historie / fehlt / ungueltig
+    end
     Runtime->>Gate: Aktion prüfen (Erfolgswahrscheinlichkeit, Wirkungsklasse)
     opt Aktion extern-wirksam (LH-FA-POL-004)
         Gate->>Appr: menschliche Freigabe anfordern
@@ -176,6 +184,14 @@ Zwischenschritt):
 
 Das Budget garantiert die Terminierung des Sammel-Loops (`LH-QA-02`); jede günstige
 Beobachtung wird höchstens **einmal** gezählt (kein `LH-FA-OBS-004`-Scheingewissheit).
+
+Externalisierte Modell-Konfidenz (`LH-FA-LLM-003`) ist dabei ein Mapping vor
+dem Gate, keine Gate-Entscheidung: Der Zyklus verwendet die neueste gueltige
+append-only Version als `Erfolgswahrscheinlichkeit` der Aktion. Fehlt eine
+gueltige Historie oder ist die Versionierung nicht append-only, entsteht keine
+gate-faehige Aktion und der Zyklus handelt fail-safe nicht. Overrides werden
+als neue Konfidenz-Versionen konsumiert; `aktion-gaten` und die Domain-Regel
+`KonfidenzGate` bleiben frei von LLM- und Adapterwissen.
 
 ## 5. Fehlermodelle und Resilienz
 
