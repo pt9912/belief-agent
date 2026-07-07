@@ -10,8 +10,9 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktiv:** `slice-027` ist als gezielter Follow-up nach `slice-022` in Arbeit
-([`slice-027-konfidenz-replay-fake-adapter`](slice-027-konfidenz-replay-fake-adapter.md)).
+**Keine aktive Welle.** `slice-027` ist als gezielter Follow-up nach
+`slice-022` auf `done/` abgeschlossen
+([`slice-027-konfidenz-replay-fake-adapter`](../done/slice-027-konfidenz-replay-fake-adapter.md)).
 Konfidenz-Zyklus-/Gate-Bindung bleibt in `slice-028`.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
@@ -119,3 +120,4 @@ flowchart LR
 | 2026-07-07 | `slice-026` **in `done/` abgeschlossen**: deterministischer `llm-hypothesen-fake` Adapter hinter `HypothesenPort`, Fake-Guards, explizite Scores/Evidenz und Build-/Arch-Integration | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Hypothesen-Provider nur nach separatem Planning-Slice |
 | 2026-07-07 | `slice-022` nach Planning-Harness re-geschnitten: Contract + Use-Case + Audit bleibt `slice-022`; Replay-/Adapter-Scope wird `slice-027`; Zyklus-/Gate-Bindung + Architektur/User-Doku wird `slice-028` | Ursprünglicher Slice hatte >3 DoD-Punkte und mehrere Schichten (Application, Audit, Adapter, Replay, Architektur, User-Doku) → nicht in einer Sitzung liefer- und reviewbar |
 | 2026-07-07 | `slice-022` **in `done/` abgeschlossen**: business-area Konfidenz-Contract, Externalisieren-/Override-Use-Case und append-only Audit-Ereignisse fuer Modell-Konfidenz | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-027` oder priorisierte Welle-05-Folge |
+| 2026-07-07 | `slice-027` **in `done/` abgeschlossen**: deterministischer `konfidenz-memory` Replay-Adapter hinter `KonfidenzPort`, fail-safe Fixture-Handling und Build-/Coverage-/Arch-Integration | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-028` oder priorisierte Welle-05-Folge |
