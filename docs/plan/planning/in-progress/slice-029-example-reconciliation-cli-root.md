@@ -22,20 +22,20 @@ reconciled.
 
 ## 2. Definition of Done
 
-- [ ] Beide Beispiel-READMEs erklären klar: Produktiver Einstieg ist
+- [x] Beide Beispiel-READMEs erklären klar: Produktiver Einstieg ist
   `adapters:inbound:cli`; das jeweilige Beispiel demonstriert nur die
   `LlmPort`-/Framework-Grenze.
-- [ ] Beide Beispiel-Runs zeigen in ihrer Ausgabe die Executor-Grenze über
+- [x] Beide Beispiel-Runs zeigen in ihrer Ausgabe die Executor-Grenze über
   `Zyklusergebnis.Gehandelt.freigabe.aktion`, nicht nur ein generisches
   `executor_allowed=true`.
-- [ ] Beispiele importieren keinen CLI-Adapter und duplizieren den
+- [x] Beispiele importieren keinen CLI-Adapter und duplizieren den
   Composition-Root nicht; Framework-Beispiel und Produktiv-Root bleiben
   getrennte Rollen.
-- [ ] `make example-langchain`, `make example-koog`, `make doc-check` und
+- [x] `make example-langchain`, `make example-koog`, `make doc-check` und
   `make gates` grün.
-- [ ] Review- und Verification-Harness-Berichte ohne offene Findings bzw.
+- [x] Review- und Verification-Harness-Berichte ohne offene Findings bzw.
   DoD-Verletzungen.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -67,13 +67,21 @@ DoD vollständig + Review/Verification + `make gates` grün + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der kleine Doku-/Output-Schnitt reichte: Die Beispiele
+bleiben unveraendert Framework-Adapter-Demos und muessen den CLI-Root nicht
+importieren. Die Beispiel-Ausgabe macht nun sichtbar, dass produktive
+Verdrahtung in `adapters:inbound:cli` lebt und Ausfuehrung an
+`Zyklusergebnis.Gehandelt.freigabe.aktion` gebunden ist.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Echte Provider-/Approval-/Ausfuehrungs- und
+Persistenzadapter bleiben separate Stabilisierung; die Beispiele testen
+weiterhin Mock-/Demo-Runner, keine reale Provider-Komposition.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Beispiel-READMEs sollten nach Composition-Root-Slices
+explizit zwischen Demonstrations-Wiring und produktivem Runtime-Root
+unterscheiden, sonst driftet Integrationsdoku in Richtung zweiter Root.
 
-**Folge-Slices:** Echte Approval-, Ausführungs- und Persistenzadapter für das
+**Folge-Slices:** Echte Approval-, Ausfuehrungs- und Persistenzadapter fuer das
 CLI-Bundle bleiben separat.
 
 ## 8. Sub-Area-Modus-Begründung

@@ -26,7 +26,7 @@
 | `LH-FA-LLM-002`/`LH-FA-LLM-004`: Framework-Beispiele bleiben abgegrenzte LLM-Aufgabe | Beispiele demonstrieren Likelihood-Schaetzung hinter `LlmPort`, nicht Aktionsausfuehrung oder Composition-Root. | erfuellt |
 | `LH-FA-POL-006`/`LH-OUT-04`: kein Bypass-Versprechen in Beispielen | README und Ausgabe binden Ausfuehrung an `Zyklusergebnis.Gehandelt.freigabe.aktion`; negative Ergebnisse bleiben geschlossen. | erfuellt |
 | Sensoren fuer Beispiele | `make example-langchain`, `make example-koog` und `make doc-check` gruen. | erfuellt |
-| Closure-Notiz mit Steering-Loop-Eintrag | Wird vor `done/` in der Slice-Datei ergaenzt. | offen bis Closure |
+| Closure-Notiz mit Steering-Loop-Eintrag | Slice-Datei enthaelt Closure-Notiz mit Steering-Loop-Eintrag vor der Verschiebung nach `done/`. | erfuellt |
 
 ## Sensors
 
@@ -41,5 +41,4 @@
 
 ## Ergebnis
 
-Keine DoD-Verletzung im Implementierungsstand. Closure-Punkt bleibt bis zur
-Verschiebung des Slice nach `done/` offen.
+Keine DoD-Verletzung gefunden. Keine Carveouts.
