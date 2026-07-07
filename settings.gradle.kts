@@ -22,5 +22,6 @@ include("adapters:outbound:voi-fake") // Fake-VoI-Kandidatenquelle (slice-016)
 include("adapters:outbound:llm-hypothesen-fake") // Fake-Hypothesen-Port (ARC-08)
 include("adapters:outbound:konfidenz-memory") // Memory-/Replay-Konfidenz-Port (ARC-08)
 include("adapters:outbound:llm-action-fake") // Fake-Aktionsvorschlags-Port (ARC-08)
+include("adapters:inbound:cli") // ARC-09 Composition Root + CLI-Einstieg
 include("example:langchain") // Lauffaehiges Integrationsbeispiel, kein Produktiv-Adapter
 include("example:koog") // Lauffaehiges Koog-Integrationsbeispiel, kein Produktiv-Adapter

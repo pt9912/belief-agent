@@ -4,10 +4,11 @@
 
 Diese Seite beschreibt, wie der aktuell vorhandene Core von `belief-agent` in
 einem Kotlin-Multiplatform-Build eingebaut wird. Sie ist kein Release- oder
-Stabilitätsversprechen: veröffentlichte Maven-/Gradle-Koordinaten und ein
-produktiver CLI-Composition-Root sind noch nicht vorhanden. Erste JVM-Adapter fuer
-LLM-Frameworks liegen als Repo-Module vor; provider-spezifische API-Keys und
-Modellwahl bleiben Aufgabe des integrierenden Systems.
+Stabilitätsversprechen: veröffentlichte Maven-/Gradle-Koordinaten sind noch
+nicht vorhanden. Ein produktiv gedachter CLI-Composition-Root liegt als
+Repo-Modul vor und laeuft netzfrei gegen deterministische Adapter; echte
+Provider-Konfiguration, API-Keys und Modellwahl bleiben Aufgabe des
+integrierenden Systems.
 
 ## 1. Integrationsmodell
 
@@ -18,13 +19,16 @@ Adapter-Modulen:
 |---|---|
 | `hexagon:domain` | fachliche Typen und reine Regeln: `BeliefState`, `BayesUpdate`, `KonfidenzGate`, `Budget`, `VoiSelektor` |
 | `hexagon:application` | Use Cases und Ports: `BeliefAktualisieren`, `AktionsVorschlagen`, `AktionGaten`, `BeobachtungWaehlen`, `Entscheidungszyklus`, `KonfidenzgebundenerEntscheidungszyklus` |
+| `adapters:inbound:cli` | Koin-basierter `ARC-09`-Composition-Root, CLI-Einstieg und Executor-Grenze |
 | `adapters:outbound:*` | Beispiel-/Fake-Adapter fuer LLM, Aktionsvorschlaege, Beobachtung, Audit, Approval, VoI-Kandidaten und Konfidenz-Replay |
 | `adapters:outbound:llm-langchain4j` | JVM-Adapter fuer LangChain4j `ChatModel` hinter `LlmPort` |
 | `adapters:outbound:llm-koog` | JVM-Adapter fuer Koog `LLMClient` oder `PromptExecutor` hinter `LlmPort` |
 
 Die Architektur ist hexagonal: Der Core definiert die Ports, Adapter
 implementieren sie. Der Core importiert keine Adapter. Die Verdrahtung liegt
-beim integrierenden System beziehungsweise spaeter beim CLI-Composition-Root.
+beim integrierenden System oder im `adapters:inbound:cli`-Composition-Root.
+Nur dieser Root darf Outbound-Adapter an Ports binden; fachliche
+Adapter-zu-Adapter-Kopplung bleibt verboten und wird durch `a-check` getrennt.
 
 Relevante Quellen:
 
@@ -48,6 +52,7 @@ benoetigt:
 dependencies {
     implementation(project(":hexagon:domain"))
     implementation(project(":hexagon:application"))
+    implementation(project(":adapters:inbound:cli"))
 
     // Optional: deterministische Stand-ins fuer Integrationstests oder Demos.
     implementation(project(":adapters:outbound:llm-fake"))
@@ -67,6 +72,15 @@ dependencies {
 Produktive Adapter sollten eigene Module sein, die die Ports aus
 `hexagon:application` implementieren. Sie duerfen den Core nutzen, aber der Core
 darf sie nicht importieren.
+
+Der vorhandene CLI-Composition-Root kann im Repo netzfrei gestartet werden:
+
+```sh
+make cli-demo
+```
+
+Der Demo-Lauf nutzt deterministische Fake-Adapter und gibt ein terminales
+CLI-Ergebnis aus, zum Beispiel `terminal=gehandelt`.
 
 ## 3. Ports Implementieren
 
@@ -131,6 +145,25 @@ keine `Aktionsfreigabe` und fuehrt nichts aus; kaputte oder unvollstaendige
 Vorschlaege werden verworfen.
 
 ## 4. Core Verdrahten
+
+Für die vorhandene Koin-Verdrahtung kann das CLI-Modul direkt genutzt werden:
+
+```kotlin
+import dev.beliefagent.adapter.cli.CliRuntime
+import dev.beliefagent.adapter.cli.StandardCliSzenarien
+
+val ergebnis = CliRuntime
+    .ausKonfiguration(StandardCliSzenarien.gehandelt())
+    .starte()
+
+check(ergebnis.sichtbareAusgabe == "terminal=gehandelt")
+```
+
+Die Runtime verbindet `AktionsVorschlagen`, `KonfidenzPort`,
+`KonfidenzgebundenerEntscheidungszyklus`, `BeobachtungWaehlen`,
+`BeliefAktualisieren`, `AktionGaten`, `HumanApprovalPort` und den Executor.
+Der Executor fuehrt nur bei `Zyklusergebnis.Gehandelt` aus und konsumiert
+dabei ausschliesslich `freigabe.aktion`.
 
 Das integrierende System erzeugt die Ports/Adapter und gibt sie an die Use Cases
 weiter. Der folgende Code nutzt die vorhandenen Fake-Adapter und zeigt den
@@ -322,6 +355,11 @@ dem `Entscheidungszyklus` erhaelt. Eine direkte
 nicht ausreichend, weil dort die menschliche Freigabe fuer irreversible Aktionen
 nicht enthalten ist.
 
+Im CLI-Modul liegt diese Grenze in `CliExecutor`: `Gehandelt` fuehrt genau die
+in `freigabe.aktion` enthaltene Aktion aus; `Eskaliert` und `Abgelehnt` bleiben
+ohne Ausfuehrungsadapter-Aufruf. Die Contract-Tests decken diese positiven und
+negativen Pfade ab.
+
 Extern-wirksame Aktionen brauchen immer beides:
 
 1. die harte Konfidenzschwelle,
@@ -356,9 +394,8 @@ ueberschreiben.
 Diese Punkte sind bewusst noch nicht als Nutzervertrag festgelegt:
 
 - Artefakt-Koordinaten und Release-Prozess.
-- Produktiver CLI-Composition-Root.
 - Provider-spezifische LLM-Composition mit API-Key-/Modell-Konfiguration und
-  belief-abhaengige VoI-Kandidaten.
+  echte externe Provider-Bindungen.
 - Echter Approval-Adapter mit einmaliger, an den Entscheidungskontext gebundener
   Freigabe.
 - Dauerhafte Audit-Persistenz.
@@ -375,6 +412,7 @@ ueber `make` laufen:
 ```sh
 make doc-check
 make gates
+make cli-demo
 make example-langchain
 make example-koog
 ```

@@ -16,18 +16,64 @@ languages:
   kotlin: ["**/*.kt"]
 
 layers:
-  domain:      ["hexagon/domain/**"]
+  domain: ["hexagon/domain/**"]
   application: ["hexagon/application/**"]
-  adapters:    ["adapters/**"]
-  examples:    ["example/**"]
+  inbound_cli: ["adapters/inbound/cli/**"]
+  outbound_llm_fake: ["adapters/outbound/llm-fake/**"]
+  outbound_llm_langchain4j: ["adapters/outbound/llm-langchain4j/**"]
+  outbound_llm_koog: ["adapters/outbound/llm-koog/**"]
+  outbound_observation_fake: ["adapters/outbound/observation-fake/**"]
+  outbound_audit_memory: ["adapters/outbound/audit-memory/**"]
+  outbound_approval_fake: ["adapters/outbound/approval-fake/**"]
+  outbound_voi_fake: ["adapters/outbound/voi-fake/**"]
+  outbound_llm_hypothesen_fake: ["adapters/outbound/llm-hypothesen-fake/**"]
+  outbound_konfidenz_memory: ["adapters/outbound/konfidenz-memory/**"]
+  outbound_llm_action_fake: ["adapters/outbound/llm-action-fake/**"]
+  examples: ["example/**"]
 
 edges:
-  - {from: application, to: domain}   # Use-Case nutzt die Domäne
-  - {from: adapters, to: application} # Adapter rufen Use Cases auf / implementieren Ports
-  - {from: adapters, to: domain}      # Adapter dürfen Domänentypen referenzieren
+  - {from: application, to: domain} # Use-Case nutzt die Domaene
+  - {from: outbound_llm_fake, to: application}
+  - {from: outbound_llm_fake, to: domain}
+  - {from: outbound_llm_langchain4j, to: application}
+  - {from: outbound_llm_langchain4j, to: domain}
+  - {from: outbound_llm_koog, to: application}
+  - {from: outbound_llm_koog, to: domain}
+  - {from: outbound_observation_fake, to: application}
+  - {from: outbound_observation_fake, to: domain}
+  - {from: outbound_audit_memory, to: application}
+  - {from: outbound_audit_memory, to: domain}
+  - {from: outbound_approval_fake, to: application}
+  - {from: outbound_approval_fake, to: domain}
+  - {from: outbound_voi_fake, to: application}
+  - {from: outbound_voi_fake, to: domain}
+  - {from: outbound_llm_hypothesen_fake, to: application}
+  - {from: outbound_llm_hypothesen_fake, to: domain}
+  - {from: outbound_konfidenz_memory, to: application}
+  - {from: outbound_llm_action_fake, to: application}
+  - {from: outbound_llm_action_fake, to: domain}
+  - {from: inbound_cli, to: application} # Composition Root ruft Use Cases auf
+  - {from: inbound_cli, to: domain}      # CLI baut deterministische Szenario-Werte
+  - {from: inbound_cli, to: outbound_llm_fake}
+  - {from: inbound_cli, to: outbound_observation_fake}
+  - {from: inbound_cli, to: outbound_audit_memory}
+  - {from: inbound_cli, to: outbound_approval_fake}
+  - {from: inbound_cli, to: outbound_voi_fake}
+  - {from: inbound_cli, to: outbound_llm_hypothesen_fake}
+  - {from: inbound_cli, to: outbound_konfidenz_memory}
+  - {from: inbound_cli, to: outbound_llm_action_fake}
   - {from: examples, to: application} # Beispiele verdrahten Use Cases/Ports, gehoeren nicht zum Core
-  - {from: examples, to: domain}      # Beispiele bauen Domänenwerte fuer demonstrative Runs
-  - {from: examples, to: adapters}    # Beispiel-Composition kann Adapter-Ports per Wire-In herstellen
+  - {from: examples, to: domain}      # Beispiele bauen Domaenenwerte fuer demonstrative Runs
+  - {from: examples, to: outbound_llm_fake}
+  - {from: examples, to: outbound_llm_langchain4j}
+  - {from: examples, to: outbound_llm_koog}
+  - {from: examples, to: outbound_observation_fake}
+  - {from: examples, to: outbound_audit_memory}
+  - {from: examples, to: outbound_approval_fake}
+  - {from: examples, to: outbound_voi_fake}
+  - {from: examples, to: outbound_llm_hypothesen_fake}
+  - {from: examples, to: outbound_konfidenz_memory}
+  - {from: examples, to: outbound_llm_action_fake}
 
 resolution:
   kotlin:
@@ -46,6 +92,7 @@ resolution:
       - "adapters/outbound/llm-hypothesen-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/konfidenz-memory/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/llm-action-fake/src/commonMain/kotlin/dev/beliefagent"
+      - "adapters/inbound/cli/src/main/kotlin/dev/beliefagent"
       - "example/langchain/src/main/kotlin/dev/beliefagent"
       - "example/koog/src/main/kotlin/dev/beliefagent"
 
@@ -53,9 +100,9 @@ resolution:
 # Kern (domain/application) ist ein tech-leak — greift auch schon bei einem
 # einzelnen Modul (Roh-Symbol, ohne resolution).
 tech:
-  - {pattern: "org.koin", adapter: "adapters"}      # DI (ADR-0002) nur in jvmMain-Adaptern
-  - {pattern: "io.micronaut", adapter: "adapters"}
-  - {pattern: "io.ktor", adapter: "adapters"}
+  - {pattern: "org.koin", adapter: "adapters/inbound/cli"} # DI (ADR-0002) nur im ARC-09-Composition-Root
+  - {pattern: "io.micronaut", adapter: "adapters/inbound/cli"}
+  - {pattern: "io.ktor", adapter: "adapters/inbound/cli"}
 
 # Test-Quellen aus dem Arch-Scan ausnehmen (nur Produktivimporte prüfen).
 exclude: ["**/src/*Test/**", "**/src/test/**"]

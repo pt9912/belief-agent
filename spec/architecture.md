@@ -45,6 +45,9 @@ flowchart LR
     end
 
     CLI -->|ruft Use Case auf| ZYK
+    CLI -.verdrahtet Ports.-> LLM
+    CLI -.verdrahtet Ports.-> OBS
+    CLI -.verdrahtet Ports.-> AUD
     APP -->|nutzt| DOM
     APP -->|braucht / bietet| PORTS
     LLM -.implementiert.-> PORTS
@@ -99,8 +102,8 @@ Rollen und erlaubte Importe (a-check-Rollen in Klammern):
 | Domain (domain), `ARC-01` | Hypothese, Belief State (inkl. Resthypothese), Evidenz, Beobachtung, Aktion, Wirkungsklasse, Eskalations-Zustand, Ereignis — pur | — (nur sich selbst) | Application, Ports, Adapter |
 | Application-Slice (app), `ARC-02`–`ARC-05`, `ARC-09` (Orchestrierung) | Use Case je Slice: command/query · handler · validator · result. Bayes-Update, Gate, VoI, Eskalation, Entscheidungszyklus | Domain, (lokale) Ports | Adapter, Infrastruktur |
 | Ports (port), `ARC-07`/`ARC-06` | Verträge, die der Use Case braucht/anbietet: LLM-, Aktionsvorschlags-, Konfidenz-, Human-Approval-, Beobachtungs-, Audit-Port — so lokal wie möglich, so geteilt wie nötig | Domain | Adapter, Application-Handler |
-| Inbound-Adapter (adapter, driving), `ARC-09` (Wiring) | Ruft Use Cases auf; Composition Root / DI-Verdrahtung | Application, Domain, Ports | fremder Adapter |
-| Outbound-Adapter (adapter, driven), `ARC-08` | Implementiert Ports: LLM-Provider, Beobachtungsquellen, Audit-Persistenz | Ports, Domain | Application-Interna, fremder Adapter (außer gemeinsamer Adapter-Senke) |
+| Inbound-Adapter (adapter, driving), `ARC-09` (Wiring) | Ruft Use Cases auf; Composition Root / DI-Verdrahtung | Application, Domain, Ports; der `cli`-Composition-Root darf ausgewählte Outbound-Adapter ausschließlich an Ports binden | fachliche Adapter-zu-Adapter-Kopplung |
+| Outbound-Adapter (adapter, driven), `ARC-08` | Implementiert Ports: LLM-Provider, Beobachtungsquellen, Audit-Persistenz | Ports, Domain | Application-Interna, fremder Adapter |
 
 Verboten (Abhängigkeit nach außen): `domain → application`, `domain → adapter`,
 `application → adapter`, `application → Infrastruktur`.
@@ -125,7 +128,10 @@ extern-wirksamen Aktionen die menschliche Freigabe über den Human-Approval-Port
 ein (`LH-FA-POL-004`), bevor es freigibt; *beobachtung-waehlen* liest die
 Beobachtungs-Ports zur Aufzählung verfügbarer Kandidaten. Der Inbound-Adapter
 (`cli`) verdrahtet die Outbound-Adapter an die Ports (DI) und stößt den
-Entscheidungszyklus an.
+Entscheidungszyklus an. Ausführung bleibt am Rand an
+`Zyklusergebnis.Gehandelt` und die darin enthaltene
+`Aktionsfreigabe.Freigegeben` gebunden; `Eskaliert` und `Abgelehnt` haben
+keinen Executor-Pfad (`LH-FA-POL-006`, `LH-OUT-04`).
 
 ## 3. Externe Abhängigkeiten
 

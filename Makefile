@@ -58,3 +58,7 @@ example-langchain: ## Lauffaehiges LangChain4j-Integrationsbeispiel
 .PHONY: example-koog
 example-koog: ## Lauffaehiges Koog-Integrationsbeispiel
 	docker build --target example-koog -t $(IMAGE):example-koog .
+
+.PHONY: cli-demo
+cli-demo: ## Lauffaehiger CLI-Composition-Root gegen deterministische Adapter
+	docker build --target cli-demo -t $(IMAGE):cli-demo .
