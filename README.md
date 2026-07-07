@@ -37,6 +37,18 @@ Repository sind diskret und hypothesenförmig („Bug in Auth 55 % / Frontend
 25 % / Gateway 20 %"), nicht kontinuierlich-gaußsch. An die Stelle eines
 Kalman-Zustands tritt daher ein **Belief State über Hypothesen**.
 
+Mit „Kalman-Zustand" ist hier bewusst die Klasse kontinuierlicher,
+linear-gaußscher Schätzverfahren gemeint: ein Zustand wird als Vektor mit
+Unsicherheit fortgeschrieben, typischerweise für Messreihen wie Position,
+Geschwindigkeit oder Sensorwerte. `belief-agent` modelliert Repository- und
+Agentenprobleme stattdessen als konkurrierende diskrete Erklärungen mit
+Wahrscheinlichkeiten. Der Belief State ist deshalb eine normierte Verteilung
+über Hypothesen plus Pflicht-Resthypothese `other`; Beobachtungen gewichten
+diese Hypothesen bayesianisch neu. Diese Abgrenzung ist ein expliziter
+Out-of-Scope-Vertrag: kein Kalmanfilter, sondern diskreter Hypothesen-Belief
+([`LH-OUT-02`](spec/lastenheft.md#lh-out-02--kein-kalmanfilter); Glossar:
+[`Belief State`](spec/lastenheft.md#4-begriffe-glossar)).
+
 ## Kerngedanke
 
 Das Sprachmodell ist **nicht der Agent**, sondern ein austauschbares Modul.
