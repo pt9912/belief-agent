@@ -23,19 +23,19 @@ Szenarien am CLI-Composition-Root vorzeigbar.
 
 ## 2. Definition of Done
 
-- [ ] CLI akzeptiert eine Szenario-Auswahl fuer `gehandelt`, `eskaliert`,
+- [x] CLI akzeptiert eine Szenario-Auswahl fuer `gehandelt`, `eskaliert`,
   `abgelehnt`, `sammelt-dann-handelt` und `all`; ohne Argument bleibt
   `gehandelt` der Default.
-- [ ] Demo-Ausgabe zeigt pro Szenario mindestens `scenario`, `terminal`,
+- [x] Demo-Ausgabe zeigt pro Szenario mindestens `scenario`, `terminal`,
   `executed` und bei negativen Pfaden einen beobachtbaren Grund.
-- [ ] `make cli-demo` bleibt gruen; ein enger Demo-Sensor zeigt alle Szenarien
+- [x] `make cli-demo` bleibt gruen; ein enger Demo-Sensor zeigt alle Szenarien
   und enthaelt `terminal=eskaliert`, `terminal=abgelehnt` und `executed=false`.
-- [ ] README/Doku macht die Repo-About-Aussage "weiss, wann er nicht genug
+- [x] README/Doku macht die Repo-About-Aussage "weiss, wann er nicht genug
   weiss" anhand der CLI-Demo belegbar.
-- [ ] `make doc-check` und `make gates` gruen.
-- [ ] Review- und Verification-Harness-Berichte ohne offene Findings bzw.
+- [x] `make doc-check` und `make gates` gruen.
+- [x] Review- und Verification-Harness-Berichte ohne offene Findings bzw.
   DoD-Verletzungen.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -69,11 +69,19 @@ DoD vollstaendig + Review/Verification + `make gates` gruen + Slice in
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Slice musste keine neue Kontrolllogik bauen. Die
+vorhandenen CLI-Szenarien reichten aus; durch `scenario`, `terminal`,
+`executed`, `reason` und `executor_boundary` ist die Sicherheitsgrenze jetzt
+als Demo-Ausgabe beobachtbar. `make cli-demo` bleibt der positive Default,
+`make cli-demo-scenarios` zeigt die negativen Pfade.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Die Szenarien laufen weiter gegen deterministische
+Fake-Adapter. Echte Provider-, Approval-, Ausfuehrungs- und Persistenzadapter
+sind weiterhin separate Stabilisierung und werden hier nicht vorweggenommen.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Wenn eine README-/About-Aussage ein Sicherheitsverhalten
+verspricht, braucht sie einen direkt zitierbaren Demo-Sensor oder Testpfad. Nur
+interne Tests reichen fuer eine Repo-Beschreibung nicht als vorzeigbarer Beleg.
 
 **Folge-Slices:** Echte Approval-, Ausfuehrungs- und Persistenzadapter fuer das
 CLI-Bundle bleiben separat.

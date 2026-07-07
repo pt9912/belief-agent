@@ -28,9 +28,9 @@
 | `LH-FA-VOI-001` sichtbar | Szenario `sammelt-dann-handelt` bleibt im bestehenden Runtime-Pfad und zeigt nach Sammlung `terminal=gehandelt` mit gesenkter Resthypothese. | erfuellt |
 | README/Doku belegt die About-Aussage | `README.md` und `docs/user/integration.md` nennen `make cli-demo-scenarios` und zeigen `terminal=eskaliert`/`executed=false`. | erfuellt |
 | Enger Demo-Sensor | `make cli-demo` und `make cli-demo-scenarios` laufen gruen; Mehrszenario-Ausgabe enthaelt `terminal=eskaliert`, `terminal=abgelehnt`, `executed=false`. | erfuellt |
-| `make doc-check` und Tests | `make doc-check` und `make test` laufen gruen. | erfuellt |
+| `make doc-check`, Tests und Gates | `make doc-check`, `make test` und `make gates` laufen gruen. | erfuellt |
 | Review- und Verification-Harness-Berichte | Review-Report ohne Findings; dieser Verification-Report ohne DoD-Verletzung. | erfuellt |
-| Closure-Notiz mit Steering-Loop-Eintrag | Wird vor `done/` in der Slice-Datei ergaenzt. | offen bis Closure |
+| Closure-Notiz mit Steering-Loop-Eintrag | Slice-Datei enthaelt Closure-Notiz mit Steering-Loop-Eintrag vor der Verschiebung nach `done/`. | erfuellt |
 
 ## Sensors
 
@@ -42,10 +42,10 @@
   `terminal=eskaliert`, `executed=false`, `reason=GateEskalation`,
   `scenario=abgelehnt`, `terminal=abgelehnt`, `executed=false` und
   `scenario=sammelt-dann-handelt`.
-- `make doc-check` - gruen (`d-check: 79 Datei(en) geprueft, 0 Befund(e)`).
+- `make doc-check` - gruen (`d-check: 81 Datei(en) geprueft, 0 Befund(e)`).
 - `make test` - gruen.
+- `make gates` - gruen; `arch-check` meldet `gesamt: 0 Befund(e)`.
 
 ## Ergebnis
 
-Keine DoD-Verletzung im Implementierungsstand. Closure-Punkt bleibt bis zur
-Verschiebung des Slice nach `done/` offen.
+Keine DoD-Verletzung gefunden. Keine Carveouts.
