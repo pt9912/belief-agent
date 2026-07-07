@@ -28,7 +28,7 @@ produktiver cli-Composition-Root (`ARC-09`-Verdrahtung).
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Folge-Slices | `slice-020` done (erfüllt) | Konfidenz-Externalisierung (`LH-FA-LLM`) und produktiver Composition-Root | M |
+| welle-05-llm-port Folge-Slices | `slice-020` done (erfüllt) | Hypothesen-Kandidaten/Port/Fake (`slice-021`, `slice-025`, `slice-026`), Konfidenz-Externalisierung (`slice-022`) und produktiver Composition-Root (`slice-024`) | M |
 
 ## Meilensteine
 
@@ -115,3 +115,4 @@ flowchart LR
 | 2026-07-06 | `slice-019` **in `done/` abgeschlossen**: LLM-Adapter hinter `LlmPort` grün (inkl. `make gates`) | Closure-Trigger für Welle-05 erfüllt; aktive Welle auf Ruhe-Marker zurück; Folge-Prioritäten (VoI+Konfidenz-Externalisierung+Composition-Root) in Roadmap offen gehalten; Drift-Notiz in `done/slice-019-llm-framework-adapter.md` |
 | 2026-07-07 | `slice-020` als gezielter Follow-up zu `welle-05-llm-port` gestartet (`open → in-progress`) | Trigger erfüllt: `slice-019` done, `slice-016`/`017` liefern statische Kandidaten-Konsumption; F4b belief-abhaengige Kandidaten offen |
 | 2026-07-07 | `slice-020` **in `done/` abgeschlossen**: `BeobachtungsAuswahlPort` belief-aware, `voi-fake` Top-2-konfigurierbar, Beispiele/Doku angepasst | `make gates` grün; F4b geschlossen ohne Erweiterung der `LH-FA-LLM-002`-Modellaufgaben |
+| 2026-07-07 | `slice-021` nach Planning-Harness re-geschnitten: Domain-Kandidaten/Übernahme-Regel bleibt `slice-021`; Application-Port/Flow wird `slice-025`; Fake-Adapter/Build-Integration wird `slice-026` | Ursprünglicher Slice hatte >3 DoD-Punkte und mehrere Schichten (Domain, Application, Adapter, Build/Arch) → nicht in einer Sitzung liefer- und reviewbar |
