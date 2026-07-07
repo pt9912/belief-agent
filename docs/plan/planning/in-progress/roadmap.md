@@ -10,11 +10,11 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-020` ist als gezielter Follow-up auf `done/`
-abgeschlossen
-([`slice-020-beobachtung-waehlen-belief-aware-llm-voi-fake`](../done/slice-020-beobachtung-waehlen-belief-aware-llm-voi-fake.md));
-`slice-019` ist ebenfalls auf `done/` abgeschlossen
-([`slice-019-llm-framework-adapter`](../done/slice-019-llm-framework-adapter.md)).
+`welle-05-llm-port` ist mit `slice-021` aktiv:
+[`slice-021-hypothesen-kandidaten-und-uebernahme-regel`](../in-progress/slice-021-llm-hypothesen-port-fake.md).
+Der Slice liefert nur den Domänenvertrag für Hypothesen-Kandidaten und deren
+Übernahme-Regel; Application-Port und Fake-Adapter bleiben in `slice-025` und
+`slice-026`.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
