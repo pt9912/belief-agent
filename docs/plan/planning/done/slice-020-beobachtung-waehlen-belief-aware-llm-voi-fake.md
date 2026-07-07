@@ -26,23 +26,23 @@ Eingangswerte hinter einem Port.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-VOI-002` erfüllt: die Beobachtungsauswahl nutzt belief-abhängige
+- [x] `LH-FA-VOI-002` erfüllt: die Beobachtungsauswahl nutzt belief-abhängige
   Kandidatenlisten und liefert die bestgeeignete Beobachtung deterministisch bei
   gegebenen Fake-Daten.
-- [ ] `LH-FA-LLM-002` nicht ausgeweitet: der Slice führt keine neue
+- [x] `LH-FA-LLM-002` nicht ausgeweitet: der Slice führt keine neue
   Modell-Aufgabe ein; VoI-Kandidaten entstehen im Beobachtungs-/VoI-Adapter
   deterministisch und providerfrei, Domänen- und Application-Regeln enthalten
   keine Provider-spezifische Logik.
-- [ ] `LH-FA-LLM-003` bleibt gewahrt, falls LLM-gelieferte Eingangswerte
+- [x] `LH-FA-LLM-003` bleibt gewahrt, falls LLM-gelieferte Eingangswerte
   beteiligt sind: alle modellbeeinflussten Zahlen werden explizit strukturiert,
   protokollierbar und überschreibbar übergeben; der Slice führt keine stillen
   Defaults für `erwarteteDiskriminierung` ein.
-- [ ] `LH-QA-03` erfüllt: neuer Pfad hat fassbare Tests (Unit + deterministische
+- [x] `LH-QA-03` erfüllt: neuer Pfad hat fassbare Tests (Unit + deterministische
   Fakes) für mindestens: positive/negative Kandidaten und leere Kandidaten.
-- [ ] `make gates` grün.
-- [ ] Doku-Update in `docs/user/integration.md`, falls der Integratorvertrag für
+- [x] `make gates` grün.
+- [x] Doku-Update in `docs/user/integration.md`, falls der Integratorvertrag für
   VoI-Kandidaten konkretisiert wird.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -50,7 +50,7 @@ Eingangswerte hinter einem Port.
 |---|---|---|
 | `hexagon/application/src/commonMain/kotlin/dev/beliefagent/application/belief/beobachtungwaehlen/ports/BeobachtungsAuswahlPort.kt` | update | Kandidaten-Contract belief-kontextfähig machen |
 | `hexagon/application/src/commonMain/kotlin/dev/beliefagent/application/belief/beobachtungwaehlen/BeobachtungWaehlen.kt` | update | Auswahl-Use-Case mit belief-nahem Aufrufpfad verbinden |
-| `adapters/outbound/voi-fake/src/commonMain/kotlin/dev/beliefagent/adapter/voi/FakeVoiKandidatenQuelle.kt` | update | Deterministischer, belief-aware Beobachtungs-/VoI-Fallback |
+| `adapters/outbound/voi-fake/src/commonMain/kotlin/dev/beliefagent/adapter/voi/FakeKandidatenquelle.kt` | update | Deterministischer, belief-aware Beobachtungs-/VoI-Fallback |
 | `hexagon/application/src/commonTest/...` | update | neue Use-Case-/Port-Tests inkl. F4b-Fall |
 | `hexagon/application/src/commonTest/...` | neu | Regression gegen `F4b` (belief-abhängige Liste → nicht-statische Wiederholung) |
 | `example/langchain` / `example/koog` | update | Beispiele auf neuen `beobachtungs-waehlen`-Contract verdrahten |
@@ -80,11 +80,20 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Contract-Schnitt blieb klein: `BeliefState` wird am
+`BeobachtungsAuswahlPort` uebergeben, `BeobachtungWaehlen` filtert weiterhin nur
+verbrauchte Kandidaten und delegiert die Auswahl an den unveraenderten
+`VoiSelektor`. Der `voi-fake` kann jetzt deterministisch nach Top-2-Hypothesen
+abbilden und behaelt den festen Listen-Konstruktor fuer bestehende Beispiele.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Keine echte Modellkalibrierung und keine
+produktive VoI-Quelle; der Fake beweist nur den belief-abhaengigen Contract.
+Konfidenz-Externalisierung/Golden-Set bleibt Folgearbeit.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Die F4b-Luecke war kein Selektorproblem, sondern ein
+Port-Kontextproblem. Der naechste aehnliche Slice sollte zuerst pruefen, ob die
+fehlende Dynamik im Use-Case-Contract oder im Adapter steckt, bevor neue
+Domänenlogik entsteht.
 
 **Folge-Slices:** falls externe Kalibrierung nötig ist, auf `slice-022` verweisen.
 

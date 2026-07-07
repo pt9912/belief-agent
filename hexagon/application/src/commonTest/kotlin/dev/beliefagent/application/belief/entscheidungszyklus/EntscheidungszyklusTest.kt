@@ -57,7 +57,7 @@ class EntscheidungszyklusTest {
         override fun freigegeben(aktion: Aktion): Boolean = ok
     }
     private fun auswahl(vararg kandidaten: VoiKandidat) = object : BeobachtungsAuswahlPort {
-        override fun kandidaten(): List<VoiKandidat> = kandidaten.toList()
+        override fun kandidaten(belief: BeliefState): List<VoiKandidat> = kandidaten.toList()
     }
 
     private fun zyklus(port: BeobachtungsAuswahlPort, approvalOk: Boolean = true) = Entscheidungszyklus(

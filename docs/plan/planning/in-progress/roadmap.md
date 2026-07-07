@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-07-06.
+**Status:** Aktiv. **Letzte Änderung:** 2026-07-07.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,13 +10,14 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-019` ist auf `done/` abgeschlossen
-([`slice-019-llm-framework-adapter`](../done/slice-019-llm-framework-adapter.md));
+**Keine aktive Welle.** `slice-020` ist als gezielter Follow-up auf `done/`
+abgeschlossen
+([`slice-020-beobachtung-waehlen-belief-aware-llm-voi-fake`](../done/slice-020-beobachtung-waehlen-belief-aware-llm-voi-fake.md));
+`slice-019` ist ebenfalls auf `done/` abgeschlossen
+([`slice-019-llm-framework-adapter`](../done/slice-019-llm-framework-adapter.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
-[Ergebnisse](../done/welle-04-voi-eskalation-results.md)). Der Folge-Resume
-für `welle-05-llm-port` bleibt bestehen: belief-abhaengige VoI-Kandidaten
-(F4b), Konfidenz-Externalisierung/Golden-Set und produktiver Composition-Root.
+[Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
 Bereinigung. Tracked Follow-ups (welle-05): Executor darf nur
@@ -27,7 +28,7 @@ produktiver cli-Composition-Root (`ARC-09`-Verdrahtung).
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port | welle-03 done (erfüllt) | LLM-Port-Adapter, belief-abhaengige VoI-Kandidaten, Konfidenz-Externalisierung (`LH-FA-LLM`) | L |
+| welle-05-llm-port Folge-Slices | `slice-020` done (erfüllt) | Konfidenz-Externalisierung (`LH-FA-LLM`) und produktiver Composition-Root | M |
 
 ## Meilensteine
 
@@ -112,3 +113,5 @@ flowchart LR
 | 2026-07-06 | `slice-018` (Schwellwert-Reconciliation) **erledigt** → `done/`: Schwellen spec-konform verschärft (θ_other_block 0,5→0,10, θ_repo 0,7→0,80, θ_extern 0,9→0,95, θ_rehyp 0,5→0,30); `ADR-0008` **supersedes** `ADR-0005`; Resume → welle-05 | Source Precedence: Spec (Rang 2) sticht ADR (Rang 4); ADR-0005 hatte Safety-Schwellen gelockert; nur 3 Grenzfall-Tests betroffen; `make gates` grün |
 | 2026-07-06 | **welle-05 gestartet**; `slice-019` in `in-progress/` angelegt (LangChain4j + Koog als echte LLM-Framework-Adapter hinter `LlmPort`) | Resume-Punkt nach `slice-018`; Multi-Adapter-Schnitt isoliert Framework-/Build-Risiko vor Modellkalibrierung und produktivem Composition-Root |
 | 2026-07-06 | `slice-019` **in `done/` abgeschlossen**: LLM-Adapter hinter `LlmPort` grün (inkl. `make gates`) | Closure-Trigger für Welle-05 erfüllt; aktive Welle auf Ruhe-Marker zurück; Folge-Prioritäten (VoI+Konfidenz-Externalisierung+Composition-Root) in Roadmap offen gehalten; Drift-Notiz in `done/slice-019-llm-framework-adapter.md` |
+| 2026-07-07 | `slice-020` als gezielter Follow-up zu `welle-05-llm-port` gestartet (`open → in-progress`) | Trigger erfüllt: `slice-019` done, `slice-016`/`017` liefern statische Kandidaten-Konsumption; F4b belief-abhaengige Kandidaten offen |
+| 2026-07-07 | `slice-020` **in `done/` abgeschlossen**: `BeobachtungsAuswahlPort` belief-aware, `voi-fake` Top-2-konfigurierbar, Beispiele/Doku angepasst | `make gates` grün; F4b geschlossen ohne Erweiterung der `LH-FA-LLM-002`-Modellaufgaben |

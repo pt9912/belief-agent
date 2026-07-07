@@ -87,7 +87,7 @@ class Entscheidungszyklus(
             //    wählen (LH-FA-VOI-001/002). Keine mehr -> erschöpft: eskalieren oder
             //    ablehnen (LH-FA-ESK-001). Der Ausschluss verhindert, dieselbe Beobachtung
             //    mehrfach zu zählen (Scheingewissheit, LH-FA-OBS-004).
-            val kandidat = beobachtungWaehlen.waehle(gewaehlt)
+            val kandidat = beobachtungWaehlen.waehle(belief, gewaehlt)
                 ?: return abschlussOhneBeobachtung(belief, gesammelt.toList(), gate)
             // beobachten -> Belief fortschreiben -> Budget verbrauchen -> Zyklus wiederholen.
             belief = beliefAktualisieren.ausfuehren(

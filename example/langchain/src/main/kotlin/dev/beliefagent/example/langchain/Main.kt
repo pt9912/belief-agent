@@ -65,7 +65,7 @@ fun main() {
         }
     }
     val cycle = Entscheidungszyklus(
-        beobachtungWaehlen = BeobachtungWaehlen(FixedCandidatePort(nextObservation)),
+        beobachtungWaehlen = BeobachtungWaehlen(BeliefAwareCandidatePort(nextObservation)),
         beliefAktualisieren = BeliefAktualisieren(langChainChatPort, MonotoneDemoClock()),
         aktionGaten = AktionGaten(AllowingHumanApproval),
     )
@@ -92,7 +92,7 @@ fun main() {
     }
 }
 
-private class FixedCandidatePort(
+private class BeliefAwareCandidatePort(
     beobachtung: Beobachtung,
 ) : BeobachtungsAuswahlPort {
     private val candidates = listOf(
@@ -103,7 +103,8 @@ private class FixedCandidatePort(
         ),
     )
 
-    override fun kandidaten(): List<VoiKandidat> = candidates
+    override fun kandidaten(belief: BeliefState): List<VoiKandidat> =
+        if (belief.hypothesen.any { it.id.wert == "regression" }) candidates else emptyList()
 }
 
 private object AllowingHumanApproval : HumanApprovalPort {

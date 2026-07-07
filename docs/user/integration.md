@@ -74,7 +74,7 @@ Adapter binden an diese Ports:
 |---|---|
 | `LlmPort` | schaetzt Likelihoods `P(Evidenz | Hypothese)` fuer die Update-Pipeline |
 | `BeobachtungsPort` | liefert Beobachtungen aus Tests, Build, Logs, Mensch oder Repo |
-| `BeobachtungsAuswahlPort` | liefert VoI-Kandidaten fuer die naechste Beobachtung |
+| `BeobachtungsAuswahlPort` | liefert belief-abhaengige VoI-Kandidaten fuer die naechste Beobachtung |
 | `HumanApprovalPort` | holt menschliche Freigabe fuer irreversible Aktionen ein |
 | `AuditPort` | persistiert das append-only `EreignisProtokoll` |
 | `UhrPort` | liefert monotone Zeitstempel fuer deterministische Ereignisse |
@@ -93,11 +93,20 @@ class FesteUhr(private val zeitstempel: Zeitstempel) : UhrPort {
 Ein produktiver `UhrPort` muss monotone, nicht fallende Zeitstempel liefern,
 weil das Ereignisprotokoll Rueckdatieren zurueckweist.
 
+`BeobachtungsAuswahlPort.kandidaten(belief: BeliefState)` erhaelt den
+aktuellen Belief-Kontext. Adapter duerfen daraus andere strukturierte
+`VoiKandidat`-Listen ableiten, zum Beispiel anhand der Top-2-Hypothesen. Die
+VoI-Entscheidung selbst bleibt im Core: der Adapter liefert Beobachtung,
+`erwarteteDiskriminierung` und Kosten; `BeobachtungWaehlen` waehlt danach
+deterministisch ueber den Domain-Selektor. LLM-beeinflusste Werte muessen
+explizit als Zahlen im Kandidaten stehen und duerfen keine stillen Defaults
+verwenden.
+
 ## 4. Core Verdrahten
 
 Das integrierende System erzeugt die Ports/Adapter und gibt sie an die Use Cases
 weiter. Der folgende Code nutzt die vorhandenen Fake-Adapter und zeigt den
-aktuellen v0-Einbau:
+aktuellen Einbau:
 
 ```kotlin
 import dev.beliefagent.adapter.approval.FakeApproval
@@ -228,7 +237,7 @@ Geeignete Rollen fuer ein LangChain-basiertes Tool:
 |---|---|---|
 | Likelihood-Schaetzung | `LlmPort` | `Likelihoods` je Hypothese plus Resthypothese |
 | Evidenzsammlung | `BeobachtungsPort` | `List<Beobachtung>` |
-| Auswahl naechster Beobachtungen | `BeobachtungsAuswahlPort` | `List<VoiKandidat>` |
+| Auswahl naechster Beobachtungen | `BeobachtungsAuswahlPort` | `BeliefState -> List<VoiKandidat>` |
 | Aktionsvorschlag | eigener Adapter/Use-Case-Rand | `Aktion`-Vorschlag, niemals Ausfuehrung |
 
 Das Tool sollte strukturierte Daten liefern. Freitext wird am Adapter-Rand
