@@ -49,8 +49,9 @@ wird vollständig durchgängig und wiederholbar.
   bei `Ablehnung`, `Eskalation` und fehlender menschlicher Freigabe wird kein
   Ausführungsadapter aufgerufen; `a-check` deckt nur Boundary-/Importregeln ab.
 - [ ] `slice-023` (Aktions-Vorschlag), `slice-020` (belief-abhängige
-  Beobachtung), `slice-021` (Hypothesen-Port), `slice-022`
-  (Konfidenz-Externalisierung) werden in der CLI-Weg-Kette konsistent konsumiert.
+  Beobachtung), `slice-021` (Hypothesen-Port), `slice-022`/`slice-027`/
+  `slice-028` (Konfidenz-Contract, Replay-Adapter, Zyklusbindung) werden in der
+  CLI-Weg-Kette konsistent konsumiert.
 - [ ] Netzfrei testbares E2E: CLI-sichtbare Terminalergebnisse
   `Gehandelt`, `Eskaliert` und `Abgelehnt` mit deterministischen Fake-Adaptern;
   mindestens ein Fall läuft zuvor durch einen Sammel-Schritt
@@ -76,10 +77,11 @@ wird vollständig durchgängig und wiederholbar.
 
 ## 4. Trigger
 
-`slice-019` bis `slice-023` in `done/`. `slice-020` bis `slice-023` sind harte
-Voraussetzungen, weil dieser Slice deren Contracts in der CLI-Weg-Kette
-konsumiert (belief-abhängige Beobachtung, Hypothesen-Port,
-Konfidenz-Externalisierung, Aktions-Vorschlag).
+`slice-019` bis `slice-023` sowie die Konfidenz-Folge-Slices `slice-027` und
+`slice-028` in `done/`. `slice-020` bis `slice-023` plus `slice-027`/`028`
+sind harte Voraussetzungen, weil dieser Slice deren Contracts in der
+CLI-Weg-Kette konsumiert (belief-abhängige Beobachtung, Hypothesen-Port,
+Konfidenz-Externalisierung, Replay/Zyklusbindung, Aktions-Vorschlag).
 
 Falls keine Welle aktiv ist, wird dieser Slice als gezielter Follow-up-Slice
 gestartet oder `welle-05-llm-port` explizit wieder geöffnet.
