@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-07-07.
+**Status:** Ruhe. **Letzte Änderung:** 2026-07-07.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,8 +10,9 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktiv:** `slice-030` ist als Demo-Slice zum CLI-Composition-Root in Arbeit
-([`slice-030-cli-szenario-demo`](slice-030-cli-szenario-demo.md)).
+**Keine aktive Welle.** `slice-030` ist als gezielter Demo-Slice zum
+CLI-Composition-Root auf `done/` abgeschlossen
+([`slice-030-cli-szenario-demo`](../done/slice-030-cli-szenario-demo.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
@@ -122,3 +123,4 @@ flowchart LR
 | 2026-07-07 | `slice-023` **in `done/` abgeschlossen**: `AktionsVorschlagsPort`, `AktionsVorschlagen` und deterministischer `llm-action-fake` Adapter liefern gate-freie, konfidenzgebundene Aktionsabsichten | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-024` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-024` **in `done/` abgeschlossen**: Koin-basierter `adapters:inbound:cli` Composition-Root, Executor-Grenze nur ueber `Aktionsfreigabe.Freigegeben`, netzfreies CLI-E2E | `make gates` grün; `make cli-demo` gibt `terminal=gehandelt` aus; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
 | 2026-07-07 | `slice-029` **in `done/` abgeschlossen**: `example:langchain` und `example:koog` bleiben LLM-Framework-Adapter-Demos, verweisen aber auf `adapters:inbound:cli` als produktiven Composition-Root und zeigen die `freigabe.aktion`-Executor-Grenze | `make gates` grün; `make example-langchain` und `make example-koog` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
+| 2026-07-07 | `slice-030` **in `done/` abgeschlossen**: CLI-Szenario-Demo zeigt `gehandelt`, `eskaliert`, `abgelehnt` und `sammelt-dann-handelt`; negative Pfade bleiben `executed=false` und `executor_boundary=closed` | `make gates` grün; `make cli-demo` und `make cli-demo-scenarios` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
