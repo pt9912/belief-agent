@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Ruhe. **Letzte Änderung:** 2026-07-07.
+**Status:** Aktiv. **Letzte Änderung:** 2026-07-07.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,11 +10,9 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-023` ist als gezielter Follow-up zu
-`welle-05-llm-port` auf `done/` abgeschlossen
-([`slice-023-llm-aktions-vorschlags-port-fake`](../done/slice-023-llm-aktions-vorschlags-port-fake.md)).
-
-Produktiver `ARC-09`-Composition-Root bleibt in `slice-024`.
+**Aktiv:** `slice-024` ist als gezielter Follow-up zu `welle-05-llm-port`
+in Arbeit
+([`slice-024-cli-composition-root-produktives-e2e`](slice-024-cli-composition-root-produktives-e2e.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
