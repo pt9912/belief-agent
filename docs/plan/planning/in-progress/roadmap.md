@@ -10,9 +10,11 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktiv:** `slice-028` ist als gezielter Follow-up nach `slice-022` und
-`slice-027` in Arbeit
-([`slice-028-konfidenz-zyklus-gate-binding`](slice-028-konfidenz-zyklus-gate-binding.md)).
+**Keine aktive Welle.** `slice-028` ist als gezielter Follow-up nach
+`slice-022` und `slice-027` auf `done/` abgeschlossen
+([`slice-028-konfidenz-zyklus-gate-binding`](../done/slice-028-konfidenz-zyklus-gate-binding.md)).
+Produktiver `ARC-09`-Composition-Root bleibt in `slice-024`;
+Aktionsvorschlags-Port bleibt in `slice-023`.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
@@ -120,3 +122,4 @@ flowchart LR
 | 2026-07-07 | `slice-022` nach Planning-Harness re-geschnitten: Contract + Use-Case + Audit bleibt `slice-022`; Replay-/Adapter-Scope wird `slice-027`; Zyklus-/Gate-Bindung + Architektur/User-Doku wird `slice-028` | Ursprünglicher Slice hatte >3 DoD-Punkte und mehrere Schichten (Application, Audit, Adapter, Replay, Architektur, User-Doku) → nicht in einer Sitzung liefer- und reviewbar |
 | 2026-07-07 | `slice-022` **in `done/` abgeschlossen**: business-area Konfidenz-Contract, Externalisieren-/Override-Use-Case und append-only Audit-Ereignisse fuer Modell-Konfidenz | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-027` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-027` **in `done/` abgeschlossen**: deterministischer `konfidenz-memory` Replay-Adapter hinter `KonfidenzPort`, fail-safe Fixture-Handling und Build-/Coverage-/Arch-Integration | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-028` oder priorisierte Welle-05-Folge |
+| 2026-07-07 | `slice-028` **in `done/` abgeschlossen**: externalisierte Konfidenz im Entscheidungszyklus/Gate-Pfad gebunden, ohne `AktionGaten` zu erweitern | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-023`, `slice-024` oder priorisierte Welle-05-Folge |
