@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-07-07.
+**Status:** Ruhe. **Letzte Änderung:** 2026-07-07.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,9 +10,9 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktiv:** `slice-023` ist als gezielter Follow-up zu `welle-05-llm-port`
-in Arbeit
-([`slice-023-llm-aktions-vorschlags-port-fake`](slice-023-llm-aktions-vorschlags-port-fake.md)).
+**Keine aktive Welle.** `slice-023` ist als gezielter Follow-up zu
+`welle-05-llm-port` auf `done/` abgeschlossen
+([`slice-023-llm-aktions-vorschlags-port-fake`](../done/slice-023-llm-aktions-vorschlags-port-fake.md)).
 
 Produktiver `ARC-09`-Composition-Root bleibt in `slice-024`.
 
@@ -123,3 +123,4 @@ flowchart LR
 | 2026-07-07 | `slice-022` **in `done/` abgeschlossen**: business-area Konfidenz-Contract, Externalisieren-/Override-Use-Case und append-only Audit-Ereignisse fuer Modell-Konfidenz | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-027` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-027` **in `done/` abgeschlossen**: deterministischer `konfidenz-memory` Replay-Adapter hinter `KonfidenzPort`, fail-safe Fixture-Handling und Build-/Coverage-/Arch-Integration | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-028` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-028` **in `done/` abgeschlossen**: externalisierte Konfidenz im Entscheidungszyklus/Gate-Pfad gebunden, ohne `AktionGaten` zu erweitern | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-023`, `slice-024` oder priorisierte Welle-05-Folge |
+| 2026-07-07 | `slice-023` **in `done/` abgeschlossen**: `AktionsVorschlagsPort`, `AktionsVorschlagen` und deterministischer `llm-action-fake` Adapter liefern gate-freie, konfidenzgebundene Aktionsabsichten | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-024` oder priorisierte Welle-05-Folge |
