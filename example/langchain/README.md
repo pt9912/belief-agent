@@ -6,6 +6,11 @@ This example shows the LangChain4j adapter behind `LlmPort` without moving
 control out of `belief-agent`: `belief-agent` orchestrates, LangChain4j returns
 structured estimates.
 
+The production-oriented composition entrypoint is
+`adapters:inbound:cli` (`make cli-demo`). This module intentionally remains a
+framework adapter example: it demonstrates the LangChain4j boundary only and
+does not replace or duplicate the CLI composition root.
+
 The runnable module uses the real `LangChain4jLlmPort` with a deterministic
 `LangChain4jChatRunner`, so it works without provider credentials or network
 access. For a production wire-up, replace the demo runner with your configured
@@ -53,24 +58,32 @@ Expected output contains:
 ```text
 belief-agent LangChain4j adapter example
 langchain4j_chat_response=...
+production_composition_root=adapters:inbound:cli
+example_scope=llm_port_boundary_only
 result=GEHANDELT
 executor_allowed=true
+executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion
 ```
 
 ## Boundary
 
 ```text
 belief-agent Core
-  BeliefAktualisieren / Entscheidungszyklus
+  BeliefAktualisieren / Entscheidungszyklus (demo-local wiring)
     -> LlmPort
       -> LangChain4jLlmPort
         -> LangChain4jChatRunner / ChatModel
           -> LangChain4j provider client
+
+Production composition:
+  adapters/inbound/cli
+    -> ports from hexagon:application
+      -> selected outbound adapters
 ```
 
 LangChain4j may estimate likelihoods. It must not execute externally effective
 actions. Execution remains bound to
-`Aktionsfreigabe.Freigegeben` from `belief-agent`.
+`Zyklusergebnis.Gehandelt.freigabe.aktion` from `belief-agent`.
 
 ## Contract
 
@@ -99,6 +112,8 @@ The adapter validates the response before constructing domain values:
 2. Build `LangChain4jLlmPort.fromChatModel(chatModel)`.
 3. Inject it into `BeliefAktualisieren`.
 4. Let `Entscheidungszyklus` and `AktionGaten` decide whether an action can run.
+5. In production composition, prefer `adapters:inbound:cli` as the runtime root
+   and keep this module as the LangChain4j `LlmPort` adapter example.
 
 The user-facing integration notes live in
 [`docs/user/integration.md`](../../docs/user/integration.md).

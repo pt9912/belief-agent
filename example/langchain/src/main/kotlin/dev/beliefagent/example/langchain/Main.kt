@@ -29,6 +29,8 @@ fun main() {
     val mode = env("BELIEF_AGENT_LANGCHAIN4J_MODE") ?: "mock"
     println("belief-agent orchestrates; LangChain4j returns structured estimates only.")
     println("belief-agent LLM mode=$mode")
+    println("production_composition_root=adapters:inbound:cli")
+    println("example_scope=llm_port_boundary_only")
 
     val prior = BeliefState.of(
         listOf(
@@ -74,18 +76,21 @@ fun main() {
         is Zyklusergebnis.Gehandelt -> {
             println("result=GEHANDELT")
             println("executor_allowed=true")
+            println("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion")
             println("approved_action=${result.freigabe.aktion.beschreibung}")
             println("posterior=${formatBelief(result.belief)}")
         }
         is Zyklusergebnis.Eskaliert -> {
             println("result=ESKALIERT")
             println("executor_allowed=false")
+            println("executor_boundary=closed")
             println("reason=${result.eskalation.grund}")
             println("belief=${formatBelief(result.eskalation.belief)}")
         }
         is Zyklusergebnis.Abgelehnt -> {
             println("result=ABGELEHNT")
             println("executor_allowed=false")
+            println("executor_boundary=closed")
             println("reason=${result.grund}")
             println("belief=${formatBelief(result.belief)}")
         }

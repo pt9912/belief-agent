@@ -5,6 +5,11 @@
 This example shows the Koog LLM adapter behind `LlmPort`: `belief-agent`
 orchestrates and Koog returns structured estimates.
 
+The production-oriented composition entrypoint is
+`adapters:inbound:cli` (`make cli-demo`). This module intentionally remains a
+framework adapter example: it demonstrates the Koog boundary only and does not
+replace or duplicate the CLI composition root.
+
 The runnable module uses the real `KoogLlmPort` with a deterministic
 `KoogPromptRunner`, so it works without provider credentials or network access.
 Production composition can switch to `KoogLlmPort.fromLlmClient(client, model)`
@@ -52,23 +57,31 @@ Expected output contains:
 ```text
 belief-agent Koog adapter example
 koog_prompt_response=...
+production_composition_root=adapters:inbound:cli
+example_scope=llm_port_boundary_only
 result=GEHANDELT
 executor_allowed=true
+executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion
 ```
 
 ## Boundary
 
 ```text
 belief-agent Core
-  BeliefAktualisieren / Entscheidungszyklus
+  BeliefAktualisieren / Entscheidungszyklus (demo-local wiring)
     -> LlmPort
       -> KoogLlmPort
         -> KoogPromptRunner / PromptExecutor / LLMClient
           -> Koog provider client
+
+Production composition:
+  adapters/inbound/cli
+    -> ports from hexagon:application
+      -> selected outbound adapters
 ```
 
 Koog may estimate likelihoods, but it must not execute externally effective
-actions. Execution remains bound to `Aktionsfreigabe.Freigegeben` from
+actions. Execution remains bound to `Zyklusergebnis.Gehandelt.freigabe.aktion` from
 `belief-agent`.
 
 ## Contract
