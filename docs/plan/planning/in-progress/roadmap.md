@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Aktiv. **Letzte Änderung:** 2026-07-07.
+**Status:** Ruhe. **Letzte Änderung:** 2026-07-07.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,23 +10,22 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Aktiv:** `slice-024` ist als gezielter Follow-up zu `welle-05-llm-port`
-in Arbeit
-([`slice-024-cli-composition-root-produktives-e2e`](slice-024-cli-composition-root-produktives-e2e.md)).
+**Keine aktive Welle.** `slice-024` ist als gezielter Follow-up zu
+`welle-05-llm-port` auf `done/` abgeschlossen
+([`slice-024-cli-composition-root-produktives-e2e`](../done/slice-024-cli-composition-root-produktives-e2e.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
-Bereinigung. Tracked Follow-ups (welle-05): Executor darf nur
-`Aktionsfreigabe.Freigegeben` (a-check-Regel); echter Approval-Adapter mit Binding;
-produktiver cli-Composition-Root (`ARC-09`-Verdrahtung).
+Bereinigung. Tracked Follow-ups (welle-05): echter Approval-Adapter mit Binding
+und echte Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle.
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Folge-Slices | `slice-020` done (erfüllt) | Hypothesen-Kandidaten/Port/Fake (`slice-021`, `slice-025`, `slice-026`), Konfidenz-Externalisierung (`slice-022`, `slice-027`, `slice-028`) und produktiver Composition-Root (`slice-024`) | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Echte Approval-, Ausfuehrungs- und Persistenzadapter fuer das CLI-Bundle; provider-spezifische LLM-Konfiguration | M |
 
 ## Meilensteine
 
@@ -122,3 +121,4 @@ flowchart LR
 | 2026-07-07 | `slice-027` **in `done/` abgeschlossen**: deterministischer `konfidenz-memory` Replay-Adapter hinter `KonfidenzPort`, fail-safe Fixture-Handling und Build-/Coverage-/Arch-Integration | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-028` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-028` **in `done/` abgeschlossen**: externalisierte Konfidenz im Entscheidungszyklus/Gate-Pfad gebunden, ohne `AktionGaten` zu erweitern | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-023`, `slice-024` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-023` **in `done/` abgeschlossen**: `AktionsVorschlagsPort`, `AktionsVorschlagen` und deterministischer `llm-action-fake` Adapter liefern gate-freie, konfidenzgebundene Aktionsabsichten | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-024` oder priorisierte Welle-05-Folge |
+| 2026-07-07 | `slice-024` **in `done/` abgeschlossen**: Koin-basierter `adapters:inbound:cli` Composition-Root, Executor-Grenze nur ueber `Aktionsfreigabe.Freigegeben`, netzfreies CLI-E2E | `make gates` grün; `make cli-demo` gibt `terminal=gehandelt` aus; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
