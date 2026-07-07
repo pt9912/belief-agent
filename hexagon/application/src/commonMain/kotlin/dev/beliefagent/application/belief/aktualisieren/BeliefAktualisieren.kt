@@ -1,5 +1,6 @@
 package dev.beliefagent.application.belief.aktualisieren
 
+import dev.beliefagent.application.belief.aktualisieren.ports.HypothesenPort
 import dev.beliefagent.application.belief.aktualisieren.ports.LlmPort
 import dev.beliefagent.application.belief.aktualisieren.ports.UhrPort
 import dev.beliefagent.domain.belief.BayesUpdate
@@ -9,6 +10,9 @@ import dev.beliefagent.domain.belief.Beobachtung
 import dev.beliefagent.domain.belief.BeobachtungErfasst
 import dev.beliefagent.domain.belief.Dedup
 import dev.beliefagent.domain.belief.Ereignis
+import dev.beliefagent.domain.belief.HypothesenKandidat
+import dev.beliefagent.domain.belief.HypothesenraumErweitern
+import dev.beliefagent.domain.belief.ReHypothesenAusloeser
 
 /** Befehl: aus [prior] mit [beobachtungen] einen neuen Belief State ableiten. */
 data class BeliefAktualisierenBefehl(
@@ -26,8 +30,11 @@ data class BeliefAktualisierenErgebnis(
  * Use-Case *belief-aktualisieren* (ARC-02, LH-FA-OBS-002): die nachvollziehbare
  * Belief-Update-Pipeline. Korrelierte Beobachtungen werden zuerst auf
  * unabhängige Evidenz reduziert ([Dedup], slice-006); je unabhängiger
- * Beobachtung holt der [LlmPort] die Likelihoods, [BayesUpdate] (slice-003)
- * schreibt den Belief **nicht-überschreibend** fort, und jeder Schritt erzeugt
+ * Beobachtung holt der [LlmPort] die Likelihoods, [BayesUpdate] schreibt den
+ * Belief **nicht-überschreibend** fort. Wenn danach die Resthypothese den
+ * domänenseitigen Re-Hypothesen-Schwellwert überschreitet, fordert der
+ * getrennte [HypothesenPort] Kandidaten an und übernimmt gültige Kandidaten
+ * über [HypothesenraumErweitern]. Jeder Zustandsschritt erzeugt
  * Protokoll-Ereignisse (erfasst + aktualisiert) mit [UhrPort]-Zeitstempel.
  *
  * Deterministisch bei deterministischen Ports (LH-QA-03) — **kein** direkter
@@ -37,6 +44,8 @@ data class BeliefAktualisierenErgebnis(
 class BeliefAktualisieren(
     private val llm: LlmPort,
     private val uhr: UhrPort,
+    private val hypothesen: HypothesenPort = KeineHypothesenPort,
+    private val reHypothesenAusloeser: ReHypothesenAusloeser = ReHypothesenAusloeser(),
 ) {
     fun ausfuehren(befehl: BeliefAktualisierenBefehl): BeliefAktualisierenErgebnis {
         var belief = befehl.prior
@@ -50,6 +59,22 @@ class BeliefAktualisieren(
             belief = BayesUpdate.posterior(belief, llm.likelihoods(beobachtung, belief))
             ereignisse += BeliefAktualisiert(t, belief)
         }
+        if (reHypothesenAusloeser.ausgeloest(belief)) {
+            val kandidaten = hypothesen.kandidaten(belief)
+            val erweitert = try {
+                HypothesenraumErweitern.mitKandidaten(belief, kandidaten)
+            } catch (_: IllegalArgumentException) {
+                belief
+            }
+            if (erweitert != belief) {
+                belief = erweitert
+                ereignisse += BeliefAktualisiert(uhr.jetzt(), belief)
+            }
+        }
         return BeliefAktualisierenErgebnis(belief, ereignisse.toList())
+    }
+
+    private object KeineHypothesenPort : HypothesenPort {
+        override fun kandidaten(belief: BeliefState): List<HypothesenKandidat> = emptyList()
     }
 }

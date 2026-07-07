@@ -22,16 +22,16 @@ zu koppeln.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-BEL-005` ist im Anwendungsfluss angebunden: der bestehende
+- [x] `LH-FA-BEL-005` ist im Anwendungsfluss angebunden: der bestehende
   domänenseitige Schwellwert löst den Hypothesen-Port nur bei hoher
   Resthypothese aus.
-- [ ] `LH-FA-LLM-002` ist erfüllt: der Port ist auf Hypothesen
+- [x] `LH-FA-LLM-002` ist erfüllt: der Port ist auf Hypothesen
   erzeugen/verfeinern beschränkt und getrennt vom bestehenden Likelihood-Port,
   von Gate-/VoI-/Aktionslogik und von Adaptern.
-- [ ] Gültige Kandidaten werden über die Domänenregel aus `slice-021` in einen
+- [x] Gültige Kandidaten werden über die Domänenregel aus `slice-021` in einen
   neuen normierten `BeliefState` übernommen; ungültige oder leere Ergebnisse
   bleiben fail-safe und deterministisch getestet.
-- [ ] `make gates` grün; Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] `make gates` grün; Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -64,11 +64,21 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der vorhandene Use-Case-Stil mit lokalen Ports passte
+direkt: `HypothesenPort` konnte neben `LlmPort` im selben Use-Case liegen,
+während die eigentliche Kandidaten-Übernahme in der Domain-Regel aus
+`slice-021` blieb. Die Tests halten Trigger, Nicht-Trigger und Fail-safe-Fälle
+ohne Adapter/Fake-Modul fest.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** `slice-026` liefert den produktionsnahen
+`llm-hypothesen-fake` Adapter. Ohne explizit verdrahteten Port nutzt
+`BeliefAktualisieren` weiter einen no-op-Port, damit bestehende Composition
+Roots bis `slice-026` nicht vorzeitig Adapter-Details brauchen.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Die Architekturformulierung wurde auf getrennte
+LLM-Likelihood- und LLM-Hypothesen-Ports geschärft. Der Review sollte bei
+Folge-Slices weiter prüfen, dass diese Port-Trennung nicht wieder zu einem
+generischen Modell-Port zusammenfällt.
 
 **Folge-Slices:** `slice-026` (`llm-hypothesen-fake` Adapter).
 

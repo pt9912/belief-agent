@@ -32,7 +32,7 @@ flowchart LR
             GATE["aktion-gaten (ARC-03)"]
             VOI["beobachtung-waehlen (ARC-04)"]
             ESK["eskalieren (ARC-05)"]
-            PORTS["ports: LLM · Human-Approval · Beobachtung · Audit (ARC-06/07)"]
+            PORTS["ports: LLM-Likelihood · LLM-Hypothesen · Human-Approval · Beobachtung · Audit (ARC-06/07)"]
         end
         subgraph DOM["domain (ARC-01)"]
             D["Hypothese · BeliefState · Resthypothese<br/>Evidenz · Beobachtung · Wirkungsklasse · Ereignis"]
@@ -74,7 +74,7 @@ hexagon/
       entscheidungszyklus/     # Agenten-Schleife: Belief→Beobachtung→Update→Gate→
                                #   Aktion/VoI/Eskalation (ARC-09-Orchestrierung)
       belief-aktualisieren/    # Bayes-Update, Normierung, Dedup, Unsicherheitsmaße (ARC-02)
-        ports/                 #   → LLM-Port (lokal)
+        ports/                 #   → LLM-Likelihood-Port + Hypothesen-Port (lokal)
       aktion-gaten/            # Konfidenz-Gate / Policy (ARC-03)
         ports/                 #   → Human-Approval-Port (lokal)
       beobachtung-waehlen/     # VoI-Selektor (ARC-04)
@@ -110,8 +110,9 @@ erhält keinen Pfad, der das Gate auslässt.
 
 **Port-Konsumenten.** Der Core ist *port-führend*: Application-Slices rufen
 über (lokale) Ports nach außen, importieren aber **nie** einen konkreten
-Adapter. Der Slice *belief-aktualisieren* erzeugt Hypothesen/Likelihoods über
-den LLM-Port; *aktion-gaten* holt bei extern-wirksamen Aktionen die
+Adapter. Der Slice *belief-aktualisieren* schätzt Likelihoods über den
+LLM-Likelihood-Port und fordert neue/verfeinerte Hypothesen über einen
+getrennten Hypothesen-Port an; *aktion-gaten* holt bei extern-wirksamen Aktionen die
 menschliche Freigabe über den Human-Approval-Port ein (`LH-FA-POL-004`), bevor
 es freigibt; *beobachtung-waehlen* liest die Beobachtungs-Ports zur Aufzählung
 verfügbarer Kandidaten. Der Inbound-Adapter (`cli`) verdrahtet die
@@ -121,7 +122,7 @@ Outbound-Adapter an die Ports (DI) und stößt den Entscheidungszyklus an.
 
 | System | Rolle | Substituierbarkeit |
 |---|---|---|
-| Sprachmodell-Anbieter | Hypothesen erzeugen/verfeinern, Likelihoods schätzen, Aktionen vorschlagen (über LLM-Port) | austauschbar (Port); kein Anbieter-Lock-in (`LH-FA-LLM-004`) |
+| Sprachmodell-Anbieter | Hypothesen erzeugen/verfeinern, Likelihoods schätzen, Aktionen vorschlagen (über abgegrenzte LLM-Ports) | austauschbar (Port); kein Anbieter-Lock-in (`LH-FA-LLM-004`) |
 | Versionskontrolle (Repo) | Beobachtungsquelle und Checkpoint-Substrat für Wirkungsklassen | vorausgesetzt (`LH-RB-02`) |
 | Beobachtungsquellen | Test-/Build-Ergebnisse, Logs, menschliches Feedback, Repo-Inspektion | austauschbar (Ports, `LH-FA-OBS-001`) |
 
