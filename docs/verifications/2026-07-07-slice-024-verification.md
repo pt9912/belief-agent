@@ -32,7 +32,7 @@
 | Konsumiert `slice-020` bis `slice-023` und `slice-027/028` konsistent | Runtime-Weg nutzt `FakeKandidatenquelle`, `FakeHypothesenPort`, `FakeAktionsVorschlagsPort`, `MemoryKonfidenzPort`, `AktionsVorschlagen` und `KonfidenzgebundenerEntscheidungszyklus`. | erfuellt |
 | Netzfrei testbares E2E mit `Gehandelt`, `Eskaliert`, `Abgelehnt` und Sammel-Schritt | `CliRuntimeE2eTest` deckt alle drei terminalen Ergebnisse ab; `terminal_gehandelt_kann_vorher_einen_sammel_schritt_durchlaufen` prueft gesenkte Resthypothese nach Sammlung. | erfuellt |
 | `docs/user/integration.md` aktualisiert | Integrationsdoku nennt `adapters:inbound:cli`, `make cli-demo`, `CliRuntime` und die Executor-Sicherheitsgrenze. | erfuellt |
-| Closure-Notiz mit Steering-Loop-Eintrag | Wird vor `done/` in der Slice-Datei ergaenzt. | offen bis Closure |
+| Closure-Notiz mit Steering-Loop-Eintrag | Slice-Datei enthaelt Closure-Notiz mit funktionierendem Schnitt, offenen Folgepunkten und Steering-Loop zur verfeinerten `a-check`-Rolle. | erfuellt |
 
 ## Sensors
 
@@ -46,5 +46,4 @@
 
 ## Ergebnis
 
-Keine DoD-Verletzung im Implementierungsstand. Closure-Punkt bleibt bis zur
-Verschiebung des Slice nach `done/` offen.
+Keine DoD-Verletzung gefunden. Keine Carveouts.

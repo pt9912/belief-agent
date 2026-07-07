@@ -28,37 +28,37 @@ wird vollständig durchgängig und wiederholbar.
 
 ## 2. Definition of Done
 
-- [ ] `make doc-check` + `make gates` grün inkl. neuer `ARC-09`-Inbound-Verbindung.
-- [ ] Architekturregel für den Composition Root ist maschinell belastbar:
+- [x] `make doc-check` + `make gates` grün inkl. neuer `ARC-09`-Inbound-Verbindung.
+- [x] Architekturregel für den Composition Root ist maschinell belastbar:
   entweder `a-check` trennt `adapters/inbound/cli`/Composition-Wiring von
   übrigen Outbound-Adaptern inkl. Negativ-Guard gegen fachliche
   Adapter-zu-Adapter-Kopplung, oder der Slice wird vor Code auf ein separates
   Runtime-/Composition-Modul re-geschnitten.
-- [ ] Produktiver `cli`-Entrypoint startet und baut `Entscheidungszyklus` mit
+- [x] Produktiver `cli`-Entrypoint startet und baut `Entscheidungszyklus` mit
   allen notwendigen Ports (`BeobachtungsAuswahl`, `Beobachtung`, `LlmPort`,
   `Audit`, `HumanApproval`) sowie einer Ausführungsgrenze/Fake-Execution-Adapter.
-- [ ] Produktive Verdrahtung verhindert indirekte/fehlerhafte Ausführungspfade:
+- [x] Produktive Verdrahtung verhindert indirekte/fehlerhafte Ausführungspfade:
   Ausführungsadapter werden nur dann angestoßen, wenn das Ergebnis des
   `Entscheidungszyklus` `Zyklusergebnis.Gehandelt` ist und der Executor die
   darin enthaltene `Aktionsfreigabe.Freigegeben` konsumiert
   (`LH-FA-POL-006`, `LH-OUT-04`).
-- [ ] Positiver Executor-Contract-Test beweist: `Zyklusergebnis.Gehandelt`
+- [x] Positiver Executor-Contract-Test beweist: `Zyklusergebnis.Gehandelt`
   führt genau einmal über `freigabe.aktion` aus; es gibt keinen
   `execute(aktion)`-/`GateEntscheidung.Freigabe`-Bypass.
-- [ ] Negative E2E-/Contract-Tests beweisen fail-closed Executor-Verhalten:
+- [x] Negative E2E-/Contract-Tests beweisen fail-closed Executor-Verhalten:
   bei `Ablehnung`, `Eskalation` und fehlender menschlicher Freigabe wird kein
   Ausführungsadapter aufgerufen; `a-check` deckt nur Boundary-/Importregeln ab.
-- [ ] `slice-023` (Aktions-Vorschlag), `slice-020` (belief-abhängige
+- [x] `slice-023` (Aktions-Vorschlag), `slice-020` (belief-abhängige
   Beobachtung), `slice-021` (Hypothesen-Port), `slice-022`/`slice-027`/
   `slice-028` (Konfidenz-Contract, Replay-Adapter, Zyklusbindung) werden in der
   CLI-Weg-Kette konsistent konsumiert.
-- [ ] Netzfrei testbares E2E: CLI-sichtbare Terminalergebnisse
+- [x] Netzfrei testbares E2E: CLI-sichtbare Terminalergebnisse
   `Gehandelt`, `Eskaliert` und `Abgelehnt` mit deterministischen Fake-Adaptern;
   mindestens ein Fall läuft zuvor durch einen Sammel-Schritt
   (`BeobachtungWaehlen` → `BeliefAktualisieren` → erneutes Gate).
-- [ ] `docs/user/integration.md` aktualisiert: Produktiv-Composition-Root als
+- [x] `docs/user/integration.md` aktualisiert: Produktiv-Composition-Root als
   Integrationssprungstelle dokumentiert.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -112,11 +112,23 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Inbound-CLI-Root konnte ohne Re-Schnitt im
+geplanten Modul umgesetzt werden, weil `a-check` mit getrennten Layern fuer
+`inbound_cli` und jeden Outbound-Adapter belastbar genug ist. Die Runtime-Kette
+nutzt die bestehenden Follow-up-Contracts (`AktionsVorschlagen`,
+`KonfidenzPort`, `KonfidenzgebundenerEntscheidungszyklus`,
+belief-abhaengige VoI-Kandidaten) ohne neue Core-Pfade.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Der CLI-Root ist produktiv gedacht, laeuft aber
+weiterhin netzfrei gegen Fake-/Memory-Adapter. Echte Approval-,
+Ausfuehrungs- und Persistenzadapter bleiben Folgearbeit; Provider-spezifische
+LLM-Konfiguration wird noch nicht ueber den CLI-Rand angeboten.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Der erste `arch-check` zeigte, dass die bisherige grobe
+Adapterrolle fuer diese Sonderrolle zu weich war. Die Regel wurde verfeinert:
+`inbound_cli` darf ausgewählte Outbound-Adapter an Ports binden, Outbound-
+Adapter untereinander erhalten keine erlaubten Kanten; Koin ist nur im
+CLI-Pfad zugelassen.
 
 **Folge-Slices:** Echte `HumanApproval`- und Ausführungsadapter-Bindung sowie
 Persistenz-Adapter
