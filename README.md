@@ -34,8 +34,8 @@ Stabilisierungsarbeit.
 Coding-Agenten scheitern selten an fehlender linearer Zustandsschätzung,
 sondern an **schlechter Unsicherheitsrepräsentation**. Probleme in einem
 Repository sind diskret und hypothesenförmig („Bug in Auth 55 % / Frontend
-25 % / Gateway 20 %"), nicht kontinuierlich-gaußsch. An die Stelle eines
-Kalman-Zustands tritt daher ein **Belief State über Hypothesen**.
+25 % / Gateway 20 %"), nicht kontinuierlich, linear und gaußverteilt. An die
+Stelle eines Kalman-Zustands tritt daher ein **Belief State über Hypothesen**.
 
 Mit „Kalman-Zustand" ist hier bewusst die Klasse kontinuierlicher,
 linear-gaußscher Schätzverfahren gemeint: ein Zustand wird als Vektor mit
