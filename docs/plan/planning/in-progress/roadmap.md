@@ -10,10 +10,11 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-`welle-05-llm-port` ist mit `slice-022` aktiv:
-[`slice-022-konfidenz-externalisierung`](slice-022-konfidenz-externalisierung.md).
-Der Slice liefert den kleinsten Konfidenz-Externalisierungs-Kern: Contract,
-Use-Case und append-only Audit-Ereignisse.
+**Keine aktive Welle.** `slice-022` ist als gezielter Follow-up auf `done/`
+abgeschlossen
+([`slice-022-konfidenz-externalisierung`](../done/slice-022-konfidenz-externalisierung.md)).
+Konfidenz-Replay und Zyklus-/Gate-Bindung bleiben in `slice-027` und
+`slice-028`.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
@@ -119,3 +120,4 @@ flowchart LR
 | 2026-07-07 | `slice-025` **in `done/` abgeschlossen**: application-lokaler Hypothesen-Port, Re-Hypothesen-Auslösung im `BeliefAktualisieren`-Flow und Architektur-Schärfung für getrennte LLM-Ports | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-026` oder priorisierte Welle-05-Folge |
 | 2026-07-07 | `slice-026` **in `done/` abgeschlossen**: deterministischer `llm-hypothesen-fake` Adapter hinter `HypothesenPort`, Fake-Guards, explizite Scores/Evidenz und Build-/Arch-Integration | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Hypothesen-Provider nur nach separatem Planning-Slice |
 | 2026-07-07 | `slice-022` nach Planning-Harness re-geschnitten: Contract + Use-Case + Audit bleibt `slice-022`; Replay-/Adapter-Scope wird `slice-027`; Zyklus-/Gate-Bindung + Architektur/User-Doku wird `slice-028` | Ursprünglicher Slice hatte >3 DoD-Punkte und mehrere Schichten (Application, Audit, Adapter, Replay, Architektur, User-Doku) → nicht in einer Sitzung liefer- und reviewbar |
+| 2026-07-07 | `slice-022` **in `done/` abgeschlossen**: business-area Konfidenz-Contract, Externalisieren-/Override-Use-Case und append-only Audit-Ereignisse fuer Modell-Konfidenz | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-027` oder priorisierte Welle-05-Folge |
