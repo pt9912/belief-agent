@@ -403,7 +403,115 @@ Extern-wirksame Aktionen brauchen immer beides:
 Bei hoher Resthypothese wird nicht gehandelt, sondern gesammelt oder eskaliert.
 Bei erschoepftem Budget eskaliert der Zyklus fail-safe.
 
-## 7. Audit Anbinden
+## 7. Code-Agent einbauen
+
+In einem Coding-Agenten wird `belief-agent` als Entscheidungs-Controller eingesetzt:
+
+1. Beobachtungen sammeln (`BeobachtungsPort` → `Beobachtung`)
+2. Belief aktualisieren (`BeliefAktualisieren`)
+3. Aktionsvorschlaege holen (`AktionsVorschlagsPort`)
+4. `AktionsVorschlagen` aufrufen (Validierung + Konfidenz-Externalisierung)
+5. `KonfidenzgebundenerEntscheidungszyklus.entscheide(...)`
+6. Nur bei `Gehandelt` durch den Executor ausfuehren
+
+```mermaid
+flowchart TD
+    A[Code-Agent Step Start] --> B[Beobachtungen einsammeln]
+    B --> C[BeliefAktualisieren(BeliefState, Beobachtungen)]
+    C --> D[AktionsVorschlagen(AktionsVorschlagPort)]
+    D --> E[KonfidenzgebundenerEntscheidungszyklus]
+    E -->|Gehandelt| F[Executor: Aktion nur hier ausfuehren]
+    E -->|Eskaliert| G[Human Review + Kontext (Belief, Evidenz, Grund)]
+    E -->|Abgelehnt| H[Keine Aktion, no-op/weitersammeln]
+```
+
+```kotlin
+class CodeAgentController(
+    private val vorschlaege: AktionsVorschlagen,
+    private val zyklus: KonfidenzgebundenerEntscheidungszyklus,
+    private val uhr: UhrPort,
+    private val evidenceIndex: Map<EvidenzReferenz, Beobachtung>,
+    private val budget: Budget,
+    private val execute: (Aktion) -> Unit,
+    private val escalate: (Eskalation) -> Unit,
+) {
+    fun step(prior: BeliefState): BeliefState {
+        val priorisierte = vorschlaege.ausfuehren(
+            AktionsVorschlagenBefehl(
+                belief = prior,
+                bekannteEvidenz = evidenceIndex,
+                zeitstempel = uhr.jetzt(),
+            ),
+        )
+
+        val vorschlag = priorisierte.firstOrNull() ?: return prior
+        return when (val ergebnis = zyklus.entscheide(vorschlag.aktion, prior, budget)) {
+            is Zyklusergebnis.Gehandelt -> {
+                execute(ergebnis.freigabe.aktion)
+                ergebnis.belief
+            }
+            is Zyklusergebnis.Eskaliert -> {
+                escalate(ergebnis.eskalation)
+                ergebnis.eskalation.belief
+            }
+            is Zyklusergebnis.Abgelehnt -> ergebnis.belief
+        }
+    }
+}
+```
+
+## 7.1 Konkrete Port-Zuordnung im aktuellen Stand
+
+Aktuelle konkrete Implementierungen im Repo (noch nicht alles produktiv):
+
+| Port | Konkrete Implementierung im Repo | Bemerkung |
+|---|---|---|
+| `AktionsVorschlagsPort` | `dev.beliefagent.adapter.llmaction.FakeAktionsVorschlagsPort` | Fake-Port für strukturiertes Rohvorschlag-Mapping |
+| `BeobachtungsAuswahlPort` | `dev.beliefagent.adapter.voi.FakeKandidatenquelle` | Deterministischer VOI-Port |
+| `HypothesenPort` | `dev.beliefagent.adapter.llmhypothesen.FakeHypothesenPort` | Deterministischer Re-Hypothesen-Port |
+| `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval` | Default-Verweigerung, boolesch |
+| `KonfidenzPort` | `dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort` | In-Memory, persistenznah (Replay) |
+| `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` | In-Memory, append-only |
+| `LlmPort` | `dev.beliefagent.adapter.llm.langchain4j.LangChain4jLlmPort` / `dev.beliefagent.adapter.llm.koog.KoogLlmPort` | echte LLM-Provider-Boundary für Likelihoods |
+
+Wichtig: Für produktive Ausführung sind `HumanApprovalPort`, persistente
+`KonfidenzPort`/`AuditPort` und die anderen vier Ports (außer `LlmPort`) aktuell
+noch als Fake-/Memory-Adapter im Repo enthalten.
+
+```kotlin
+val actionPort: AktionsVorschlagsPort = FakeAktionsVorschlagsPort(config.aktionsVorschlaege)
+val voiPort: BeobachtungsAuswahlPort = FakeKandidatenquelle(config.voiKandidaten)
+val hypothesisPort: HypothesenPort = FakeHypothesenPort()
+val approvalPort: HumanApprovalPort = FakeApproval(freigabe = true)
+val konfidenzPort: KonfidenzPort = MemoryKonfidenzPort.leer()
+val auditPort: AuditPort = MemoryAudit()
+
+val beliefAktualisieren = BeliefAktualisieren(llm, uhr, hypothesisPort)
+val vorschlaege = AktionsVorschlagen(actionPort, konfidenzPort, auditPort)
+val waehlen = BeobachtungWaehlen(voiPort)
+val aktionGaten = AktionGaten(approvalPort)
+val zyklus = Entscheidungszyklus(waehlen, beliefAktualisieren, aktionGaten)
+val konfidenzEntscheidungszyklus = KonfidenzgebundenerEntscheidungszyklus(zyklus, konfidenzPort)
+
+val controller = CodeAgentController(
+    vorschlaege = vorschlaege,
+    zyklus = konfidenzEntscheidungszyklus,
+    uhr = uhr,
+    evidenceIndex = evidenceIndex,
+    budget = Budget(maxSchritte = 3),
+    execute = ::execute,
+    escalate = ::escalate,
+)
+```
+
+Wichtig fuer Code-Agenten:
+
+- **`AktionsVorschlagsPort` darf nur strukturierte Aktionen liefern**, keine direkten Werkzeugaufrufe.
+- **`HumanApprovalPort` für irreversible Aktionen** als sicherer Mensch-Check ausrüsten (Nonce/Identität + Kontextbindung).
+- **`AuditPort` persistent** führen: bei jedem Schritt Belief-/Eskalationskontext speichern.
+- **`KonfidenzPort` append-only** betreiben, damit Replay und Overrides nachvollziehbar bleiben.
+
+## 8. Audit Anbinden
 
 `BeliefAktualisieren` liefert Ereignisse im Ergebnis. Ein Integrator persistiert
 sie ueber `AuditPort`:
@@ -424,7 +532,7 @@ update.ereignisse.forEach(audit::anhaengen)
 append-only-Verhalten erhalten und darf vergangene Ereignisse nicht
 ueberschreiben.
 
-## 8. Noch Nicht Stabil
+## 9. Noch Nicht Stabil
 
 Diese Punkte sind bewusst noch nicht als Nutzervertrag festgelegt:
 

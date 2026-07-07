@@ -33,6 +33,7 @@ arch-check: a-check ## Architektur: Kern importiert kein Adapter/Framework (a-ch
 # Einstiegspunkt bleibt make; die Toolchain lebt im Dockerfile (kein Host-JDK,
 # AGENTS.md §3.1). arch-check folgt, sobald a-check verdrahtet ist.
 IMAGE ?= belief-agent
+CODE_AGENT_APPROVAL_APPROVED ?= false
 
 .PHONY: build
 build: ## Reproduzierbarer Build aller Module (Dockerfile-Stage build)
@@ -58,6 +59,12 @@ example-langchain: ## Lauffaehiges LangChain4j-Integrationsbeispiel
 .PHONY: example-koog
 example-koog: ## Lauffaehiges Koog-Integrationsbeispiel
 	docker build --target example-koog -t $(IMAGE):example-koog .
+
+.PHONY: example-code-agent
+example-code-agent: ## Lauffaehiges Code-Agent-Composition-Beispiel
+	docker build --target example-code-agent \
+		--build-arg CODE_AGENT_APPROVAL_APPROVED=$(CODE_AGENT_APPROVAL_APPROVED) \
+		-t $(IMAGE):example-code-agent .
 
 .PHONY: cli-demo
 cli-demo: ## Lauffaehiger CLI-Composition-Root gegen deterministische Adapter
