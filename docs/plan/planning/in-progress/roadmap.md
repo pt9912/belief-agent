@@ -10,10 +10,10 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-025` ist als gezielter Follow-up auf `done/`
-abgeschlossen
-([`slice-025-hypothesen-port-application-flow`](../done/slice-025-hypothesen-port-application-flow.md)).
-Fake-Adapter bleibt in `slice-026`.
+`welle-05-llm-port` ist mit `slice-026` aktiv:
+[`slice-026-llm-hypothesen-fake-adapter`](slice-026-llm-hypothesen-fake-adapter.md).
+Der Slice liefert den deterministischen Fake-Adapter hinter dem
+application-lokalen Hypothesen-Port.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
