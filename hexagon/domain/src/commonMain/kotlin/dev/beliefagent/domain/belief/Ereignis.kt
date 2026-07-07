@@ -44,3 +44,35 @@ data class EskalationAngefordert(
     override val zeitstempel: Zeitstempel,
     val grund: String,
 ) : Ereignis
+
+data class KonfidenzExternalisiert(
+    override val zeitstempel: Zeitstempel,
+    val referenz: String,
+    val wert: Double,
+    val quelle: String,
+    val version: Int,
+) : Ereignis {
+    init {
+        require(referenz.isNotBlank()) { "Konfidenz-Referenz darf nicht leer sein" }
+        require(wert in 0.0..1.0) { "Konfidenz-Wert muss in [0,1] liegen: $wert" }
+        require(quelle.isNotBlank()) { "Konfidenz-Quelle darf nicht leer sein" }
+        require(version > 0) { "Konfidenz-Version muss positiv sein: $version" }
+    }
+}
+
+data class KonfidenzUeberschrieben(
+    override val zeitstempel: Zeitstempel,
+    val referenz: String,
+    val alterWert: Double,
+    val neuerWert: Double,
+    val begruendung: String,
+    val version: Int,
+) : Ereignis {
+    init {
+        require(referenz.isNotBlank()) { "Konfidenz-Referenz darf nicht leer sein" }
+        require(alterWert in 0.0..1.0) { "Alter Konfidenz-Wert muss in [0,1] liegen: $alterWert" }
+        require(neuerWert in 0.0..1.0) { "Neuer Konfidenz-Wert muss in [0,1] liegen: $neuerWert" }
+        require(begruendung.isNotBlank()) { "Konfidenz-Override braucht eine Begruendung" }
+        require(version > 0) { "Konfidenz-Version muss positiv sein: $version" }
+    }
+}

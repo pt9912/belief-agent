@@ -24,17 +24,17 @@ in separaten Slices.
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-LLM-003` erfüllt: rohe Modell-Konfidenz wird in explizite,
+- [x] `LH-FA-LLM-003` erfüllt: rohe Modell-Konfidenz wird in explizite,
   protokollierbare Contract-Typen mit stabiler Referenz überführt.
-- [ ] Overrides erzeugen ein neues Audit-Ereignis und mutieren keinen bestehenden
+- [x] Overrides erzeugen ein neues Audit-Ereignis und mutieren keinen bestehenden
   Eintrag (`LH-FA-AUD-001`, `LH-FA-AUD-003`).
-- [ ] `LH-QA-04` erfüllt: der Konfidenz-Contract liegt business-area-geteilt
+- [x] `LH-QA-04` erfüllt: der Konfidenz-Contract liegt business-area-geteilt
   unter `hexagon/application/belief/ports`, sodass `slice-023` ihn konsumieren
   kann, ohne use-case-lokale DTOs zu importieren.
-- [ ] Deterministische Application-Tests decken Externalisierung, Override und
+- [x] Deterministische Application-Tests decken Externalisierung, Override und
   Ablehnung ungueltiger Konfidenzwerte ab.
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] `make gates` grün.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -70,11 +70,18 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Schnitt blieb klein: Contract-Typen, Port und
+Use-Case liegen im Application-Core; Domain-Ereignisse tragen nur primitive
+Audit-Felder und erzeugen keine Application-Abhaengigkeit.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Persistenz-/Replay-Adapter, Golden-Set-Fixtures
+und die Bindung an Entscheidungszyklus/Gate-Pfad bleiben bewusst in
+`slice-027` und `slice-028`.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Der Planning-Split war wirksam: ohne ihn waeren Adapter,
+Replay, Architektur- und Zyklusbindung in denselben Review-Diff gerutscht. Die
+Konfidenz-Externalisierung sollte weiterhin nur Contract + append-only Audit
+liefern; Gate-Konsum gehoert in einen separaten Slice.
 
 **Folge-Slices:** `slice-027` (Konfidenz-Replay-Fake-Adapter), `slice-028`
 (Konfidenz an Zyklus/Gate-Pfad binden), danach E2E-Validierung in `slice-024`.
