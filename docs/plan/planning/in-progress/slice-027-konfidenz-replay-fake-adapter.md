@@ -23,16 +23,16 @@ netzfrei und reproduzierbar gegen externalisierte Modell-Konfidenz laufen.
 
 ## 2. Definition of Done
 
-- [ ] `adapters/outbound/konfidenz-memory` implementiert den Konfidenz-Port
+- [x] `adapters/outbound/konfidenz-memory` implementiert den Konfidenz-Port
   deterministisch und append-only; vorhandene Einträge werden nicht mutiert.
-- [ ] Golden-Set-/Replay-Fixtures können feste externalisierte Konfidenzen und
+- [x] Golden-Set-/Replay-Fixtures können feste externalisierte Konfidenzen und
   Overrides reproduzierbar laden; kaputte Fixtures führen fail-safe zu keiner
   gate-fähigen Konfidenz.
-- [ ] Build-, Coverage- und Architekturkonfiguration nehmen das neue
+- [x] Build-, Coverage- und Architekturkonfiguration nehmen das neue
   Adapter-Modul explizit auf (`ADR-0006`, `ARC-08`), ohne Kern-Abhängigkeiten
   auf Adapter zu erzeugen.
-- [ ] `make gates` grün.
-- [ ] Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] `make gates` grün.
+- [x] Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -64,11 +64,18 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der vorhandene `KonfidenzPort` aus `slice-022` war
+schmal genug, um einen reinen Memory-/Replay-Adapter ohne neue Application-
+Schnittstelle zu liefern. Die expliziten Build-/Coverage-/a-check-Listen haben
+das neue Modul sichtbar in alle Gates gezogen.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Der Adapter trifft bewusst keine Gate-
+Entscheidung und bindet die Konfidenz noch nicht an den Entscheidungszyklus.
+Diese Laufzeitbindung bleibt in `slice-028`.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Bei weiteren Fake-/Replay-Adaptern sollte die Versionsfolge
+aus dem Port-Vertrag direkt im Adapter getestet werden; kaputte Fixtures
+muessen fail-safe leer bleiben, nicht teilweise geladen werden.
 
 **Folge-Slices:** `slice-028` bindet den Contract an Entscheidungszyklus/Gate-Pfad.
 
