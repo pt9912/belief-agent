@@ -44,8 +44,9 @@ object BayesUpdate {
             "Posterior-Gesamtmasse ist 0 (Prior × Likelihood überall 0) — Update nicht definierbar"
         }
 
+        val evidenzNachId = prior.hypothesen.associate { it.id to it.stuetzendeEvidenz }
         val posteriorHypothesen = unnormierteHypothesen.map { (id, masse) ->
-            Hypothese(id, masse / gesamtmasse)
+            Hypothese(id, masse / gesamtmasse, evidenzNachId[id] ?: emptyList())
         }
         return BeliefState.of(posteriorHypothesen, Resthypothese(unnormierteRestmasse / gesamtmasse))
     }

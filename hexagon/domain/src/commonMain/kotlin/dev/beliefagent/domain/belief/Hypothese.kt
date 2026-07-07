@@ -12,14 +12,26 @@ value class HypotheseId(val wert: String) {
 }
 
 /**
+ * Referenz auf stützende Evidenz einer Hypothese (LH-FA-BEL-007).
+ *
+ * Der Wert ist bewusst nur eine stabile Referenz, kein eingebetteter
+ * Beobachtungsinhalt: Beobachtungen/Ereignisse bleiben eigenständige
+ * Protokollobjekte, Hypothesen machen deren Beleg nur referenzierbar.
+ */
+@JvmInline
+value class EvidenzReferenz(val wert: String) {
+    init {
+        require(wert.isNotBlank()) { "EvidenzReferenz darf nicht leer sein" }
+    }
+}
+
+/**
  * Eine konkurrierende Hypothese mit zugeordneter Wahrscheinlichkeit
  * (LH-FA-BEL-001): Das System führt eine Menge solcher Hypothesen statt einer
  * einzelnen angenommenen Wahrheit.
- *
- * Bewusst noch ohne Normierungs-/Validierungslogik (slice-002) und ohne
- * Bayes-Update (slice-003) — dieser Slice liefert nur den puren Domain-Typ.
  */
 data class Hypothese(
     val id: HypotheseId,
     val wahrscheinlichkeit: Double,
+    val stuetzendeEvidenz: List<EvidenzReferenz> = emptyList(),
 )

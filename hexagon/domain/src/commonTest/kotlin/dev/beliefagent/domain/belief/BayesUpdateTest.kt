@@ -74,6 +74,24 @@ class BayesUpdateTest {
     }
 
     @Test
+    fun posterior_erhaelt_evidenzreferenzen_der_hypothesen() { // LH-FA-BEL-007
+        val p = BeliefState.of(
+            hypothesen = listOf(
+                Hypothese(a, 0.5, listOf(EvidenzReferenz("obs:test-rot"))),
+                Hypothese(b, 0.3),
+            ),
+            resthypothese = Resthypothese(0.2),
+        )
+
+        val post = BayesUpdate.posterior(
+            p,
+            Likelihoods(mapOf(a to 0.9, b to 0.1), resthypothese = 0.1),
+        )
+
+        assertEquals(listOf("obs:test-rot"), post.hypothesen.first { it.id == a }.stuetzendeEvidenz.map { it.wert })
+    }
+
+    @Test
     fun deterministisch_bei_gegebenen_likelihoods() { // LH-QA-03
         val p = prior()
         val l = Likelihoods(mapOf(a to 0.6, b to 0.25), resthypothese = 0.3)

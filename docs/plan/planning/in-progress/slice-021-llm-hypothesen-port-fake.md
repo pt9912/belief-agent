@@ -20,16 +20,16 @@ Hypothesen-Kandidaten und deren kontrollierte Übernahme in einen normierten
 
 ## 2. Definition of Done
 
-- [ ] `LH-FA-BEL-006`/`LH-FA-BEL-007` sind domänenseitig vorbereitet:
+- [x] `LH-FA-BEL-006`/`LH-FA-BEL-007` sind domänenseitig vorbereitet:
   Kandidaten tragen Hypothesen-ID, expliziten Score und eine referenzierbare
   stützende Evidenz/Beobachtung.
-- [ ] `LH-FA-LLM-003` ist als Invariante abgebildet: fehlender oder ungültiger
+- [x] `LH-FA-LLM-003` ist als Invariante abgebildet: fehlender oder ungültiger
   Score und fehlende Evidenz machen einen Kandidaten ungültig; deterministische
   Tests decken diese Fälle ab.
-- [ ] Eine reine Domänenregel übernimmt gültige neue/verfeinerte Kandidaten in
+- [x] Eine reine Domänenregel übernimmt gültige neue/verfeinerte Kandidaten in
   einen normierten `BeliefState`, ohne Application-Port, Adapter oder
   statische Kandidatenliste im Kern zu koppeln.
-- [ ] `make gates` grün; Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] `make gates` grün; Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -63,11 +63,20 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Planning-Split hielt den Diff klein: `slice-021`
+blieb reine Domäne. Die Score-Regel konnte als Anteil der Resthypothesen-Masse
+deterministisch formuliert werden und ließ sich direkt über Unit-Tests gegen
+neue, verfeinerte und ungültige Kandidaten prüfen.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Application-Port, Auslösung im
+`BeliefAktualisieren`-Flow und Fake-Adapter bleiben bewusst in `slice-025` und
+`slice-026`. Bestehende Initial-Hypothesen dürfen weiter ohne Evidenzreferenz
+konstruiert werden; verpflichtende Kandidaten-Traceability beginnt an der
+Übernahmeregel.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Review- und Verification-Harness bleiben getrennt: Review
+prüfte den Diff gegen Plan/Konventionen, Verification die DoD-/Spec-Abdeckung.
+Die DoD ist für diesen Slice klein genug; kein weiterer Planning-Re-Cut nötig.
 
 **Folge-Slices:** `slice-025` (Application-Port + Re-Hypothesen-Flow) und
 `slice-026` (`llm-hypothesen-fake` Adapter).

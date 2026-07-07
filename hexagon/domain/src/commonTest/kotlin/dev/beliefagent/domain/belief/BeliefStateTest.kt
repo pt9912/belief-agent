@@ -48,4 +48,15 @@ class BeliefStateTest {
     fun hypothese_id_darf_nicht_leer_sein() {
         assertFailsWith<IllegalArgumentException> { HypotheseId(" ") }
     }
+
+    @Test
+    fun hypothese_kann_stuetzende_evidenz_referenzieren() { // LH-FA-BEL-007
+        val hypothese = Hypothese(
+            id = HypotheseId("auth"),
+            wahrscheinlichkeit = 0.8,
+            stuetzendeEvidenz = listOf(EvidenzReferenz("obs:test-rot")),
+        )
+
+        assertEquals(listOf("obs:test-rot"), hypothese.stuetzendeEvidenz.map { it.wert })
+    }
 }
