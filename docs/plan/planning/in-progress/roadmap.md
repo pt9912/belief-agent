@@ -10,10 +10,9 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-027` ist als gezielter Follow-up nach
-`slice-022` auf `done/` abgeschlossen
-([`slice-027-konfidenz-replay-fake-adapter`](../done/slice-027-konfidenz-replay-fake-adapter.md)).
-Konfidenz-Zyklus-/Gate-Bindung bleibt in `slice-028`.
+**Aktiv:** `slice-028` ist als gezielter Follow-up nach `slice-022` und
+`slice-027` in Arbeit
+([`slice-028-konfidenz-zyklus-gate-binding`](slice-028-konfidenz-zyklus-gate-binding.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
