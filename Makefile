@@ -34,8 +34,8 @@ arch-check: a-check ## Architektur: Kern importiert kein Adapter/Framework (a-ch
 # AGENTS.md §3.1). arch-check folgt, sobald a-check verdrahtet ist.
 IMAGE ?= belief-agent
 CODE_AGENT_APPROVAL_APPROVED ?= false
-CODE_AGENT_BUILD_FIXTURE ?= example/code-agent/fixtures/build.fixture
-CODE_AGENT_REPO_FIXTURE ?= example/code-agent/fixtures/repo.fixture
+CODE_AGENT_IMAGE_BUILD_FIXTURE ?= /app/fixtures/build.fixture
+CODE_AGENT_IMAGE_REPO_FIXTURE ?= /app/fixtures/repo.fixture
 
 .PHONY: build
 build: ## Reproduzierbarer Build aller Module (Dockerfile-Stage build)
@@ -63,12 +63,16 @@ example-koog: ## Lauffaehiges Koog-Integrationsbeispiel
 	docker build --target example-koog -t $(IMAGE):example-koog .
 
 .PHONY: example-code-agent
-example-code-agent: ## Lauffaehiges Code-Agent-Composition-Beispiel
+example-code-agent: ## Direkt ausfuehrbares Code-Agent-Runtime-Image
 	docker build --target example-code-agent \
 		--build-arg CODE_AGENT_APPROVAL_APPROVED=$(CODE_AGENT_APPROVAL_APPROVED) \
-		--build-arg CODE_AGENT_BUILD_FIXTURE=$(CODE_AGENT_BUILD_FIXTURE) \
-		--build-arg CODE_AGENT_REPO_FIXTURE=$(CODE_AGENT_REPO_FIXTURE) \
+		--build-arg CODE_AGENT_BUILD_FIXTURE=$(CODE_AGENT_IMAGE_BUILD_FIXTURE) \
+		--build-arg CODE_AGENT_REPO_FIXTURE=$(CODE_AGENT_IMAGE_REPO_FIXTURE) \
 		-t $(IMAGE):example-code-agent .
+
+.PHONY: example-code-agent-run
+example-code-agent-run: example-code-agent ## Code-Agent-Runtime-Image starten
+	docker run --rm $(IMAGE):example-code-agent
 
 .PHONY: cli-demo
 cli-demo: ## Lauffaehiger CLI-Composition-Root gegen deterministische Adapter

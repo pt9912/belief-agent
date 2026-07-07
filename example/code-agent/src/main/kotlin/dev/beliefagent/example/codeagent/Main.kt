@@ -41,18 +41,39 @@ import dev.beliefagent.domain.belief.Zeitstempel
 import dev.beliefagent.domain.eskalation.Budget
 import dev.beliefagent.domain.eskalation.Eskalation
 import dev.beliefagent.domain.voi.VoiKandidat
+import java.io.IOException
+import java.nio.charset.MalformedInputException
+import java.nio.file.AccessDeniedException
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.util.Locale
+import kotlin.system.exitProcess
 
 private const val BUILD_FIXTURE_ENV = "CODE_AGENT_BUILD_FIXTURE"
 private const val REPO_FIXTURE_ENV = "CODE_AGENT_REPO_FIXTURE"
+private const val EX_DATAERR = 65
 
 fun main() {
-    println("belief-agent code-agent example")
-    println("compose=CodeAgentController")
+    val exitCode = runCodeAgent(System.getenv(), ::println)
+    if (exitCode != 0) {
+        exitProcess(exitCode)
+    }
+}
 
-    val approvalFreigegeben = envBool("CODE_AGENT_APPROVAL_APPROVED", default = false)
+fun runCodeAgent(env: Map<String, String?>, print: (String) -> Unit): Int = try {
+    runCodeAgentUnsafe(env, print)
+    0
+} catch (failure: FixtureInputFailure) {
+    printFixtureFailure(failure, print)
+    EX_DATAERR
+}
+
+private fun runCodeAgentUnsafe(env: Map<String, String?>, print: (String) -> Unit) {
+    print("belief-agent code-agent example")
+    print("compose=CodeAgentController")
+
+    val approvalFreigegeben = envBool(env, "CODE_AGENT_APPROVAL_APPROVED", default = false)
     val prior = BeliefState.of(
         listOf(
             Hypothese(HypotheseId("regression"), 0.9),
@@ -61,7 +82,7 @@ fun main() {
         Resthypothese(0.1),
     )
 
-    val observations = codeAgentObservations()
+    val observations = codeAgentObservations(env)
     val uhr = MonotoneDemoClock(start = 1L)
 
     val beobachtungsPort = StaticBeobachtungsPort(observations)
@@ -100,34 +121,38 @@ fun main() {
         budget = Budget(maxSchritte = 3),
         uhr = uhr,
         audit = audit,
-        execute = { aktion -> println("execute=${aktion.beschreibung}") },
-        escalate = { eskalation -> println("escalate reason=${eskalationsGrund(eskalation)}") },
+        execute = { aktion -> print("execute=${aktion.beschreibung}") },
+        escalate = { eskalation -> print("escalate reason=${eskalationsGrund(eskalation)}") },
     )
 
     val result = controller.step(prior)
 
-    println("scenario=code-agent")
-    printObservations(observations)
-    printResult(result, approvalFreigegeben)
-    println("audit_events=${audit.lade().groesse}")
+    print("scenario=code-agent")
+    printObservations(observations, print)
+    printResult(result, approvalFreigegeben, print)
+    print("audit_events=${audit.lade().groesse}")
 }
 
-private fun codeAgentObservations(): List<Beobachtung> {
+private fun codeAgentObservations(env: Map<String, String?>): List<Beobachtung> {
     val beobachtungsZeit = MonotoneDemoClock(start = 10L)
     val build = BuildReportBeobachter(
-        quelle = BuildReportDateiQuelle(requiredEnvPath(BUILD_FIXTURE_ENV)),
+        quelle = BuildReportDateiQuelle(requiredEnvPath(env, BUILD_FIXTURE_ENV)),
         zeitstempel = beobachtungsZeit::jetzt,
     )
     val repo = GitStatusBeobachter(
         quelle = GitStatusQuellenFactory.create(
             GitSourceConfig(
                 source = "fixture",
-                fixturePath = requiredEnvPath(REPO_FIXTURE_ENV),
+                fixturePath = requiredEnvPath(env, REPO_FIXTURE_ENV),
             ),
         ),
         zeitstempel = beobachtungsZeit::jetzt,
     )
-    return build.lies() + repo.lies()
+    return try {
+        build.lies() + repo.lies()
+    } catch (error: Throwable) {
+        throw classifyFixtureFailure(error) ?: error
+    }
 }
 
 private class CodeAgentController(
@@ -264,38 +289,38 @@ private class MonotoneDemoClock(start: Long = 1L) : UhrPort {
     override fun jetzt(): Zeitstempel = Zeitstempel(now++)
 }
 
-private fun printObservations(observations: List<Beobachtung>) {
+private fun printObservations(observations: List<Beobachtung>, print: (String) -> Unit) {
     observations.forEach { beobachtung ->
-        println(
+        print(
             "observation source=${beobachtung.quelle.name}; timestamp=${beobachtung.zeitstempel.epochMillis}; " +
                 "evidence=${beobachtung.evidenz.beschreibung}",
         )
     }
 }
 
-private fun printResult(result: Zyklusergebnis, approvalFreigegeben: Boolean) {
+private fun printResult(result: Zyklusergebnis, approvalFreigegeben: Boolean, print: (String) -> Unit) {
     when (result) {
         is Zyklusergebnis.Gehandelt -> {
-            println("terminal=gehandelt")
-            println("executed=true")
-            println("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion")
-            println("reason=gate_freigegeben")
-            println("approval=$approvalFreigegeben")
-            println("resthypothese=${format(result.belief.resthypothese.wahrscheinlichkeit)}")
+            print("terminal=gehandelt")
+            print("executed=true")
+            print("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion")
+            print("reason=gate_freigegeben")
+            print("approval=$approvalFreigegeben")
+            print("resthypothese=${format(result.belief.resthypothese.wahrscheinlichkeit)}")
         }
         is Zyklusergebnis.Eskaliert -> {
-            println("terminal=eskaliert")
-            println("executed=false")
-            println("executor_boundary=closed")
-            println("reason=GateEskalation")
-            println("resthypothese=${format(result.eskalation.belief.resthypothese.wahrscheinlichkeit)}")
+            print("terminal=eskaliert")
+            print("executed=false")
+            print("executor_boundary=closed")
+            print("reason=GateEskalation")
+            print("resthypothese=${format(result.eskalation.belief.resthypothese.wahrscheinlichkeit)}")
         }
         is Zyklusergebnis.Abgelehnt -> {
-            println("terminal=abgelehnt")
-            println("executed=false")
-            println("executor_boundary=closed")
-            println("reason=${result.grund}")
-            println("resthypothese=${format(result.belief.resthypothese.wahrscheinlichkeit)}")
+            print("terminal=abgelehnt")
+            print("executed=false")
+            print("executor_boundary=closed")
+            print("reason=${result.grund}")
+            print("resthypothese=${format(result.belief.resthypothese.wahrscheinlichkeit)}")
         }
     }
 }
@@ -306,9 +331,30 @@ private fun eskalationsGrund(eskalation: Eskalation): String = when (val grund =
     is dev.beliefagent.domain.eskalation.Eskalationsgrund.BudgetErschoepft -> "BudgetErschoepft"
 }
 
-private fun requiredEnvPath(name: String): Path {
-    val value = System.getenv(name)?.trim()
-    require(!value.isNullOrEmpty()) { "$name muss auf eine nicht-leere Fixture-Datei zeigen" }
+private class FixtureInputFailure(
+    val fehlerklasse: String,
+    detail: String,
+    cause: Throwable? = null,
+) : RuntimeException(detail, cause)
+
+private fun requiredEnvPath(env: Map<String, String?>, name: String): Path {
+    val value = env[name]?.trim()
+    if (value.isNullOrEmpty()) {
+        throw FixtureInputFailure("fixture_env_missing", "$name fehlt oder ist leer")
+    }
+    val resolved = resolveFixturePath(value)
+    when {
+        !Files.exists(resolved) -> throw FixtureInputFailure("fixture_missing", "$name zeigt auf fehlende Datei: $resolved")
+        !Files.isRegularFile(resolved) || !Files.isReadable(resolved) -> throw FixtureInputFailure(
+            "fixture_unreadable",
+            "$name ist keine lesbare regulaere Datei: $resolved",
+        )
+        Files.size(resolved) == 0L -> throw FixtureInputFailure("fixture_empty", "$name ist leer: $resolved")
+    }
+    return resolved
+}
+
+private fun resolveFixturePath(value: String): Path {
     val configured = Path.of(value)
     if (configured.isAbsolute) {
         return configured
@@ -323,10 +369,45 @@ private fun requiredEnvPath(name: String): Path {
     return repoRoot.resolve(configured).normalize()
 }
 
+private fun classifyFixtureFailure(error: Throwable): FixtureInputFailure? {
+    val cause = rootCause(error)
+    val message = cause.message.orEmpty()
+    return when (cause) {
+        is MalformedInputException -> FixtureInputFailure("fixture_encoding_invalid", "Fixture ist nicht gueltig UTF-8", cause)
+        is NoSuchFileException -> FixtureInputFailure("fixture_missing", "Fixture-Datei fehlt: ${cause.file}", cause)
+        is AccessDeniedException -> FixtureInputFailure("fixture_unreadable", "Fixture-Datei ist nicht lesbar: ${cause.file}", cause)
+        is IOException -> FixtureInputFailure("fixture_unreadable", "Fixture-Datei konnte nicht gelesen werden: $message", cause)
+        is IllegalArgumentException -> {
+            val fehlerklasse = if (message.contains("key=value")) {
+                "fixture_malformed_json"
+            } else {
+                "fixture_schema_mismatch"
+            }
+            FixtureInputFailure(fehlerklasse, message.ifBlank { cause::class.simpleName.orEmpty() }, cause)
+        }
+        is IllegalStateException -> FixtureInputFailure(
+            "fixture_schema_mismatch",
+            message.ifBlank { cause::class.simpleName.orEmpty() },
+            cause,
+        )
+        else -> null
+    }
+}
+
+private fun rootCause(error: Throwable): Throwable = error.cause?.let(::rootCause) ?: error
+
+private fun printFixtureFailure(failure: FixtureInputFailure, print: (String) -> Unit) {
+    print("scenario=code-agent")
+    print("terminal=eskaliert")
+    print("executed=false")
+    print("executor_boundary=closed")
+    print("reason=${failure.fehlerklasse}: ${failure.message}")
+}
+
 private fun format(value: Double): String = String.format(Locale.ROOT, "%.6f", value)
 
-private fun envBool(name: String, default: Boolean): Boolean {
-    val value = System.getenv(name)?.trim()
+private fun envBool(env: Map<String, String?>, name: String, default: Boolean): Boolean {
+    val value = env[name]?.trim()
     if (value.isNullOrEmpty()) {
         return default
     }

@@ -1,6 +1,6 @@
 # Slice slice-033: Code-Agent Fixture-Fehlerverifikation
 
-**Status:** open -> next -> in-progress -> done (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung
 
@@ -18,26 +18,26 @@ fail-closed behandelt und mit einer expliziten Verifikationsmatrix belegt.
 
 ## 2. Definition of Done
 
-- [ ] `example/code-agent` behandelt fehlerhafte Fixture-Inputs hart definiert:
+- [x] `example/code-agent` behandelt fehlerhafte Fixture-Inputs hart definiert:
   `fixture_env_missing`, `fixture_missing`, `fixture_unreadable`, `fixture_empty`,
   `fixture_malformed_json`, `fixture_schema_mismatch`, `fixture_encoding_invalid`.
   Jede Klasse fuehrt zu Exit-Code `65` (`EX_DATAERR`), keinem `execute`-Aufruf,
   `executed=false`, `executor_boundary=closed`, `terminal=eskaliert` und einem
   `reason`, der die Fehlerklasse enthaelt.
-- [ ] Keine impliziten Fallback-Datenquellen: fehlende oder leere
+- [x] Keine impliziten Fallback-Datenquellen: fehlende oder leere
   `CODE_AGENT_BUILD_FIXTURE` / `CODE_AGENT_REPO_FIXTURE` ersetzen sich im expliziten
   Negativtest-/Runner-Pfad nicht durch Standardpfade, `FakeLlm`-Seeds oder harte
   Seed-Daten. Das direkt ausfuehrbare Runtime-Image aus `slice-032` bleibt konsistent,
   weil es nicht-leere Default-ENV fuer die im Image enthaltenen Fixtures setzt.
-- [ ] Dedizierte Tests oder Verification-Runs decken M0-M5 ab:
+- [x] Dedizierte Tests oder Verification-Runs decken M0-M5 ab:
   M0 env-missing, M1 missing, M2 unreadable/empty, M3 malformed JSON,
   M4 schema mismatch, M5 invalid encoding.
-- [ ] `docs/verifications/2026-07-07-slice-033-verification.md` dokumentiert Matrix,
+- [x] `docs/verifications/2026-07-07-slice-033-verification.md` dokumentiert Matrix,
   Kommandos/Sensoren und Ergebnis je Fehlerklasse.
-- [ ] `make example-code-agent`, `docker run --rm $(IMAGE):example-code-agent`,
+- [x] `make example-code-agent`, `docker run --rm $(IMAGE):example-code-agent`,
   `make doc-check` und `make gates` laufen gruen; der positive Runtime-Image-Pfad
   bleibt trotz Negativfall-Handling intakt.
-- [ ] Closure-Notiz mit Lerneintrag vorhanden.
+- [x] Closure-Notiz mit Lerneintrag vorhanden.
 
 ## 3. Plan (vor Code)
 
@@ -71,7 +71,17 @@ nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Wird nach `done/` ergaenzt.**
+Abgeschlossen am 2026-07-07. Die Fixture-Fehlerklassen M0-M5 sind als
+deterministische Tests gegen Build- und Repo-Fixtures abgedeckt; insbesondere
+wurden die unabhaengig gemeldeten Luecken fuer `repo`-missing und `repo`-empty
+geschlossen. Der positive Runtime-Pfad nutzt die in `slice-032` festgelegten
+Image-internen Default-Fixtures unter `/app/fixtures/*.fixture`; Host-Pfade
+muessen explizit per Volume-Mount und ENV eingebunden werden.
+
+Review/Verification: unabhaengiger kontextfreier Review
+(`docs/reviews/2026-07-07-code-agent-runtime-image-review.md`) meldete zwei
+Medium-Befunde; beide sind integriert. `make example-code-agent-run` und
+`make gates` liefen anschliessend gruen.
 
 ## 8. Sub-Area-Modus-Begründung
 

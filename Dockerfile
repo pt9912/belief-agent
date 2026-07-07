@@ -41,13 +41,14 @@ RUN gradle --no-daemon --console=plain assemble
 
 # --- test: deterministische Tests aller Module (LH-QA-03) ------------------
 FROM build AS test
-RUN gradle --no-daemon --console=plain \
+RUN gradle --no-daemon --console=plain --max-workers=1 \
     allTests \
     :adapters:inbound:cli:test \
     :adapters:outbound:llm-langchain4j:test \
     :adapters:outbound:llm-koog:test \
     :adapters:outbound:observation-build-report:test \
-    :adapters:outbound:observation-git-local:test
+    :adapters:outbound:observation-git-local:test \
+    :example:code-agent:test
 
 # --- coverage: Kover Line-Coverage-Report je Modul (Modul 13; Report) -------
 # Report über alle logik-tragenden Module (per-Modul kover, ADR-0006).
@@ -91,13 +92,18 @@ RUN gradle --no-daemon --console=plain :example:langchain:run
 FROM build AS example-koog
 RUN gradle --no-daemon --console=plain :example:koog:run
 
-# --- example-code-agent: lauffaehiges Code-Agent-Composition-Beispiel -----
-FROM build AS example-code-agent
+# --- example-code-agent: direkt ausfuehrbares Runtime-Image ---------------
+FROM build AS example-code-agent-dist
+RUN gradle --no-daemon --console=plain :example:code-agent:installDist
+
+FROM eclipse-temurin:21-jre@sha256:d2b9f8f12212cadcfdf889461531784e8fd097feade954d65b31ee7a71c473ec AS example-code-agent
+WORKDIR /app
+COPY --from=example-code-agent-dist /src/example/code-agent/build/install/code-agent/ /app/
+COPY example/code-agent/fixtures ./fixtures
 ARG CODE_AGENT_APPROVAL_APPROVED=false
-ARG CODE_AGENT_BUILD_FIXTURE=example/code-agent/fixtures/build.fixture
-ARG CODE_AGENT_REPO_FIXTURE=example/code-agent/fixtures/repo.fixture
+ARG CODE_AGENT_BUILD_FIXTURE=/app/fixtures/build.fixture
+ARG CODE_AGENT_REPO_FIXTURE=/app/fixtures/repo.fixture
 ENV CODE_AGENT_APPROVAL_APPROVED=${CODE_AGENT_APPROVAL_APPROVED}
 ENV CODE_AGENT_BUILD_FIXTURE=${CODE_AGENT_BUILD_FIXTURE}
 ENV CODE_AGENT_REPO_FIXTURE=${CODE_AGENT_REPO_FIXTURE}
-RUN gradle --no-daemon --console=plain :example:code-agent:run
-ENTRYPOINT ["gradle", "--no-daemon", "--console=plain", ":example:code-agent:run"]
+ENTRYPOINT ["/app/bin/code-agent"]
