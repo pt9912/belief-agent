@@ -10,11 +10,10 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-`welle-05-llm-port` ist mit `slice-021` aktiv:
-[`slice-021-hypothesen-kandidaten-und-uebernahme-regel`](../in-progress/slice-021-llm-hypothesen-port-fake.md).
-Der Slice liefert nur den Domänenvertrag für Hypothesen-Kandidaten und deren
-Übernahme-Regel; Application-Port und Fake-Adapter bleiben in `slice-025` und
-`slice-026`.
+**Keine aktive Welle.** `slice-021` ist als gezielter Follow-up auf `done/`
+abgeschlossen
+([`slice-021-hypothesen-kandidaten-und-uebernahme-regel`](../done/slice-021-llm-hypothesen-port-fake.md)).
+Application-Port und Fake-Adapter bleiben in `slice-025` und `slice-026`.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
@@ -116,3 +115,4 @@ flowchart LR
 | 2026-07-07 | `slice-020` als gezielter Follow-up zu `welle-05-llm-port` gestartet (`open → in-progress`) | Trigger erfüllt: `slice-019` done, `slice-016`/`017` liefern statische Kandidaten-Konsumption; F4b belief-abhaengige Kandidaten offen |
 | 2026-07-07 | `slice-020` **in `done/` abgeschlossen**: `BeobachtungsAuswahlPort` belief-aware, `voi-fake` Top-2-konfigurierbar, Beispiele/Doku angepasst | `make gates` grün; F4b geschlossen ohne Erweiterung der `LH-FA-LLM-002`-Modellaufgaben |
 | 2026-07-07 | `slice-021` nach Planning-Harness re-geschnitten: Domain-Kandidaten/Übernahme-Regel bleibt `slice-021`; Application-Port/Flow wird `slice-025`; Fake-Adapter/Build-Integration wird `slice-026` | Ursprünglicher Slice hatte >3 DoD-Punkte und mehrere Schichten (Domain, Application, Adapter, Build/Arch) → nicht in einer Sitzung liefer- und reviewbar |
+| 2026-07-07 | `slice-021` **in `done/` abgeschlossen**: Domain-Kandidaten, explizite Kandidaten-Scores, Evidenzreferenzen und konservative Übernahme aus Resthypothesen-Masse | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-025` oder priorisierte Welle-05-Folge |
