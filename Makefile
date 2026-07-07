@@ -62,3 +62,7 @@ example-koog: ## Lauffaehiges Koog-Integrationsbeispiel
 .PHONY: cli-demo
 cli-demo: ## Lauffaehiger CLI-Composition-Root gegen deterministische Adapter
 	docker build --target cli-demo -t $(IMAGE):cli-demo .
+
+.PHONY: cli-demo-scenarios
+cli-demo-scenarios: ## CLI-Demo fuer handeln/eskalieren/ablehnen/sammeln
+	docker build --target cli-demo-scenarios -t $(IMAGE):cli-demo-scenarios .

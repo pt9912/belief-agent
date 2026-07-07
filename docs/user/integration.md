@@ -80,7 +80,37 @@ make cli-demo
 ```
 
 Der Demo-Lauf nutzt deterministische Fake-Adapter und gibt ein terminales
-CLI-Ergebnis aus, zum Beispiel `terminal=gehandelt`.
+CLI-Ergebnis aus. Ohne Argument bleibt der Default der positive Pfad
+`gehandelt`.
+
+```text
+scenario=gehandelt
+terminal=gehandelt
+executed=true
+executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion
+```
+
+Die vorzeigbare Unsicherheitsgrenze laeuft ueber alle deterministischen
+Szenarien:
+
+```sh
+make cli-demo-scenarios
+```
+
+Der Lauf enthaelt negative Pfade, in denen der Executor geschlossen bleibt:
+
+```text
+scenario=eskaliert
+terminal=eskaliert
+executed=false
+reason=GateEskalation
+executor_boundary=closed
+
+scenario=abgelehnt
+terminal=abgelehnt
+executed=false
+executor_boundary=closed
+```
 
 ## 3. Ports Implementieren
 
@@ -156,7 +186,8 @@ val ergebnis = CliRuntime
     .ausKonfiguration(StandardCliSzenarien.gehandelt())
     .starte()
 
-check(ergebnis.sichtbareAusgabe == "terminal=gehandelt")
+check(ergebnis.terminal == CliTerminal.GEHANDELT)
+check(ergebnis.executor.ausgefuehrt)
 ```
 
 Die Runtime verbindet `AktionsVorschlagen`, `KonfidenzPort`,

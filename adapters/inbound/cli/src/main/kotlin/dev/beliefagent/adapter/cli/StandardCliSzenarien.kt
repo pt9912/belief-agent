@@ -21,6 +21,7 @@ object StandardCliSzenarien {
 
     fun gehandelt(): CliRuntimeKonfiguration =
         basis(
+            szenario = "gehandelt",
             prior = belief(hypotheseP = 0.9, rest = 0.1),
             pSuccess = 0.8,
             wirkungsklasse = Wirkungsklasse.ARBEITSBEREICH_LOKAL,
@@ -29,6 +30,7 @@ object StandardCliSzenarien {
 
     fun eskaliert(): CliRuntimeKonfiguration =
         basis(
+            szenario = "eskaliert",
             prior = belief(hypotheseP = 0.9, rest = 0.1),
             pSuccess = 0.95,
             wirkungsklasse = Wirkungsklasse.EXTERN_WIRKSAM,
@@ -37,6 +39,7 @@ object StandardCliSzenarien {
 
     fun abgelehnt(): CliRuntimeKonfiguration =
         basis(
+            szenario = "abgelehnt",
             prior = belief(hypotheseP = 0.9, rest = 0.1),
             pSuccess = 0.3,
             wirkungsklasse = Wirkungsklasse.ARBEITSBEREICH_LOKAL,
@@ -45,6 +48,7 @@ object StandardCliSzenarien {
 
     fun sammeltDannHandelt(): CliRuntimeKonfiguration =
         basis(
+            szenario = "sammelt-dann-handelt",
             prior = belief(hypotheseP = 0.05, rest = 0.95),
             pSuccess = 0.95,
             wirkungsklasse = Wirkungsklasse.EXTERN_WIRKSAM,
@@ -58,6 +62,7 @@ object StandardCliSzenarien {
         )
 
     private fun basis(
+        szenario: String,
         prior: BeliefState,
         pSuccess: Double,
         wirkungsklasse: Wirkungsklasse,
@@ -70,6 +75,7 @@ object StandardCliSzenarien {
         approvalFreigegeben = approval,
         bekannteEvidenz = mapOf(evidenzRef to evidenz),
         voiKandidaten = voiKandidaten,
+        szenario = szenario,
         aktionsVorschlaege = listOf(
             FakeAktionsVorschlagKonfiguration(
                 beschreibung = "Fake-CLI-Aktion",

@@ -72,6 +72,10 @@ RUN gradle --no-daemon --console=plain \
 FROM build AS cli-demo
 RUN gradle --no-daemon --console=plain :adapters:inbound:cli:run
 
+# --- cli-demo-scenarios: alle deterministischen CLI-Szenarien ---------------
+FROM build AS cli-demo-scenarios
+RUN gradle --no-daemon --console=plain :adapters:inbound:cli:run --args='all'
+
 # --- example-langchain: lauffaehiges Integrationsbeispiel -------------------
 FROM build AS example-langchain
 RUN gradle --no-daemon --console=plain :example:langchain:run

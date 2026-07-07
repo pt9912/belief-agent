@@ -16,7 +16,10 @@ class CliRuntimeE2eTest {
 
         val gehandelt = assertIs<Zyklusergebnis.Gehandelt>(ergebnis.zyklus)
         assertEquals(CliTerminal.GEHANDELT, ergebnis.terminal)
-        assertEquals("terminal=gehandelt", ergebnis.sichtbareAusgabe)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("scenario=gehandelt"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("terminal=gehandelt"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=true"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion"))
         assertTrue(ergebnis.executor.ausgefuehrt)
         assertEquals(listOf(gehandelt.freigabe.aktion), runtime.ausgefuehrteAktionen())
     }
@@ -29,7 +32,11 @@ class CliRuntimeE2eTest {
 
         assertIs<Zyklusergebnis.Eskaliert>(ergebnis.zyklus)
         assertEquals(CliTerminal.ESKALIERT, ergebnis.terminal)
-        assertEquals("terminal=eskaliert", ergebnis.sichtbareAusgabe)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("scenario=eskaliert"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("terminal=eskaliert"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("reason=GateEskalation"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executor_boundary=closed"))
         assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
     }
 
@@ -41,7 +48,10 @@ class CliRuntimeE2eTest {
 
         assertIs<Zyklusergebnis.Abgelehnt>(ergebnis.zyklus)
         assertEquals(CliTerminal.ABGELEHNT, ergebnis.terminal)
-        assertEquals("terminal=abgelehnt", ergebnis.sichtbareAusgabe)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("scenario=abgelehnt"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("terminal=abgelehnt"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executor_boundary=closed"))
         assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
     }
 
@@ -53,8 +63,32 @@ class CliRuntimeE2eTest {
 
         val gehandelt = assertIs<Zyklusergebnis.Gehandelt>(ergebnis.zyklus)
         assertEquals(CliTerminal.GEHANDELT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("scenario=sammelt-dann-handelt"))
         assertTrue(gehandelt.belief.resthypothese.wahrscheinlichkeit < 0.95)
         assertEquals(listOf(gehandelt.freigabe.aktion), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun cli_demo_default_bleibt_gehandelt() {
+        val ausgabe = cliDemoAusgabe(emptyArray())
+
+        assertTrue(ausgabe.contains("scenario=gehandelt"))
+        assertTrue(ausgabe.contains("terminal=gehandelt"))
+        assertTrue(ausgabe.contains("executed=true"))
+    }
+
+    @Test
+    fun cli_demo_all_zeigt_unsicherheitsgrenzen() {
+        val ausgabe = cliDemoAusgabe(arrayOf("all"))
+
+        assertTrue(ausgabe.contains("scenario=gehandelt"))
+        assertTrue(ausgabe.contains("scenario=eskaliert"))
+        assertTrue(ausgabe.contains("terminal=eskaliert"))
+        assertTrue(ausgabe.contains("reason=GateEskalation"))
+        assertTrue(ausgabe.contains("scenario=abgelehnt"))
+        assertTrue(ausgabe.contains("terminal=abgelehnt"))
+        assertTrue(ausgabe.contains("executed=false"))
+        assertTrue(ausgabe.contains("scenario=sammelt-dann-handelt"))
     }
 
     @Test

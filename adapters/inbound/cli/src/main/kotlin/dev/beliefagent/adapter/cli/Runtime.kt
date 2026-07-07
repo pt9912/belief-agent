@@ -31,7 +31,9 @@ import dev.beliefagent.domain.belief.Beobachtung
 import dev.beliefagent.domain.belief.EvidenzReferenz
 import dev.beliefagent.domain.belief.Zeitstempel
 import dev.beliefagent.domain.eskalation.Budget
+import dev.beliefagent.domain.eskalation.Eskalationsgrund
 import dev.beliefagent.domain.voi.VoiKandidat
+import java.util.Locale
 import org.koin.core.Koin
 import org.koin.core.KoinApplication
 import org.koin.core.qualifier.named
@@ -52,6 +54,7 @@ data class CliRuntimeKonfiguration(
     val voiKandidaten: List<VoiKandidat> = emptyList(),
     val approvalFreigegeben: Boolean = false,
     val startZeit: Long = 1L,
+    val szenario: String = "custom",
 )
 
 data class CliLaufErgebnis(
@@ -90,7 +93,7 @@ class CliRuntime private constructor(
             terminal = executorErgebnis.terminal,
             zyklus = zyklusErgebnis,
             executor = executorErgebnis,
-            sichtbareAusgabe = "terminal=${executorErgebnis.terminal.name.lowercase()}",
+            sichtbareAusgabe = sichtbareAusgabe(config, zyklusErgebnis, executorErgebnis),
         )
     }
 
@@ -101,6 +104,42 @@ class CliRuntime private constructor(
             CliRuntime(koinApplication { modules(cliModule(config)) })
     }
 }
+
+private fun sichtbareAusgabe(
+    config: CliRuntimeKonfiguration,
+    zyklus: Zyklusergebnis,
+    executor: ExecutorErgebnis,
+): String = buildString {
+    appendLine("scenario=${config.szenario}")
+    appendLine("terminal=${executor.terminal.name.lowercase()}")
+    appendLine("executed=${executor.ausgefuehrt}")
+    when (zyklus) {
+        is Zyklusergebnis.Gehandelt -> {
+            appendLine("reason=gate_freigegeben")
+            appendLine("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion")
+            append("resthypothese=${formatWahrscheinlichkeit(zyklus.belief.resthypothese.wahrscheinlichkeit)}")
+        }
+        is Zyklusergebnis.Eskaliert -> {
+            appendLine("reason=${eskalationsgrundName(zyklus.eskalation.grund)}")
+            appendLine("executor_boundary=closed")
+            append("resthypothese=${formatWahrscheinlichkeit(zyklus.eskalation.belief.resthypothese.wahrscheinlichkeit)}")
+        }
+        is Zyklusergebnis.Abgelehnt -> {
+            appendLine("reason=${zyklus.grund}")
+            appendLine("executor_boundary=closed")
+            append("resthypothese=${formatWahrscheinlichkeit(zyklus.belief.resthypothese.wahrscheinlichkeit)}")
+        }
+    }
+}
+
+private fun eskalationsgrundName(grund: Eskalationsgrund): String = when (grund) {
+    is Eskalationsgrund.BeobachtungenErschoepft -> "BeobachtungenErschoepft"
+    is Eskalationsgrund.GateEskalation -> "GateEskalation"
+    is Eskalationsgrund.BudgetErschoepft -> "BudgetErschoepft"
+}
+
+private fun formatWahrscheinlichkeit(wert: Double): String =
+    String.format(Locale.ROOT, "%.6f", wert)
 
 fun cliModule(config: CliRuntimeKonfiguration) = module {
     single { config }

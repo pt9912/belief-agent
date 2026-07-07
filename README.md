@@ -11,14 +11,20 @@ weiß, wann er nicht genug weiß.**
 
 ## Was kann ich heute tun?
 
-**Stand:** Version [`v0.1.0`](version.md#aktuell) (in Entwicklung). Welle-01
-(Belief-Kern) ist abgeschlossen; Welle-02 (Evidenz + Audit) läuft.
+**Stand:** Version [`v0.1.0`](version.md#aktuell) (in Entwicklung). Der
+Belief-Kern, der Entscheidungszyklus und ein netzfreier CLI-Composition-Root
+sind lauffaehig; echte Provider-/Approval-/Persistenzadapter bleiben
+Stabilisierungsarbeit.
 
 - Lauffähiger **Belief-Kern** in `hexagon:domain` (Kotlin Multiplatform,
   HexSlice-Architektur): normierter Belief State mit Pflicht-Resthypothese,
   nicht-überschreibendes Bayes-Update, Unsicherheitsmaße, Re-Hypothesen-Auslöser.
 - `make gates` läuft grün — **fünf Gates**: `doc-check` · `build` · `test` ·
   `coverage-gate` · `arch-check` (alles im Docker, kein Host-JDK).
+- `make cli-demo-scenarios` zeigt deterministisch, wann der Agent nicht
+  handelt: `terminal=eskaliert` und `terminal=abgelehnt` bleiben
+  `executed=false`, während `sammelt-dann-handelt` erst Information sammelt
+  und dann freigibt.
 - `make help` zeigt die Targets; `make build`/`make test` bauen/testen im Docker.
 - Lastenheft, Spezifikation, Architektur und Roadmap sind les- und
   navigierbar (siehe unten).
@@ -37,6 +43,21 @@ Das Sprachmodell ist **nicht der Agent**, sondern ein austauschbares Modul.
 Seine implizite Konfidenz wird in explizite, prüfbare und gate-fähige Zahlen
 überführt; erst wenn die Konfidenz die Risikoklasse der Aktion deckt, wird
 gehandelt — andernfalls wird Information gesammelt oder eskaliert.
+
+```sh
+make cli-demo-scenarios
+```
+
+Der Demo-Target laeuft ohne Netzwerk gegen deterministische Adapter und gibt
+unter anderem aus:
+
+```text
+scenario=eskaliert
+terminal=eskaliert
+executed=false
+reason=GateEskalation
+executor_boundary=closed
+```
 
 ## Was macht es vertrauenswürdig?
 
