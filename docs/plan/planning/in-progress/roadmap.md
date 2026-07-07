@@ -10,10 +10,10 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-`welle-05-llm-port` ist mit `slice-025` aktiv:
-[`slice-025-hypothesen-port-application-flow`](../in-progress/slice-025-hypothesen-port-application-flow.md).
-Der Slice bindet die Domain-Kandidatenregel aus `slice-021` an einen
-application-lokalen Hypothesen-Port an; Fake-Adapter bleibt in `slice-026`.
+**Keine aktive Welle.** `slice-025` ist als gezielter Follow-up auf `done/`
+abgeschlossen
+([`slice-025-hypothesen-port-application-flow`](../done/slice-025-hypothesen-port-application-flow.md)).
+Fake-Adapter bleibt in `slice-026`.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
@@ -116,3 +116,4 @@ flowchart LR
 | 2026-07-07 | `slice-020` **in `done/` abgeschlossen**: `BeobachtungsAuswahlPort` belief-aware, `voi-fake` Top-2-konfigurierbar, Beispiele/Doku angepasst | `make gates` grün; F4b geschlossen ohne Erweiterung der `LH-FA-LLM-002`-Modellaufgaben |
 | 2026-07-07 | `slice-021` nach Planning-Harness re-geschnitten: Domain-Kandidaten/Übernahme-Regel bleibt `slice-021`; Application-Port/Flow wird `slice-025`; Fake-Adapter/Build-Integration wird `slice-026` | Ursprünglicher Slice hatte >3 DoD-Punkte und mehrere Schichten (Domain, Application, Adapter, Build/Arch) → nicht in einer Sitzung liefer- und reviewbar |
 | 2026-07-07 | `slice-021` **in `done/` abgeschlossen**: Domain-Kandidaten, explizite Kandidaten-Scores, Evidenzreferenzen und konservative Übernahme aus Resthypothesen-Masse | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-025` oder priorisierte Welle-05-Folge |
+| 2026-07-07 | `slice-025` **in `done/` abgeschlossen**: application-lokaler Hypothesen-Port, Re-Hypothesen-Auslösung im `BeliefAktualisieren`-Flow und Architektur-Schärfung für getrennte LLM-Ports | `make gates` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → `slice-026` oder priorisierte Welle-05-Folge |
