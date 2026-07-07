@@ -10,11 +10,11 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-028` ist als gezielter Follow-up nach
-`slice-022` und `slice-027` auf `done/` abgeschlossen
-([`slice-028-konfidenz-zyklus-gate-binding`](../done/slice-028-konfidenz-zyklus-gate-binding.md)).
-Produktiver `ARC-09`-Composition-Root bleibt in `slice-024`;
-Aktionsvorschlags-Port bleibt in `slice-023`.
+**Aktiv:** `slice-023` ist als gezielter Follow-up zu `welle-05-llm-port`
+in Arbeit
+([`slice-023-llm-aktions-vorschlags-port-fake`](slice-023-llm-aktions-vorschlags-port-fake.md)).
+
+Produktiver `ARC-09`-Composition-Root bleibt in `slice-024`.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
