@@ -20,14 +20,14 @@ Adapter-Modul in Build, Architekturprüfung und Tests auf.
 
 ## 2. Definition of Done
 
-- [ ] `adapters/outbound/llm-hypothesen-fake` implementiert den
+- [x] `adapters/outbound/llm-hypothesen-fake` implementiert den
   Hypothesen-Port deterministisch und liefert klar als Fake erkennbare
   Kandidaten.
-- [ ] `LH-FA-LLM-003` bleibt abgesichert: Fake-Daten enthalten explizite Scores
+- [x] `LH-FA-LLM-003` bleibt abgesichert: Fake-Daten enthalten explizite Scores
   und Evidenzreferenzen; ungültige Konfigurationen werden fail-safe getestet.
-- [ ] Build- und Architekturkonfigurationen nehmen das neue Adapter-Modul auf,
+- [x] Build- und Architekturkonfigurationen nehmen das neue Adapter-Modul auf,
   ohne Domain/Application-Abhängigkeiten auf Adapter zu erzeugen.
-- [ ] `make gates` grün; Closure-Notiz mit Steering-Loop-Eintrag.
+- [x] `make gates` grün; Closure-Notiz mit Steering-Loop-Eintrag.
 
 ## 3. Plan (vor Code)
 
@@ -59,11 +59,17 @@ DoD vollständig + Closure-Notiz + Slice in `done/`.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-**Was funktionierte:** TODO.
+**Was funktionierte:** Der Adapter-Schnitt blieb klein: rohe
+Fake-Konfiguration wird erst im Adapter in Domain-Werte gemappt, wodurch
+ungueltige Scores, leere Evidenz und nicht als Fake markierte IDs fail-safe zu
+`emptyList()` werden.
 
-**Was ist offen geblieben:** TODO.
+**Was ist offen geblieben:** Echte Hypothesen-Provider, Prompt-/Schema-Vertrag
+und produktive Provider-Konfiguration bleiben bewusst ausserhalb dieses Slices.
 
-**Steering-Loop:** TODO.
+**Steering-Loop:** Die DoD-Formulierung "klar als Fake erkennbar" wurde beim
+Review in eine pruefbare Adapter-Guard uebersetzt (`fake-`/`fake:`), statt nur
+Default-Testdaten so zu benennen.
 
 **Folge-Slices:** echte Hypothesen-Provider nur nach separatem Planning-Slice.
 

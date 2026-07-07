@@ -43,6 +43,7 @@ resolution:
       - "adapters/outbound/audit-memory/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/approval-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/voi-fake/src/commonMain/kotlin/dev/beliefagent"
+      - "adapters/outbound/llm-hypothesen-fake/src/commonMain/kotlin/dev/beliefagent"
       - "example/langchain/src/main/kotlin/dev/beliefagent"
       - "example/koog/src/main/kotlin/dev/beliefagent"
 
