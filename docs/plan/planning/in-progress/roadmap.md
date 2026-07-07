@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Ruhe. **Letzte Änderung:** 2026-07-07.
+**Status:** Aktiv. **Letzte Änderung:** 2026-07-07.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,9 +10,8 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-029` ist als gezielter Follow-up zu
-`slice-024` auf `done/` abgeschlossen
-([`slice-029-example-reconciliation-cli-root`](../done/slice-029-example-reconciliation-cli-root.md)).
+**Aktiv:** `slice-030` ist als Demo-Slice zum CLI-Composition-Root in Arbeit
+([`slice-030-cli-szenario-demo`](slice-030-cli-szenario-demo.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
