@@ -10,10 +10,10 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-026` ist als gezielter Follow-up auf `done/`
-abgeschlossen
-([`slice-026-llm-hypothesen-fake-adapter`](../done/slice-026-llm-hypothesen-fake-adapter.md)).
-Echte Hypothesen-Provider bleiben Folge-Slices.
+`welle-05-llm-port` ist mit `slice-022` aktiv:
+[`slice-022-konfidenz-externalisierung`](slice-022-konfidenz-externalisierung.md).
+Der Slice liefert den kleinsten Konfidenz-Externalisierungs-Kern: Contract,
+Use-Case und append-only Audit-Ereignisse.
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
