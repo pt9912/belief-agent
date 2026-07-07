@@ -18,6 +18,8 @@ COPY adapters/outbound/llm-fake/build.gradle.kts ./adapters/outbound/llm-fake/bu
 COPY adapters/outbound/llm-langchain4j/build.gradle.kts ./adapters/outbound/llm-langchain4j/build.gradle.kts
 COPY adapters/outbound/llm-koog/build.gradle.kts ./adapters/outbound/llm-koog/build.gradle.kts
 COPY adapters/outbound/observation-fake/build.gradle.kts ./adapters/outbound/observation-fake/build.gradle.kts
+COPY adapters/outbound/observation-build-report/build.gradle.kts ./adapters/outbound/observation-build-report/build.gradle.kts
+COPY adapters/outbound/observation-git-local/build.gradle.kts ./adapters/outbound/observation-git-local/build.gradle.kts
 COPY adapters/outbound/audit-memory/build.gradle.kts ./adapters/outbound/audit-memory/build.gradle.kts
 COPY adapters/outbound/approval-fake/build.gradle.kts ./adapters/outbound/approval-fake/build.gradle.kts
 COPY adapters/outbound/voi-fake/build.gradle.kts ./adapters/outbound/voi-fake/build.gradle.kts
@@ -27,7 +29,8 @@ COPY adapters/outbound/llm-action-fake/build.gradle.kts ./adapters/outbound/llm-
 COPY adapters/inbound/cli/build.gradle.kts ./adapters/inbound/cli/build.gradle.kts
 COPY example/langchain/build.gradle.kts ./example/langchain/build.gradle.kts
 COPY example/koog/build.gradle.kts ./example/koog/build.gradle.kts
-RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:llm-langchain4j:dependencies :adapters:outbound:llm-koog:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:approval-fake:dependencies :adapters:outbound:voi-fake:dependencies :adapters:outbound:llm-hypothesen-fake:dependencies :adapters:outbound:konfidenz-memory:dependencies :adapters:outbound:llm-action-fake:dependencies :adapters:inbound:cli:dependencies :example:langchain:dependencies :example:koog:dependencies
+COPY example/code-agent/build.gradle.kts ./example/code-agent/build.gradle.kts
+RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:llm-langchain4j:dependencies :adapters:outbound:llm-koog:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:observation-build-report:dependencies :adapters:outbound:observation-git-local:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:approval-fake:dependencies :adapters:outbound:voi-fake:dependencies :adapters:outbound:llm-hypothesen-fake:dependencies :adapters:outbound:konfidenz-memory:dependencies :adapters:outbound:llm-action-fake:dependencies :adapters:inbound:cli:dependencies :example:langchain:dependencies :example:koog:dependencies :example:code-agent:dependencies
 
 # --- build: Quellcode kompilieren (alle Module) ----------------------------
 FROM deps AS build
@@ -42,7 +45,9 @@ RUN gradle --no-daemon --console=plain \
     allTests \
     :adapters:inbound:cli:test \
     :adapters:outbound:llm-langchain4j:test \
-    :adapters:outbound:llm-koog:test
+    :adapters:outbound:llm-koog:test \
+    :adapters:outbound:observation-build-report:test \
+    :adapters:outbound:observation-git-local:test
 
 # --- coverage: Kover Line-Coverage-Report je Modul (Modul 13; Report) -------
 # Report über alle logik-tragenden Module (per-Modul kover, ADR-0006).
@@ -51,6 +56,7 @@ RUN gradle --no-daemon --console=plain \
     :hexagon:domain:koverLog :hexagon:application:koverLog \
     :adapters:outbound:llm-fake:koverLog :adapters:outbound:llm-langchain4j:koverLog \
     :adapters:outbound:llm-koog:koverLog :adapters:outbound:observation-fake:koverLog \
+    :adapters:outbound:observation-build-report:koverLog :adapters:outbound:observation-git-local:koverLog \
     :adapters:outbound:audit-memory:koverLog :adapters:outbound:approval-fake:koverLog \
     :adapters:outbound:voi-fake:koverLog :adapters:outbound:llm-hypothesen-fake:koverLog \
     :adapters:outbound:konfidenz-memory:koverLog :adapters:outbound:llm-action-fake:koverLog \
@@ -59,10 +65,11 @@ RUN gradle --no-daemon --console=plain \
 # --- coverage-gate: Kover Schwellen-Verifikation (ADR-0004/ADR-0006) --------
 # Gate über domain + application + alle Adapter (Schwellen je Modul, ADR-0006).
 FROM build AS coverage-gate
-RUN gradle --no-daemon --console=plain \
+RUN gradle --no-daemon --console=plain --max-workers=1 \
     :hexagon:domain:koverVerify :hexagon:application:koverVerify \
     :adapters:outbound:llm-fake:koverVerify :adapters:outbound:llm-langchain4j:koverVerify \
     :adapters:outbound:llm-koog:koverVerify :adapters:outbound:observation-fake:koverVerify \
+    :adapters:outbound:observation-build-report:koverVerify :adapters:outbound:observation-git-local:koverVerify \
     :adapters:outbound:audit-memory:koverVerify :adapters:outbound:approval-fake:koverVerify \
     :adapters:outbound:voi-fake:koverVerify :adapters:outbound:llm-hypothesen-fake:koverVerify \
     :adapters:outbound:konfidenz-memory:koverVerify :adapters:outbound:llm-action-fake:koverVerify \
@@ -83,3 +90,9 @@ RUN gradle --no-daemon --console=plain :example:langchain:run
 # --- example-koog: lauffaehiges Integrationsbeispiel ------------------------
 FROM build AS example-koog
 RUN gradle --no-daemon --console=plain :example:koog:run
+
+# --- example-code-agent: lauffaehiges Code-Agent-Composition-Beispiel -----
+FROM build AS example-code-agent
+ARG CODE_AGENT_APPROVAL_APPROVED=false
+ENV CODE_AGENT_APPROVAL_APPROVED=${CODE_AGENT_APPROVAL_APPROVED}
+RUN gradle --no-daemon --console=plain :example:code-agent:run

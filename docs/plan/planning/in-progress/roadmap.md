@@ -18,14 +18,15 @@ CLI-Composition-Root auf `done/` abgeschlossen
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
-Bereinigung. Tracked Follow-ups (welle-05): echter Approval-Adapter mit Binding
-und echte Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle.
+Bereinigung. Tracked Follow-ups (welle-05): echter Approval-Adapter mit Binding,
+echte Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle und realistische
+Build-/Repo-Beobachtungsquellen fuer `example/code-agent` (`slice-031`..`034`).
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Echte Approval-, Ausfuehrungs- und Persistenzadapter fuer das CLI-Bundle; provider-spezifische LLM-Konfiguration | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Echte Approval-, Ausfuehrungs- und Persistenzadapter fuer das CLI-Bundle; provider-spezifische LLM-Konfiguration; realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` (`slice-031`..`034`) | M |
 
 ## Meilensteine
 
@@ -124,3 +125,4 @@ flowchart LR
 | 2026-07-07 | `slice-024` **in `done/` abgeschlossen**: Koin-basierter `adapters:inbound:cli` Composition-Root, Executor-Grenze nur ueber `Aktionsfreigabe.Freigegeben`, netzfreies CLI-E2E | `make gates` grün; `make cli-demo` gibt `terminal=gehandelt` aus; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
 | 2026-07-07 | `slice-029` **in `done/` abgeschlossen**: `example:langchain` und `example:koog` bleiben LLM-Framework-Adapter-Demos, verweisen aber auf `adapters:inbound:cli` als produktiven Composition-Root und zeigen die `freigabe.aktion`-Executor-Grenze | `make gates` grün; `make example-langchain` und `make example-koog` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
 | 2026-07-07 | `slice-030` **in `done/` abgeschlossen**: CLI-Szenario-Demo zeigt `gehandelt`, `eskaliert`, `abgelehnt` und `sammelt-dann-handelt`; negative Pfade bleiben `executed=false` und `executor_boundary=closed` | `make gates` grün; `make cli-demo` und `make cli-demo-scenarios` grün; Review-Report ohne Findings und Verification-Report ohne DoD-Verletzung; Resume → echte Approval-/Ausfuehrungs-/Persistenzadapter oder priorisierte Stabilisierung |
+| 2026-07-07 | `slice-031` **in `done/` abgeschlossen**: konkrete Build-/Git-Beobachter `observation-build-report` und `observation-git-local` hinter `BeobachtungsPort` geliefert, ohne Demo-/Produktiv-Composition umzubinden | `make gates` grün; neue Adapter in `settings.gradle.kts`, `.a-check.yml` und Dockerfile-Build-/Coverage-Gate registriert; `coverage-gate` seriell stabilisiert; Review-Follow-up → `slice-034` Git-Source-Strategie vor `slice-032` Code-Agent-Binding |

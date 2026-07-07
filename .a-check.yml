@@ -23,6 +23,8 @@ layers:
   outbound_llm_langchain4j: ["adapters/outbound/llm-langchain4j/**"]
   outbound_llm_koog: ["adapters/outbound/llm-koog/**"]
   outbound_observation_fake: ["adapters/outbound/observation-fake/**"]
+  outbound_observation_build_report: ["adapters/outbound/observation-build-report/**"]
+  outbound_observation_git_local: ["adapters/outbound/observation-git-local/**"]
   outbound_audit_memory: ["adapters/outbound/audit-memory/**"]
   outbound_approval_fake: ["adapters/outbound/approval-fake/**"]
   outbound_voi_fake: ["adapters/outbound/voi-fake/**"]
@@ -41,6 +43,10 @@ edges:
   - {from: outbound_llm_koog, to: domain}
   - {from: outbound_observation_fake, to: application}
   - {from: outbound_observation_fake, to: domain}
+  - {from: outbound_observation_build_report, to: application}
+  - {from: outbound_observation_build_report, to: domain}
+  - {from: outbound_observation_git_local, to: application}
+  - {from: outbound_observation_git_local, to: domain}
   - {from: outbound_audit_memory, to: application}
   - {from: outbound_audit_memory, to: domain}
   - {from: outbound_approval_fake, to: application}
@@ -86,6 +92,8 @@ resolution:
       - "adapters/outbound/llm-langchain4j/src/main/kotlin/dev/beliefagent"
       - "adapters/outbound/llm-koog/src/main/kotlin/dev/beliefagent"
       - "adapters/outbound/observation-fake/src/commonMain/kotlin/dev/beliefagent"
+      - "adapters/outbound/observation-build-report/src/main/kotlin/dev/beliefagent"
+      - "adapters/outbound/observation-git-local/src/main/kotlin/dev/beliefagent"
       - "adapters/outbound/audit-memory/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/approval-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/voi-fake/src/commonMain/kotlin/dev/beliefagent"
