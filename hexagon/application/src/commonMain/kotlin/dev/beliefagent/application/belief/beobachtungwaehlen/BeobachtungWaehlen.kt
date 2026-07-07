@@ -2,6 +2,7 @@ package dev.beliefagent.application.belief.beobachtungwaehlen
 
 import dev.beliefagent.application.belief.beobachtungwaehlen.ports.BeobachtungsAuswahlPort
 import dev.beliefagent.domain.belief.BeliefState
+import dev.beliefagent.domain.belief.Beobachtung
 import dev.beliefagent.domain.voi.VoiKandidat
 import dev.beliefagent.domain.voi.VoiSelektor
 
@@ -11,7 +12,7 @@ import dev.beliefagent.domain.voi.VoiSelektor
  * [BeobachtungsAuswahlPort] und wendet die reine Domänen-Regel [VoiSelektor] an
  * (max Gewinn/Kosten über die Top-2-Trennung).
  *
- * [bereitsGewaehlt] schließt bereits **verbrauchte** Kandidaten aus, damit der
+ * [bereitsGesammelt] schließt bereits **verbrauchte** Beobachtungen aus, damit der
  * Entscheidungszyklus (slice-017) über mehrere Runden **verschiedene** Beobachtungen
  * sammelt und nicht dieselbe wiederholt (sonst zählte ein Beweis mehrfach —
  * Scheingewissheit, `LH-FA-OBS-004`).
@@ -29,6 +30,6 @@ import dev.beliefagent.domain.voi.VoiSelektor
 class BeobachtungWaehlen(
     private val port: BeobachtungsAuswahlPort,
 ) {
-    fun waehle(belief: BeliefState, bereitsGewaehlt: Set<VoiKandidat> = emptySet()): VoiKandidat? =
-        VoiSelektor.waehle(port.kandidaten(belief).filterNot { it in bereitsGewaehlt })
+    fun waehle(belief: BeliefState, bereitsGesammelt: Set<Beobachtung> = emptySet()): VoiKandidat? =
+        VoiSelektor.waehle(port.kandidaten(belief).filterNot { it.beobachtung in bereitsGesammelt })
 }

@@ -13,7 +13,6 @@ import dev.beliefagent.domain.eskalation.Budget
 import dev.beliefagent.domain.eskalation.Eskalation
 import dev.beliefagent.domain.eskalation.Eskalationsbedingung
 import dev.beliefagent.domain.eskalation.Eskalationsgrund
-import dev.beliefagent.domain.voi.VoiKandidat
 
 /**
  * Terminales Ergebnis des Entscheidungszyklus (`ARC-09`): genau **eines von drei**.
@@ -68,7 +67,7 @@ class Entscheidungszyklus(
         var belief = prior
         var restbudget = budget
         val gesammelt = mutableListOf<Beobachtung>()
-        val gewaehlt = mutableSetOf<VoiKandidat>() // verbrauchte Kandidaten -> keine Wiederholung
+        val bereitsGesammelt = mutableSetOf<Beobachtung>() // verbrauchte Beobachtungen -> keine Wiederholung
         while (true) {
             // 1. Gate (nicht umgehbar, LH-FA-POL-006): freigegeben -> handeln. Sonst
             //    die geschlossene Entscheidung als Domänen-GateEntscheidung festhalten.
@@ -87,7 +86,7 @@ class Entscheidungszyklus(
             //    wählen (LH-FA-VOI-001/002). Keine mehr -> erschöpft: eskalieren oder
             //    ablehnen (LH-FA-ESK-001). Der Ausschluss verhindert, dieselbe Beobachtung
             //    mehrfach zu zählen (Scheingewissheit, LH-FA-OBS-004).
-            val kandidat = beobachtungWaehlen.waehle(belief, gewaehlt)
+            val kandidat = beobachtungWaehlen.waehle(belief, bereitsGesammelt)
                 ?: return abschlussOhneBeobachtung(belief, gesammelt.toList(), gate)
             // beobachten -> Belief fortschreiben -> Budget verbrauchen -> Zyklus wiederholen.
             belief = beliefAktualisieren.ausfuehren(
@@ -95,7 +94,7 @@ class Entscheidungszyklus(
             ).belief
             restbudget = restbudget.verbrauche(kandidat.kosten)
             gesammelt += kandidat.beobachtung
-            gewaehlt += kandidat
+            bereitsGesammelt += kandidat.beobachtung
         }
     }
 

@@ -28,6 +28,11 @@ class BeobachtungWaehlenTest {
     private fun kandidat(diskriminierung: Double, kosten: Double) =
         VoiKandidat(beobachtung, diskriminierung, kosten)
 
+    private fun beobachtung(text: String) = Beobachtung(Quelle.TEST, Zeitstempel(1L), Evidenz(text))
+
+    private fun kandidat(beobachtung: Beobachtung, diskriminierung: Double, kosten: Double) =
+        VoiKandidat(beobachtung, diskriminierung, kosten)
+
     private fun port(vararg kandidaten: VoiKandidat) = object : BeobachtungsAuswahlPort {
         override fun kandidaten(belief: BeliefState): List<VoiKandidat> = kandidaten.toList()
     }
@@ -65,13 +70,26 @@ class BeobachtungWaehlenTest {
     }
 
     @Test
-    fun schliesst_bereits_gewaehlte_kandidaten_aus() { // Konsumption: keine Wiederholung (Scheingewissheit)
-        val a = kandidat(diskriminierung = 0.6, kosten = 1.0)
-        val b = kandidat(diskriminierung = 0.4, kosten = 1.0)
+    fun schliesst_bereits_gesammelte_beobachtungen_aus() { // Konsumption: keine Wiederholung (Scheingewissheit)
+        val beobachtungA = beobachtung("a")
+        val beobachtungB = beobachtung("b")
+        val a = kandidat(beobachtungA, diskriminierung = 0.6, kosten = 1.0)
+        val b = kandidat(beobachtungB, diskriminierung = 0.4, kosten = 1.0)
         val useCase = BeobachtungWaehlen(port(a, b))
         assertSame(a, useCase.waehle(belief))
-        assertSame(b, useCase.waehle(belief, bereitsGewaehlt = setOf(a)))
-        assertNull(useCase.waehle(belief, bereitsGewaehlt = setOf(a, b)))
+        assertSame(b, useCase.waehle(belief, bereitsGesammelt = setOf(beobachtungA)))
+        assertNull(useCase.waehle(belief, bereitsGesammelt = setOf(beobachtungA, beobachtungB)))
+    }
+
+    @Test
+    fun schliesst_beobachtung_auch_bei_geaendertem_score_aus() { // Review F-1 / LH-FA-OBS-004
+        val erneuteBeobachtung = beobachtung("gleiches evidenzstueck")
+        val alterScore = kandidat(erneuteBeobachtung, diskriminierung = 0.4, kosten = 1.0)
+        val neuerScore = kandidat(erneuteBeobachtung, diskriminierung = 0.9, kosten = 1.0)
+        val useCase = BeobachtungWaehlen(port(neuerScore))
+
+        assertSame(neuerScore, useCase.waehle(belief))
+        assertNull(useCase.waehle(belief, bereitsGesammelt = setOf(alterScore.beobachtung)))
     }
 
     @Test
