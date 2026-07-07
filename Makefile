@@ -65,4 +65,4 @@ cli-demo: ## Lauffaehiger CLI-Composition-Root gegen deterministische Adapter
 
 .PHONY: cli-demo-scenarios
 cli-demo-scenarios: ## CLI-Demo fuer handeln/eskalieren/ablehnen/sammeln
-	docker build --target cli-demo-scenarios -t $(IMAGE):cli-demo-scenarios .
+	docker build  --no-cache-filter cli-demo-scenarios --progress plain --target cli-demo-scenarios -t $(IMAGE):cli-demo-scenarios .

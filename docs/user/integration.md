@@ -112,6 +112,10 @@ executed=false
 executor_boundary=closed
 ```
 
+Für die vollständige Datenspur je Szenario (Inputwerte, Gate-Berechnungen,
+Sammelpfad und Ausführungsgrenze) siehe
+[`CLI-Entscheidungsnachweis`](./cli-entscheidungsnachweis.md).
+
 ## 3. Ports Implementieren
 
 Adapter binden an diese Ports:
