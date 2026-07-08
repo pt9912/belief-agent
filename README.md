@@ -12,9 +12,11 @@ weiß, wann er nicht genug weiß.**
 ## Was kann ich heute tun?
 
 **Stand:** Version [`v0.1.0`](version.md#aktuell) (in Entwicklung). Der
-Belief-Kern, der Entscheidungszyklus und ein netzfreier CLI-Composition-Root
-sind lauffaehig; echte Provider-/Approval-/Persistenzadapter bleiben
-Stabilisierungsarbeit.
+Belief-Kern, der Entscheidungszyklus, ein netzfreier CLI-Composition-Root und
+die Human-Approval-Kanäle (lokal + Remote/UI, fail-closed, mit append-only
+Approval-Audit) sind lauffaehig; echte LLM-Provideradapter
+(Aktionsvorschlag/Hypothesen) und dauerhafte Persistenz (Audit-DB, Konfidenz,
+Uhr) bleiben Stabilisierungsarbeit.
 
 - Lauffähiger **Belief-Kern** in `hexagon:domain` (Kotlin Multiplatform,
   HexSlice-Architektur): normierter Belief State mit Pflicht-Resthypothese,
@@ -25,6 +27,9 @@ Stabilisierungsarbeit.
   handelt: `terminal=eskaliert` und `terminal=abgelehnt` bleiben
   `executed=false`, während `sammelt-dann-handelt` erst Information sammelt
   und dann freigibt.
+- `make cli-demo-approval-local` und `make cli-demo-approval-remote-ui`
+  demonstrieren die Human-Approval-Kanäle; ohne Eingabe (EOF) bleiben sie
+  fail-closed (`executed=false`).
 - `make help` zeigt die Targets; `make build`/`make test` bauen/testen im Docker.
 - Lastenheft, Spezifikation, Architektur und Roadmap sind les- und
   navigierbar (siehe unten).
@@ -65,6 +70,7 @@ unter anderem aus:
 
 ```text
 scenario=eskaliert
+approval=fake
 terminal=eskaliert
 executed=false
 reason=GateEskalation
