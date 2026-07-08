@@ -1,6 +1,6 @@
 # Slice slice-039: Remote/UI-Approval-Kanal
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -21,22 +21,22 @@ eine kontext- und nonce-gebundene Antwort als menschliche Freigabe.
 
 ## 2. Definition of Done
 
-- [ ] Ein neuer Kanaladapter (z. B. `approval-remote-ui`) implementiert den in
+- [x] Ein neuer Kanaladapter (z. B. `approval-remote-ui`) implementiert den in
   `slice-038` definierten Kanalvertrag hinter `HumanApprovalPort`/Dispatcher:
   Anfrage-Serialisierung, Nonce/Kontext-Digest, Antwortvalidierung und
   Transportfehler sind testbar abstrahiert; ohne gueltige Antwort wird
   fail-closed verweigert (`LH-QA-02`, `LH-FA-POL-004`).
-- [ ] Remote/UI-Negativmatrix ist deterministisch und netzfrei getestet
+- [x] Remote/UI-Negativmatrix ist deterministisch und netzfrei getestet
   (`LH-QA-03`): Timeout/EOF, Transportfehler, unbekannte Identitaet, falsche
   Nonce, Kontext-Digest-Mismatch, Replay und doppelte Antwort fuehren zu keiner
   Freigabe; eine exakt passende Antwort gibt nur die konkrete Anfrage frei.
-- [ ] Build-/Arch-/Doku-Integration ist vollstaendig: neues Modul/Adapter in
+- [x] Build-/Arch-/Doku-Integration ist vollstaendig: neues Modul/Adapter in
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`/Coverage-Gate und
   Kanalwahl-Doku registriert; reale Netzwerk-/UI-Implementierung bleibt hinter
   einer abstrahierten Transportgrenze und wird nicht fuer lokale Gates benoetigt.
   Review-/Verification-Artefakte, `make doc-check`, `make gates` und
   Closure-Notiz liegen vor.
-- [ ] Der neue Kanal ist im bestehenden CLI-Composition-Root aus `slice-038`
+- [x] Der neue Kanal ist im bestehenden CLI-Composition-Root aus `slice-038`
   bewusst auswählbar: `adapters/inbound/cli` bindet den Outbound-Adapter als
   weiteren Kanal an den Dispatcher, genau ein Kanal wird pro `ApprovalAnfrage`
   aufgerufen, unbekannte/fehlende Bindings bleiben fail-closed, und die
@@ -96,7 +96,28 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-08. Implementiert wurde
+`adapters:outbound:approval-remote-ui` als hermetisch testbarer Remote/UI-
+Kanal hinter `HumanApprovalPort`: Anfrage, Nonce, Kontext-Digest und
+serialisierte Payload werden an eine abstrakte Transportgrenze uebergeben;
+Freigabe entsteht nur bei genau einer passenden Antwort mit erlaubter
+Identitaet, korrekter Nonce, passendem Digest und `FREIGEBEN`.
+
+Der Kanal ist im CLI-Composition-Root aus `slice-038` explizit als
+`approval=remote-ui` waehlbar. Der lokale Default-Transport bleibt netzfrei und
+liefert keine Antwort, dadurch endet der Demo-Pfad fail-closed mit
+`terminal=eskaliert`, `executed=false` und geschlossener Executor-Grenze. Der
+Core-Port und `hexagon/application/.../gaten/ports` blieben unveraendert; die
+neue Architektur-Kante ist ausschliesslich
+`inbound_cli -> outbound_approval_remote_ui`.
+
+Review/Verification: Plan- und Design-Review lagen vor; Code-/Safety-Review
+meldete keine Findings; Verification meldete keine DoD-Verletzung und keine
+Carveouts.
+
+Ausgefuehrte Sensors: `make test`, `git diff --check`, `make doc-check`,
+`make cli-demo-approval-remote-ui`, `make gates`. Finale Closure-Sensors:
+`make doc-check`, `make gates`.
 
 ## 8. Sub-Area-Modus-Begründung
 
