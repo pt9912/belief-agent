@@ -29,15 +29,15 @@ Approval-Audit-Persistenz (`slice-040`), persistenter AuditPort-Adapter
 (`slice-041`), echter Aktionsvorschlags-Provider-Adapter (`slice-042`),
 Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`), echte
 Hypothesen-Provider-Adapter (`slice-044`), echter BeobachtungsAuswahl-Adapter
-(`slice-045`), persistenter KonfidenzPort-Adapter (`slice-046`), echte
-Ausfuehrungsadapter fuer das CLI-Bundle und
+(`slice-045`), persistenter KonfidenzPort-Adapter (`slice-046`), echter
+UhrPort-Systemadapter (`slice-047`), echte Ausfuehrungsadapter fuer das CLI-Bundle und
 provider-spezifische LLM-Konfiguration.
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → persistenter AuditPort-Adapter (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echter BeobachtungsAuswahl-Adapter (`slice-045`) → persistenter KonfidenzPort-Adapter (`slice-046`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → persistenter AuditPort-Adapter (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echter BeobachtungsAuswahl-Adapter (`slice-045`) → persistenter KonfidenzPort-Adapter (`slice-046`) → echter UhrPort-Systemadapter (`slice-047`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
 
 ## Meilensteine
 
@@ -153,3 +153,4 @@ flowchart LR
 | 2026-07-08 | `slice-044` in `open/` geplant: LLM-Hypothesen-Provider-Adapter | Folgeslice zu `slice-025`/`slice-026`: ein echter, lokal testbarer Provider-/Framework-Adapter implementiert `HypothesenPort` mit strengem Kandidaten-Schema. Likelihood-Port, Aktionsvorschlaege, CLI-Default-Binding, Live-Secrets und produktive Provider-Konfiguration bleiben getrennt. |
 | 2026-07-08 | `slice-045` in `open/` geplant: realer BeobachtungsAuswahlPort-Adapter | Folgeslice zu `slice-016`/`slice-020`: ein echter, lokal testbarer Adapter liefert `VoiKandidat`en aus strukturierten Beobachtungs-/Kandidaten-Eingaben. Auswahl bleibt im `VoiSelektor`; Adapter-zu-Adapter-Kopplung, CLI-/Example-Binding und Live-Quellen bleiben getrennt. |
 | 2026-07-08 | `slice-046` in `open/` geplant: persistenter KonfidenzPort-Adapter | Folgeslice zu `slice-022`/`slice-027`/`slice-028`: ein echter nicht-Memory-Adapter speichert externalisierte Modell-Konfidenzen append-only und restart-fest. CLI-Default-Binding, allgemeine Audit-Datenbank, Retention und Migration bleiben getrennt. |
+| 2026-07-08 | `slice-047` in `open/` geplant: echter UhrPort-Systemadapter | Folgeslice zu `slice-009`: ein echter Systemzeitadapter implementiert `UhrPort` mit monoton nicht-fallenden `Zeitstempel`n. CLI-/Runtime-Default-Binding, Demo-Zeitpolitik, externe Zeitdienste und Zeitzonenformatierung bleiben getrennt. |
