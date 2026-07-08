@@ -81,3 +81,7 @@ cli-demo: ## Lauffaehiger CLI-Composition-Root gegen deterministische Adapter
 .PHONY: cli-demo-scenarios
 cli-demo-scenarios: ## CLI-Demo fuer handeln/eskalieren/ablehnen/sammeln
 	docker build  --no-cache-filter cli-demo-scenarios --progress plain --target cli-demo-scenarios -t $(IMAGE):cli-demo-scenarios .
+
+.PHONY: cli-demo-approval-local
+cli-demo-approval-local: ## CLI-Demo fuer lokalen Approval-Kanal (EOF fail-closed)
+	docker build --no-cache-filter cli-demo-approval-local --progress plain --target cli-demo-approval-local -t $(IMAGE):cli-demo-approval-local .

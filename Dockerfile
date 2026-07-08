@@ -87,6 +87,10 @@ RUN gradle --no-daemon --console=plain :adapters:inbound:cli:run
 FROM build AS cli-demo-scenarios
 RUN gradle --no-daemon --console=plain :adapters:inbound:cli:run --args='all'
 
+# --- cli-demo-approval-local: lokaler Approval-Kanal, EOF bleibt fail-closed -
+FROM build AS cli-demo-approval-local
+RUN gradle --no-daemon --console=plain :adapters:inbound:cli:run --args='eskaliert approval=local'
+
 # --- example-langchain: lauffaehiges Integrationsbeispiel -------------------
 FROM build AS example-langchain
 RUN gradle --no-daemon --console=plain :example:langchain:run

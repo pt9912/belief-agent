@@ -119,7 +119,7 @@ Sammelpfad und Ausführungsgrenze) siehe
 Der CLI-Root kann den Approval-Adapter bewusst waehlen:
 
 ```sh
-./gradlew :adapters:inbound:cli:run --args='eskaliert approval=local'
+make cli-demo-approval-local
 ```
 
 Ohne `approval=local` bleiben die Szenarien bei ihrer expliziten

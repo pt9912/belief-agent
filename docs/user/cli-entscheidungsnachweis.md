@@ -171,7 +171,7 @@ und exakter Bestaetigung `FREIGEBEN` gibt die Anfrage frei.
 ## 3. Reproduzierbarkeit
 
 - `make cli-demo` (zeigt nur `scenario=gehandelt`/positivpfad).
-- `make cli-demo-szenarios` (zeigt alle vier Szenarien inklusive `executed=false` bei
+- `make cli-demo-scenarios` (zeigt alle vier Szenarien inklusive `executed=false` bei
   eskalierten/abgelehnten Fällen).
 - `make cli-demo-scenarios`-Ausgabe enthält die Daten exakt in den Feldern
   `scenario`, `terminal`, `executed`, `reason`, `executor_boundary`,
