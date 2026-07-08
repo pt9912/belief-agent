@@ -1,6 +1,6 @@
 # Integration — belief-agent
 
-**Status:** v0, intern. **Letzte Änderung:** 2026-07-07.
+**Status:** v0, intern. **Letzte Änderung:** 2026-07-08.
 
 Diese Seite beschreibt, wie der aktuell vorhandene Core von `belief-agent` in
 einem Kotlin-Multiplatform-Build eingebaut wird. Sie ist kein Release- oder
@@ -547,8 +547,8 @@ Diese Punkte sind bewusst noch nicht als Nutzervertrag festgelegt:
 - Artefakt-Koordinaten und Release-Prozess.
 - Provider-spezifische LLM-Composition mit API-Key-/Modell-Konfiguration und
   echte externe Provider-Bindungen.
-- Echter Approval-Adapter mit einmaliger, an den Entscheidungskontext gebundener
-  Freigabe.
+- Produktives CLI-/Remote-/UI-Binding des lokalen Approval-Adapters samt
+  persistentem Approval-Audit.
 - Dauerhafte Audit-Persistenz.
 
 Die Spezifikation markiert externe Port-Vertraege derzeit als `v0 (intern)`.
