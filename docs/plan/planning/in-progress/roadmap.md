@@ -28,14 +28,15 @@ Approval-Kanalwahl (`slice-038`), Remote/UI-Approval-Kanal (`slice-039`),
 Approval-Audit-Persistenz (`slice-040`), dauerhafte Audit-Datenbank
 (`slice-041`), echter Aktionsvorschlags-Provider-Adapter (`slice-042`),
 Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`), echte
-Hypothesen-Provider-Adapter (`slice-044`), echte Ausfuehrungsadapter fuer das CLI-Bundle und
+Hypothesen-Provider-Adapter (`slice-044`), echter BeobachtungsAuswahl-Adapter
+(`slice-045`), echte Ausfuehrungsadapter fuer das CLI-Bundle und
 provider-spezifische LLM-Konfiguration.
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → dauerhafte Audit-Datenbank (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → dauerhafte Audit-Datenbank (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echter BeobachtungsAuswahl-Adapter (`slice-045`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
 
 ## Meilensteine
 
@@ -149,3 +150,4 @@ flowchart LR
 | 2026-07-08 | `slice-042` in `open/` geplant: LLM-Aktionsvorschlag-Provider-Adapter | Folgeslice zu `slice-023`/`slice-019`: ein echter, lokal testbarer Provider-/Framework-Adapter implementiert `AktionsVorschlagsPort` mit strengem JSON-Schema. CLI-Default-Binding, Live-Provider-Secrets, Gate/Freigabe und Aktionsausfuehrung bleiben getrennt. |
 | 2026-07-08 | `slice-043` in `open/` geplant: Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege | Folgeslice zu `slice-042`: der nach dem ersten Providerpfad fehlende Koog- oder LangChain4j-Adapter wird ergaenzt und beide Framework-Pfade werden gegen dieselbe Contract-Matrix verifiziert. CLI-Default-Binding, Live-Secrets, Approval und Ausfuehrung bleiben getrennt. |
 | 2026-07-08 | `slice-044` in `open/` geplant: LLM-Hypothesen-Provider-Adapter | Folgeslice zu `slice-025`/`slice-026`: ein echter, lokal testbarer Provider-/Framework-Adapter implementiert `HypothesenPort` mit strengem Kandidaten-Schema. Likelihood-Port, Aktionsvorschlaege, CLI-Default-Binding, Live-Secrets und produktive Provider-Konfiguration bleiben getrennt. |
+| 2026-07-08 | `slice-045` in `open/` geplant: realer BeobachtungsAuswahlPort-Adapter | Folgeslice zu `slice-016`/`slice-020`: ein echter, lokal testbarer Adapter liefert `VoiKandidat`en aus strukturierten Beobachtungs-/Kandidaten-Eingaben. Auswahl bleibt im `VoiSelektor`; Adapter-zu-Adapter-Kopplung, CLI-/Example-Binding und Live-Quellen bleiben getrennt. |
