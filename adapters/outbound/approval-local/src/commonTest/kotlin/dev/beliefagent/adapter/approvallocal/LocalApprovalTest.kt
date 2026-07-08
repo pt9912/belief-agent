@@ -55,8 +55,11 @@ class LocalApprovalTest {
         val store = InMemoryApprovalNonceStore()
         val approval = approval(store = store) { passendeAntwort(it) }
 
-        assertTrue(approval.freigegeben(anfrage()))
-        assertFalse(approval.freigegeben(anfrage()), "Nonce darf nicht wiederverwendet werden")
+        val ergebnis = approval.entscheide(anfrage())
+        assertTrue(ergebnis.istFreigegeben())
+        assertEquals(LocalApproval.KANAL, ergebnis.audit.kanal)
+        assertEquals("alice", ergebnis.audit.identitaetsReferenz)
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben(), "Nonce darf nicht wiederverwendet werden")
     }
 
     @Test
@@ -65,7 +68,7 @@ class LocalApprovalTest {
             passendeAntwort(challenge).copy(nonce = "andere-nonce")
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -74,7 +77,7 @@ class LocalApprovalTest {
             passendeAntwort(challenge).copy(identitaet = " ")
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -83,14 +86,14 @@ class LocalApprovalTest {
             passendeAntwort(challenge).copy(kontextDigest = "anderer-kontext")
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
     fun eof_oder_abbruch_verweigert_fail_closed() {
         val approval = approval { null }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -99,7 +102,7 @@ class LocalApprovalTest {
             passendeAntwort(challenge).copy(bestaetigung = "ja")
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -120,7 +123,7 @@ class LocalApprovalTest {
             ausgabe = ApprovalAusgabe { challenges += it },
         )
 
-        assertTrue(approval.freigegeben(anfrage()))
+        assertTrue(approval.entscheide(anfrage()).istFreigegeben())
 
         val challenge = challenges.single()
         assertEquals("nonce-1", challenge.nonce.wert)

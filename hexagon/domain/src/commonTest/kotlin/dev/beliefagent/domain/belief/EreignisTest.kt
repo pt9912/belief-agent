@@ -27,11 +27,15 @@ class EreignisTest {
             AktionVorgeschlagen(t, "Deploy"),
             GateAbgelehnt(t, "Konfidenz unter Schwelle"),
             EskalationAngefordert(t, "Resthypothese hoch"),
+            ApprovalAngefragt(t, "digest-1", "remote-ui", "nonce-1"),
+            ApprovalErteilt(t, "digest-1", "remote-ui", "nonce-1", "antwort-1", "operator", "freigegeben"),
+            ApprovalVerweigert(t, "digest-1", "remote-ui", "nonce-1", "antwort-2", "operator", "digest-mismatch"),
+            ApprovalFehler(t, "digest-1", "remote-ui", "nonce-1", null, null, "transport-fehler"),
             KonfidenzExternalisiert(t, "llm:aktion:1", 0.7, "llm-action", 1),
             KonfidenzUeberschrieben(t, "llm:aktion:1", 0.7, 0.5, "Golden-Set-Korrektur", 2),
         )
 
-        assertEquals(8, ereignisse.size)
+        assertEquals(12, ereignisse.size)
     }
 
     @Test

@@ -14,6 +14,7 @@ kotlin {
 dependencies {
     implementation(project(":hexagon:domain"))
     implementation(project(":hexagon:application"))
+    implementation(project(":adapters:outbound:audit-memory"))
     implementation(project(":adapters:outbound:llm-langchain4j"))
     runtimeOnly("dev.langchain4j:langchain4j:1.17.1")
 }

@@ -3,9 +3,13 @@ package dev.beliefagent.adapter.approval
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.Aktionsfreigabe
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.aktualisieren.ports.UhrPort
+import dev.beliefagent.application.ports.AuditPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
+import dev.beliefagent.domain.belief.Ereignis
+import dev.beliefagent.domain.belief.EreignisProtokoll
 import dev.beliefagent.domain.belief.Erfolgswahrscheinlichkeit
 import dev.beliefagent.domain.belief.Evidenz
 import dev.beliefagent.domain.belief.Hypothese
@@ -36,19 +40,38 @@ class FakeApprovalTest {
 
     @Test
     fun default_verweigert_freigabe() { // fail-safe
-        assertFalse(FakeApproval().freigegeben(anfrage()))
+        assertFalse(FakeApproval().entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
     fun konfiguriert_freigegeben() {
-        assertTrue(FakeApproval(freigabe = true).freigegeben(anfrage()))
+        assertTrue(FakeApproval(freigabe = true).entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
     fun e2e_extern_wirksam_nur_mit_freigabe_frei() { // LH-FA-POL-004/006 (E2E gegen echten Fake-Adapter)
         val aktion = aktion(0.95)
         val belief = belief(0.1)
-        assertTrue(AktionGaten(FakeApproval(freigabe = false)).pruefe(aktion, belief) is Aktionsfreigabe.Eskaliert)
-        assertTrue(AktionGaten(FakeApproval(freigabe = true)).pruefe(aktion, belief) is Aktionsfreigabe.Freigegeben)
+        assertTrue(gaten(FakeApproval(freigabe = false)).pruefe(aktion, belief) is Aktionsfreigabe.Eskaliert)
+        assertTrue(gaten(FakeApproval(freigabe = true)).pruefe(aktion, belief) is Aktionsfreigabe.Freigegeben)
+    }
+
+    private fun gaten(approval: FakeApproval): AktionGaten =
+        AktionGaten(approval, SpeichernderAuditPort(), FakeUhr())
+
+    private class SpeichernderAuditPort : AuditPort {
+        private var protokoll = EreignisProtokoll.LEER
+
+        override fun anhaengen(ereignis: Ereignis) {
+            protokoll = protokoll.append(ereignis)
+        }
+
+        override fun lade(): EreignisProtokoll = protokoll
+    }
+
+    private class FakeUhr : UhrPort {
+        private var naechster = 1L
+
+        override fun jetzt(): Zeitstempel = Zeitstempel(naechster++)
     }
 }

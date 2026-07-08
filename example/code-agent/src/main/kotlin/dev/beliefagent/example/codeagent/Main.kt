@@ -25,6 +25,9 @@ import dev.beliefagent.application.belief.entscheidungszyklus.Konfidenzgebundene
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditKontextDigestBerechner
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.application.belief.ports.KonfidenzPort
 import dev.beliefagent.application.ports.AuditPort
@@ -111,7 +114,7 @@ private fun runCodeAgentUnsafe(env: Map<String, String?>, print: (String) -> Uni
     val entscheideZyklus = Entscheidungszyklus(
         BeobachtungWaehlen(voePort),
         beliefAktualisieren,
-        AktionGaten(StaticApproval(approvalFreigegeben)),
+        AktionGaten(StaticApproval(approvalFreigegeben), audit, uhr),
     )
     val konfidenzEntscheidungsZyklus = KonfidenzgebundenerEntscheidungszyklus(entscheideZyklus, konfidenzPort)
     val controller = CodeAgentController(
@@ -282,7 +285,19 @@ private class StaticHypothesenPort : HypothesenPort {
 }
 
 private class StaticApproval(private val freigabe: Boolean) : HumanApprovalPort {
-    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean = freigabe
+    private val digestBerechner = ApprovalAuditKontextDigestBerechner()
+
+    override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis {
+        val snapshot = ApprovalAuditSnapshot(
+            anfrageKontextDigest = digestBerechner.digest(anfrage),
+            kanal = "code-agent",
+            nonceReferenz = "code-agent-static",
+            antwortReferenz = "code-agent-static-response",
+            identitaetsReferenz = "code-agent-operator",
+            ergebnisGrund = if (freigabe) "freigegeben" else "verweigert",
+        )
+        return if (freigabe) ApprovalErgebnis.freigegeben(snapshot) else ApprovalErgebnis.verweigert(snapshot)
+    }
 }
 
 private class MonotoneDemoClock(start: Long = 1L) : UhrPort {

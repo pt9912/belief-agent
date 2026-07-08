@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Keine aktive Welle. **Letzte Änderung:** 2026-07-08.
+**Status:** welle-05-llm-port Stabilisierung in progress. **Letzte Änderung:** 2026-07-08.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,8 +10,8 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-Keine aktive Welle. `slice-039` ist abgeschlossen; naechster geplanter Slice:
-[`slice-040-approval-audit-persistenz`](../open/slice-040-approval-audit-persistenz.md).
+`slice-040-approval-audit-persistenz` ist in Umsetzung:
+[`slice-040-approval-audit-persistenz`](./slice-040-approval-audit-persistenz.md).
 
 `slice-039` ist als hermetisch testbarer Remote/UI-Approval-Kanal auf `done/`
 abgeschlossen

@@ -15,7 +15,13 @@ import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalTransport
 import dev.beliefagent.adapter.approvalremoteui.RemoteUiApproval
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditKontextDigestBerechner
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
+import dev.beliefagent.domain.belief.ApprovalAngefragt
+import dev.beliefagent.domain.belief.ApprovalErteilt
+import dev.beliefagent.domain.belief.ApprovalFehler
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -151,6 +157,8 @@ class CliRuntimeE2eTest {
         assertTrue(ergebnis.sichtbareAusgabe.contains("executed=true"))
         assertTrue(ergebnis.sichtbareAusgabe.contains("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion"))
         assertEquals(listOf(gehandelt.freigabe.aktion), runtime.ausgefuehrteAktionen())
+        assertTrue(runtime.auditEreignisse().any { it is ApprovalAngefragt && it.kanal == "local" })
+        assertTrue(runtime.auditEreignisse().any { it is ApprovalErteilt && it.kanal == "local" })
     }
 
     @Test
@@ -258,6 +266,7 @@ class CliRuntimeE2eTest {
         assertTrue(ergebnis.sichtbareAusgabe.contains("approval=remote-ui"))
         assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
         assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
+        assertTrue(runtime.auditEreignisse().any { it is ApprovalFehler && it.kanal == "remote-ui" })
     }
 
     @Test
@@ -288,7 +297,7 @@ class CliRuntimeE2eTest {
                     kanal = CliApprovalKanalName.LOCAL,
                     kanaele = mapOf(
                         CliApprovalKanalName.LOCAL to object : HumanApprovalPort {
-                            override fun freigegeben(anfrage: ApprovalAnfrage): Boolean =
+                            override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis =
                                 error("approval channel failed")
                         },
                     ),
@@ -370,9 +379,21 @@ class CliRuntimeE2eTest {
         var aufrufe = 0
             private set
 
-        override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
+        override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis {
             aufrufe += 1
-            return freigegeben
+            val snapshot = ApprovalAuditSnapshot(
+                anfrageKontextDigest = digestBerechner.digest(anfrage),
+                kanal = "zaehler",
+                nonceReferenz = "zaehler-nonce",
+                antwortReferenz = "zaehler-response",
+                identitaetsReferenz = "zaehler-operator",
+                ergebnisGrund = if (freigegeben) "freigegeben" else "verweigert",
+            )
+            return if (freigegeben) ApprovalErgebnis.freigegeben(snapshot) else ApprovalErgebnis.verweigert(snapshot)
         }
+    }
+
+    companion object {
+        private val digestBerechner = ApprovalAuditKontextDigestBerechner()
     }
 }

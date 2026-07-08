@@ -1,10 +1,20 @@
 package dev.beliefagent.application.belief.gaten
 
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditKontextDigestBerechner
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
+import dev.beliefagent.application.belief.aktualisieren.ports.UhrPort
+import dev.beliefagent.application.ports.AuditPort
 import dev.beliefagent.domain.belief.Aktion
+import dev.beliefagent.domain.belief.ApprovalAngefragt
+import dev.beliefagent.domain.belief.ApprovalErteilt
+import dev.beliefagent.domain.belief.ApprovalVerweigert
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
+import dev.beliefagent.domain.belief.Ereignis
+import dev.beliefagent.domain.belief.EreignisProtokoll
 import dev.beliefagent.domain.belief.Erfolgswahrscheinlichkeit
 import dev.beliefagent.domain.belief.Evidenz
 import dev.beliefagent.domain.belief.Hypothese
@@ -32,15 +42,24 @@ class AktionGatenTest {
     )
 
     private fun approval(ja: Boolean) = object : HumanApprovalPort {
-        override fun freigegeben(anfrage: ApprovalAnfrage) = ja
+        override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis =
+            if (ja) {
+                ApprovalErgebnis.freigegeben(snapshot(anfrage, "freigegeben"))
+            } else {
+                ApprovalErgebnis.verweigert(snapshot(anfrage, "verweigert"))
+            }
     }
 
     private class RecordingApproval(private val ja: Boolean) : HumanApprovalPort {
         val anfragen = mutableListOf<ApprovalAnfrage>()
 
-        override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
+        override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis {
             anfragen += anfrage
-            return ja
+            return if (ja) {
+                ApprovalErgebnis.freigegeben(snapshot(anfrage, "freigegeben"))
+            } else {
+                ApprovalErgebnis.verweigert(snapshot(anfrage, "verweigert"))
+            }
         }
     }
 
@@ -49,21 +68,21 @@ class AktionGatenTest {
         // Niedrige Erfolgs-P -> Gate lehnt ab; aktion-gaten hebt das NICHT zur Freigabe an.
         val approval = RecordingApproval(ja = true)
         assertTrue(
-            AktionGaten(approval).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.1), belief(0.1)) is Aktionsfreigabe.Abgelehnt,
+            gaten(approval).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.1), belief(0.1)) is Aktionsfreigabe.Abgelehnt,
         )
         assertEquals(0, approval.anfragen.size)
     }
 
     @Test
     fun irreversibel_ohne_freigabe_wird_eskaliert() { // LH-FA-POL-004
-        val e = AktionGaten(approval(false)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.1))
+        val e = gaten(approval(false)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.1))
         assertTrue(e is Aktionsfreigabe.Eskaliert && "LH-FA-POL-004" in e.grund)
     }
 
     @Test
     fun irreversibel_mit_freigabe_wird_freigegeben() { // LH-FA-POL-004
         assertTrue(
-            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.1)) is Aktionsfreigabe.Freigegeben,
+            gaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.1)) is Aktionsfreigabe.Freigegeben,
         )
     }
 
@@ -73,7 +92,7 @@ class AktionGatenTest {
         val aktion = aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95)
         val belief = belief(0.1)
 
-        assertTrue(AktionGaten(approval).pruefe(aktion, belief) is Aktionsfreigabe.Freigegeben)
+        assertTrue(gaten(approval).pruefe(aktion, belief) is Aktionsfreigabe.Freigegeben)
 
         assertEquals(1, approval.anfragen.size)
         assertEquals(aktion, approval.anfragen.single().aktion)
@@ -85,7 +104,7 @@ class AktionGatenTest {
     fun reversible_freigabe_braucht_keine_menschliche_freigabe() {
         // repository-wirksam ist reversibel -> Freigegeben ohne Approval.
         assertTrue(
-            AktionGaten(approval(false)).pruefe(aktion(Wirkungsklasse.REPOSITORY_WIRKSAM, 0.9), belief(0.1)) is Aktionsfreigabe.Freigegeben,
+            gaten(approval(false)).pruefe(aktion(Wirkungsklasse.REPOSITORY_WIRKSAM, 0.9), belief(0.1)) is Aktionsfreigabe.Freigegeben,
         )
     }
 
@@ -94,8 +113,95 @@ class AktionGatenTest {
         // extern-wirksam + hohe Resthypothese -> Gate eskaliert; Approval ändert nichts.
         val approval = RecordingApproval(ja = true)
         assertTrue(
-            AktionGaten(approval).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.6)) is Aktionsfreigabe.Eskaliert,
+            gaten(approval).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.6)) is Aktionsfreigabe.Eskaliert,
         )
         assertEquals(0, approval.anfragen.size)
+    }
+
+    @Test
+    fun approval_audit_spur_wird_append_only_in_reihenfolge_geschrieben() {
+        val audit = SpeichernderAuditPort()
+
+        val ergebnis = gaten(approval(true), audit).pruefe(
+            aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95),
+            belief(0.1),
+        )
+
+        assertTrue(ergebnis is Aktionsfreigabe.Freigegeben)
+        assertEquals(2, audit.ereignisse.size)
+        assertTrue(audit.ereignisse[0] is ApprovalAngefragt)
+        assertTrue(audit.ereignisse[1] is ApprovalErteilt)
+        assertEquals(1L, audit.ereignisse[0].zeitstempel.epochMillis)
+        assertEquals(2L, audit.ereignisse[1].zeitstempel.epochMillis)
+        assertEquals(audit.ereignisse, audit.lade().ereignisse)
+    }
+
+    @Test
+    fun verweigerte_freigabe_bleibt_auditierbar() {
+        val audit = SpeichernderAuditPort()
+
+        val ergebnis = gaten(approval(false), audit).pruefe(
+            aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95),
+            belief(0.1),
+        )
+
+        assertTrue(ergebnis is Aktionsfreigabe.Eskaliert)
+        assertEquals(2, audit.ereignisse.size)
+        assertTrue(audit.ereignisse[0] is ApprovalAngefragt)
+        assertTrue(audit.ereignisse[1] is ApprovalVerweigert)
+    }
+
+    @Test
+    fun audit_ausfall_fuer_extern_wirksame_aktion_bleibt_fail_closed() {
+        val ergebnis = gaten(approval(true), FehlernderAuditPort()).pruefe(
+            aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95),
+            belief(0.1),
+        )
+
+        assertTrue(ergebnis is Aktionsfreigabe.Eskaliert)
+        assertTrue("Approval-Audit" in ergebnis.grund)
+    }
+
+    private fun gaten(
+        approval: HumanApprovalPort,
+        audit: AuditPort = SpeichernderAuditPort(),
+    ): AktionGaten = AktionGaten(approval, audit, FakeUhr())
+
+    private class SpeichernderAuditPort : AuditPort {
+        val ereignisse = mutableListOf<Ereignis>()
+
+        override fun anhaengen(ereignis: Ereignis) {
+            ereignisse += ereignis
+        }
+
+        override fun lade(): EreignisProtokoll = EreignisProtokoll.von(ereignisse)
+    }
+
+    private class FehlernderAuditPort : AuditPort {
+        override fun anhaengen(ereignis: Ereignis) {
+            error("audit failed")
+        }
+
+        override fun lade(): EreignisProtokoll = EreignisProtokoll.LEER
+    }
+
+    private class FakeUhr : UhrPort {
+        private var naechster = 1L
+
+        override fun jetzt(): Zeitstempel = Zeitstempel(naechster++)
+    }
+
+    companion object {
+        private val digestBerechner = ApprovalAuditKontextDigestBerechner()
+
+        private fun snapshot(anfrage: ApprovalAnfrage, grund: String): ApprovalAuditSnapshot =
+            ApprovalAuditSnapshot(
+                anfrageKontextDigest = digestBerechner.digest(anfrage),
+                kanal = "test",
+                nonceReferenz = "test-nonce",
+                antwortReferenz = "test-response",
+                identitaetsReferenz = "test-operator",
+                ergebnisGrund = grund,
+            )
     }
 }

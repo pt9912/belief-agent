@@ -1,6 +1,8 @@
 package dev.beliefagent.adapter.approvallocal
 
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
@@ -66,7 +68,7 @@ class LocalApproval(
     private val digestBerechner: ApprovalKontextDigestBerechner = ApprovalKontextDigestBerechner(),
 ) : HumanApprovalPort {
 
-    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
+    override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis {
         val nonce = nonceQuelle.naechsteNonce()
         val digest = digestBerechner.digest(anfrage)
         val challenge = ApprovalChallenge(
@@ -76,17 +78,80 @@ class LocalApproval(
             text = render(anfrage, nonce, digest),
         )
 
-        ausgabe.schreibe(challenge)
-        val antwort = eingabe.lese(challenge) ?: return false
+        try {
+            ausgabe.schreibe(challenge)
+        } catch (_: Exception) {
+            return fehler(digest, nonce, null, null, "ausgabe-fehler")
+        }
+        val antwort = try {
+            eingabe.lese(challenge)
+        } catch (_: Exception) {
+            return fehler(digest, nonce, null, null, "eingabe-fehler")
+        } ?: return verweigert(digest, nonce, null, null, "keine-antwort")
 
-        if (antwort.nonce != nonce.wert) return false
-        if (antwort.identitaet.isBlank()) return false
-        if (antwort.kontextDigest != digest.wert) return false
-        if (antwort.bestaetigung != BESTAETIGUNG) return false
-        if (!nonceStore.verbrauche(nonce)) return false
+        if (antwort.nonce != nonce.wert) return verweigert(digest, nonce, antwort, "falsche-nonce")
+        if (antwort.identitaet.isBlank()) return verweigert(digest, nonce, antwort, "leere-identitaet")
+        if (antwort.kontextDigest != digest.wert) return verweigert(digest, nonce, antwort, "digest-mismatch")
+        if (antwort.bestaetigung != BESTAETIGUNG) return verweigert(digest, nonce, antwort, "bestaetigung-fehlt")
+        if (!nonceStore.verbrauche(nonce)) return verweigert(digest, nonce, antwort, "nonce-replay")
 
-        return true
+        return ApprovalErgebnis.freigegeben(snapshot(digest, nonce, antwort, "freigegeben"))
     }
+
+    private fun verweigert(
+        digest: ApprovalKontextDigest,
+        nonce: ApprovalNonce,
+        antwort: ApprovalAntwort?,
+        grund: String,
+    ): ApprovalErgebnis = ApprovalErgebnis.verweigert(snapshot(digest, nonce, antwort, grund))
+
+    private fun verweigert(
+        digest: ApprovalKontextDigest,
+        nonce: ApprovalNonce,
+        antwortReferenz: String?,
+        identitaetsReferenz: String?,
+        grund: String,
+    ): ApprovalErgebnis = ApprovalErgebnis.verweigert(
+        snapshot(digest, nonce, antwortReferenz, identitaetsReferenz, grund),
+    )
+
+    private fun fehler(
+        digest: ApprovalKontextDigest,
+        nonce: ApprovalNonce,
+        antwortReferenz: String?,
+        identitaetsReferenz: String?,
+        grund: String,
+    ): ApprovalErgebnis = ApprovalErgebnis.fehler(
+        snapshot(digest, nonce, antwortReferenz, identitaetsReferenz, grund),
+    )
+
+    private fun snapshot(
+        digest: ApprovalKontextDigest,
+        nonce: ApprovalNonce,
+        antwort: ApprovalAntwort?,
+        grund: String,
+    ): ApprovalAuditSnapshot = snapshot(
+        digest = digest,
+        nonce = nonce,
+        antwortReferenz = antwort?.nonce?.let { "local-response:$it" },
+        identitaetsReferenz = antwort?.identitaet?.takeIf { it.isNotBlank() },
+        grund = grund,
+    )
+
+    private fun snapshot(
+        digest: ApprovalKontextDigest,
+        nonce: ApprovalNonce,
+        antwortReferenz: String?,
+        identitaetsReferenz: String?,
+        grund: String,
+    ): ApprovalAuditSnapshot = ApprovalAuditSnapshot(
+        anfrageKontextDigest = digest.wert,
+        kanal = KANAL,
+        nonceReferenz = "local:${nonce.wert}",
+        antwortReferenz = antwortReferenz,
+        identitaetsReferenz = identitaetsReferenz,
+        ergebnisGrund = grund,
+    )
 
     private fun render(
         anfrage: ApprovalAnfrage,
@@ -105,6 +170,7 @@ class LocalApproval(
 
     companion object {
         const val BESTAETIGUNG: String = "FREIGEBEN"
+        const val KANAL: String = "local"
     }
 }
 

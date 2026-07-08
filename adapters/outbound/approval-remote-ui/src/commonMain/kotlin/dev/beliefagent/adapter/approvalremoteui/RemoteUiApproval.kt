@@ -1,6 +1,8 @@
 package dev.beliefagent.adapter.approvalremoteui
 
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
@@ -74,7 +76,7 @@ class RemoteUiApproval(
         require(erlaubteIdentitaeten.none { it.isBlank() }) { "Remote-Approval-Identitaeten duerfen nicht leer sein" }
     }
 
-    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
+    override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis {
         val nonce = nonceQuelle.naechsteNonce()
         val digest = digestBerechner.digest(anfrage)
         val auftrag = RemoteApprovalAuftrag(
@@ -92,22 +94,79 @@ class RemoteUiApproval(
         val antworten = try {
             transport.frage(auftrag)
         } catch (_: Exception) {
-            return false
+            return fehler(digest, nonce, null, null, "transport-fehler")
         }
-        if (antworten.size != 1) return false
+        if (antworten.isEmpty()) return verweigert(digest, nonce, null, null, "keine-antwort")
+        if (antworten.size != 1) return verweigert(digest, nonce, "remote-response-count:${antworten.size}", null, "mehrfachantwort")
 
         val antwort = antworten.single()
-        if (antwort.nonce != nonce.wert) return false
-        if (antwort.identitaet !in erlaubteIdentitaeten) return false
-        if (antwort.kontextDigest != digest.wert) return false
-        if (antwort.bestaetigung != BESTAETIGUNG) return false
-        if (!nonceStore.verbrauche(nonce)) return false
+        if (antwort.nonce != nonce.wert) return verweigert(digest, nonce, antwort, "falsche-nonce")
+        if (antwort.identitaet !in erlaubteIdentitaeten) return verweigert(digest, nonce, antwort, "unbekannte-identitaet")
+        if (antwort.kontextDigest != digest.wert) return verweigert(digest, nonce, antwort, "digest-mismatch")
+        if (antwort.bestaetigung != BESTAETIGUNG) return verweigert(digest, nonce, antwort, "bestaetigung-fehlt")
+        if (!nonceStore.verbrauche(nonce)) return verweigert(digest, nonce, antwort, "nonce-replay")
 
-        return true
+        return ApprovalErgebnis.freigegeben(snapshot(digest, nonce, antwort, "freigegeben"))
     }
+
+    private fun verweigert(
+        digest: RemoteApprovalKontextDigest,
+        nonce: RemoteApprovalNonce,
+        antwort: RemoteApprovalAntwort?,
+        grund: String,
+    ): ApprovalErgebnis = ApprovalErgebnis.verweigert(snapshot(digest, nonce, antwort, grund))
+
+    private fun verweigert(
+        digest: RemoteApprovalKontextDigest,
+        nonce: RemoteApprovalNonce,
+        antwortReferenz: String?,
+        identitaetsReferenz: String?,
+        grund: String,
+    ): ApprovalErgebnis = ApprovalErgebnis.verweigert(
+        snapshot(digest, nonce, antwortReferenz, identitaetsReferenz, grund),
+    )
+
+    private fun fehler(
+        digest: RemoteApprovalKontextDigest,
+        nonce: RemoteApprovalNonce,
+        antwortReferenz: String?,
+        identitaetsReferenz: String?,
+        grund: String,
+    ): ApprovalErgebnis = ApprovalErgebnis.fehler(
+        snapshot(digest, nonce, antwortReferenz, identitaetsReferenz, grund),
+    )
+
+    private fun snapshot(
+        digest: RemoteApprovalKontextDigest,
+        nonce: RemoteApprovalNonce,
+        antwort: RemoteApprovalAntwort?,
+        grund: String,
+    ): ApprovalAuditSnapshot = snapshot(
+        digest = digest,
+        nonce = nonce,
+        antwortReferenz = antwort?.nonce?.let { "remote-response:$it" },
+        identitaetsReferenz = antwort?.identitaet?.takeIf { it.isNotBlank() },
+        grund = grund,
+    )
+
+    private fun snapshot(
+        digest: RemoteApprovalKontextDigest,
+        nonce: RemoteApprovalNonce,
+        antwortReferenz: String?,
+        identitaetsReferenz: String?,
+        grund: String,
+    ): ApprovalAuditSnapshot = ApprovalAuditSnapshot(
+        anfrageKontextDigest = digest.wert,
+        kanal = KANAL,
+        nonceReferenz = "remote-ui:${nonce.wert}",
+        antwortReferenz = antwortReferenz,
+        identitaetsReferenz = identitaetsReferenz,
+        ergebnisGrund = grund,
+    )
 
     companion object {
         const val BESTAETIGUNG: String = "FREIGEBEN"
+        const val KANAL: String = "remote-ui"
     }
 }
 

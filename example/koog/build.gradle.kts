@@ -13,6 +13,7 @@ kotlin {
 dependencies {
     implementation(project(":hexagon:domain"))
     implementation(project(":hexagon:application"))
+    implementation(project(":adapters:outbound:audit-memory"))
     implementation(project(":adapters:outbound:llm-koog"))
     runtimeOnly("ai.koog:koog-agents:1.0.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")

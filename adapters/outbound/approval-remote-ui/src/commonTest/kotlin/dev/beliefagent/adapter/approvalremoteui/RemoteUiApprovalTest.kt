@@ -56,15 +56,18 @@ class RemoteUiApprovalTest {
         val store = InMemoryRemoteApprovalNonceStore()
         val approval = approval(store = store) { listOf(passendeAntwort(it)) }
 
-        assertTrue(approval.freigegeben(anfrage()))
-        assertFalse(approval.freigegeben(anfrage()), "Nonce darf nicht wiederverwendet werden")
+        val ergebnis = approval.entscheide(anfrage())
+        assertTrue(ergebnis.istFreigegeben())
+        assertEquals(RemoteUiApproval.KANAL, ergebnis.audit.kanal)
+        assertEquals("operator", ergebnis.audit.identitaetsReferenz)
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben(), "Nonce darf nicht wiederverwendet werden")
     }
 
     @Test
     fun timeout_oder_eof_verweigert_fail_closed() {
         val approval = approval { emptyList() }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -73,7 +76,7 @@ class RemoteUiApprovalTest {
             error("transport unavailable")
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -82,7 +85,7 @@ class RemoteUiApprovalTest {
             listOf(passendeAntwort(auftrag).copy(identitaet = "mallory"))
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -91,7 +94,7 @@ class RemoteUiApprovalTest {
             listOf(passendeAntwort(auftrag).copy(nonce = "andere-nonce"))
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -100,7 +103,7 @@ class RemoteUiApprovalTest {
             listOf(passendeAntwort(auftrag).copy(kontextDigest = "anderer-kontext"))
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -109,7 +112,7 @@ class RemoteUiApprovalTest {
             listOf(passendeAntwort(auftrag).copy(bestaetigung = "ja"))
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -118,7 +121,7 @@ class RemoteUiApprovalTest {
             listOf(passendeAntwort(auftrag), passendeAntwort(auftrag))
         }
 
-        assertFalse(approval.freigegeben(anfrage()))
+        assertFalse(approval.entscheide(anfrage()).istFreigegeben())
     }
 
     @Test
@@ -138,7 +141,7 @@ class RemoteUiApprovalTest {
             listOf(passendeAntwort(auftrag))
         }
 
-        assertTrue(approval.freigegeben(anfrage()))
+        assertTrue(approval.entscheide(anfrage()).istFreigegeben())
 
         val auftrag = auftraege.single()
         assertEquals("nonce-remote", auftrag.nonce.wert)

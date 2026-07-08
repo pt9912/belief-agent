@@ -37,6 +37,9 @@ import dev.beliefagent.application.belief.entscheidungszyklus.Konfidenzgebundene
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditKontextDigestBerechner
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.application.belief.ports.KonfidenzPort
 import dev.beliefagent.application.ports.AuditPort
@@ -177,15 +180,28 @@ data class CliApprovalKanalName(val wert: String) {
 class CliApprovalKanalDispatcher(
     private val kanal: CliApprovalKanalName,
     private val kanaele: Map<CliApprovalKanalName, HumanApprovalPort>,
+    private val digestBerechner: ApprovalAuditKontextDigestBerechner = ApprovalAuditKontextDigestBerechner(),
 ) : HumanApprovalPort {
-    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
-        val ausgewaehlt = kanaele[kanal] ?: return false
+    override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis {
+        val ausgewaehlt = kanaele[kanal] ?: return ApprovalErgebnis.fehler(
+            snapshot(anfrage, "kanal-nicht-gebunden"),
+        )
         return try {
-            ausgewaehlt.freigegeben(anfrage)
+            ausgewaehlt.entscheide(anfrage)
         } catch (_: Exception) {
-            false
+            ApprovalErgebnis.fehler(snapshot(anfrage, "kanal-fehler"))
         }
     }
+
+    private fun snapshot(anfrage: ApprovalAnfrage, grund: String): ApprovalAuditSnapshot =
+        ApprovalAuditSnapshot(
+            anfrageKontextDigest = digestBerechner.digest(anfrage),
+            kanal = kanal.anzeigeName(),
+            nonceReferenz = "dispatcher-unavailable",
+            antwortReferenz = null,
+            identitaetsReferenz = null,
+            ergebnisGrund = grund,
+        )
 }
 
 data class CliLaufErgebnis(
@@ -229,6 +245,8 @@ class CliRuntime private constructor(
     }
 
     fun ausgefuehrteAktionen() = koin.get<RecordingAktionsAusfuehrungsAdapter>().ausgefuehrteAktionen()
+
+    fun auditEreignisse() = koin.get<AuditPort>().lade().ereignisse
 
     companion object {
         fun ausKonfiguration(config: CliRuntimeKonfiguration): CliRuntime =
@@ -286,7 +304,7 @@ fun cliModule(config: CliRuntimeKonfiguration) = module {
     single<HumanApprovalPort> { config.approval.toHumanApprovalPort() }
     single { BeliefAktualisieren(get(), get(), get()) }
     single { BeobachtungWaehlen(get()) }
-    single { AktionGaten(get()) }
+    single { AktionGaten(get(), get(), get()) }
     single { Entscheidungszyklus(get(), get(), get()) }
     single { KonfidenzgebundenerEntscheidungszyklus(get(), get()) }
     single { AktionsVorschlagen(get(), get(), get()) }

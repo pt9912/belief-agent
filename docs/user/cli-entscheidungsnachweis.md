@@ -37,6 +37,10 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   `BeliefState`. Der lokale Adapter `LocalApproval` bindet diese Anfrage an
   Nonce, Identitaet und Kontext-Digest; der Remote/UI-Adapter
   `RemoteUiApproval` tut dasselbe hinter einer abstrahierten Transportgrenze.
+  Beide liefern ein adapterfreies `ApprovalErgebnis` mit
+  `ApprovalAuditSnapshot`; `AktionGaten` schreibt daraus append-only
+  `ApprovalAngefragt` plus Ergebnisereignis ueber `AuditPort`. Ein
+  Audit-Ausfall bleibt fuer irreversible Aktionen fail-closed.
   Der CLI-Composition-Root waehlt den Approval-Pfad ueber einen fail-closed
   Kanal-Dispatcher. `approval=local` waehlt den lokalen Kanal,
   `approval=remote-ui` den Remote/UI-Kanal; unbekannte Kanaele, fehlende

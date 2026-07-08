@@ -1,5 +1,6 @@
 package dev.beliefagent.example.koog
 
+import dev.beliefagent.adapter.audit.MemoryAudit
 import dev.beliefagent.adapter.llm.koog.KoogLlmPort
 import dev.beliefagent.adapter.llm.koog.KoogPromptRunner
 import dev.beliefagent.application.belief.aktualisieren.BeliefAktualisieren
@@ -10,6 +11,9 @@ import dev.beliefagent.application.belief.entscheidungszyklus.Entscheidungszyklu
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditKontextDigestBerechner
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.Beobachtung
@@ -67,10 +71,11 @@ fun main() {
             KoogLlmPort(koogMockRunner())
         }
     }
+    val uhr = MonotoneDemoClock()
     val cycle = Entscheidungszyklus(
         beobachtungWaehlen = BeobachtungWaehlen(BeliefAwareCandidatePort(nextObservation)),
-        beliefAktualisieren = BeliefAktualisieren(koogLlmPort, MonotoneDemoClock()),
-        aktionGaten = AktionGaten(AllowingHumanApproval),
+        beliefAktualisieren = BeliefAktualisieren(koogLlmPort, uhr),
+        aktionGaten = AktionGaten(AllowingHumanApproval, MemoryAudit(), uhr),
     )
 
     when (val result = cycle.entscheide(action, prior, Budget(maxSchritte = 3))) {
@@ -114,7 +119,19 @@ private class BeliefAwareCandidatePort(
 }
 
 private object AllowingHumanApproval : HumanApprovalPort {
-    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean = true
+    private val digestBerechner = ApprovalAuditKontextDigestBerechner()
+
+    override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis =
+        ApprovalErgebnis.freigegeben(
+            ApprovalAuditSnapshot(
+                anfrageKontextDigest = digestBerechner.digest(anfrage),
+                kanal = "example-koog",
+                nonceReferenz = "example-static",
+                antwortReferenz = "example-static-response",
+                identitaetsReferenz = "example-operator",
+                ergebnisGrund = "example-freigegeben",
+            ),
+        )
 }
 
 private class MonotoneDemoClock : UhrPort {

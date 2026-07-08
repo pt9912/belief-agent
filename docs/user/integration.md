@@ -136,14 +136,16 @@ abstrahierte Bediengrenze, erzeugt Nonce und Kontext-Digest und akzeptiert nur
 eine einzelne Antwort mit erlaubter Identitaet, passender Nonce, passendem
 Digest und Bestaetigung `FREIGEBEN`. Der im CLI-Demo gebundene Transport ist
 netzfrei und liefert keine Antwort; die Demo bleibt deshalb fail-closed.
-Produktive Netzwerk-/UI-Transporte, starke Authentisierung und persistenter
-Approval-Audit bleiben Folge-Scope.
+Produktive Netzwerk-/UI-Transporte und starke Authentisierung bleiben
+Folge-Scope.
 
 Die Kanalwahl ist nur CLI-Composition-Konfiguration. Der Core sieht weiterhin
-nur `HumanApprovalPort`; konkrete Kanalnamen sind kein Port-Vertrag.
-`local` und `remote-ui` sind aktuell konkrete Kanaele. Unbekannte Kanaele,
-nicht konfigurierte Kanaele und Kanalfehler gelten als verweigerte Freigabe.
-Persistenter Approval-Audit bleibt Folgescope.
+nur `HumanApprovalPort`; konkrete Kanalnamen sind kein Port-Vertrag. Der Port
+liefert aber ein adapterfreies `ApprovalErgebnis` mit `ApprovalAuditSnapshot`,
+damit `AktionGaten` die Approval-Spur ueber den bestehenden `AuditPort`
+append-only schreiben kann. `local` und `remote-ui` sind aktuell konkrete
+Kanaele. Unbekannte Kanaele, nicht konfigurierte Kanaele und Kanalfehler gelten
+als verweigerte Freigabe oder Approval-Fehler.
 
 ## 3. Ports Implementieren
 
@@ -235,6 +237,7 @@ aktuellen Einbau:
 
 ```kotlin
 import dev.beliefagent.adapter.approval.FakeApproval
+import dev.beliefagent.adapter.audit.MemoryAudit
 import dev.beliefagent.adapter.llm.FakeLlm
 import dev.beliefagent.adapter.voi.FakeKandidatenquelle
 import dev.beliefagent.application.belief.aktualisieren.BeliefAktualisieren
@@ -284,8 +287,11 @@ val aktion = Aktion(
 )
 
 val uhr = object : UhrPort {
-    override fun jetzt(): Zeitstempel = Zeitstempel(2L)
+    private var next = 2L
+
+    override fun jetzt(): Zeitstempel = Zeitstempel(next++)
 }
+val audit = MemoryAudit()
 
 val zyklus = Entscheidungszyklus(
     beobachtungWaehlen = BeobachtungWaehlen(
@@ -300,7 +306,7 @@ val zyklus = Entscheidungszyklus(
         ),
     ),
     beliefAktualisieren = BeliefAktualisieren(FakeLlm(), uhr),
-    aktionGaten = AktionGaten(FakeApproval(freigabe = true)),
+    aktionGaten = AktionGaten(FakeApproval(freigabe = true), audit, uhr),
 )
 
 when (val ergebnis = zyklus.entscheide(aktion, prior, Budget(maxSchritte = 3))) {
@@ -432,8 +438,14 @@ Extern-wirksame Aktionen brauchen immer beides:
 Der `HumanApprovalPort` erhaelt dafuer eine `ApprovalAnfrage` aus der konkreten
 `Aktion` und dem aktuellen `BeliefState`. Ein echter Adapter muss diese Anfrage
 als Entscheidungs-Kontext behandeln; Nonce, Identitaet und Einmaligkeit sind
-Teil des Adaptervertrags. Der CLI-Composition-Root bindet Approval ueber eine
-fail-closed Kanalwahl: `approval=local` waehlt den lokalen Kanal,
+Teil des Adaptervertrags. Statt eines nackten Boolean liefert der Port ein
+adapterfreies `ApprovalErgebnis` mit Snapshot-Feldern fuer Kontext-Digest,
+Kanal, Nonce-/Antwortreferenz, Identitaetsreferenz und Ergebnisgrund.
+`AktionGaten` schreibt daraus `ApprovalAngefragt` plus
+`ApprovalErteilt`/`ApprovalVerweigert`/`ApprovalFehler` ueber `AuditPort`; ein
+Audit-Ausfall bleibt fuer irreversible Aktionen fail-closed. Der
+CLI-Composition-Root bindet Approval ueber eine fail-closed Kanalwahl:
+`approval=local` waehlt den lokalen Kanal,
 `approval=remote-ui` den transportabstrahierten Remote/UI-Kanal; unbekannte oder
 ungebundene Kanaele geben nicht frei, und ein Kanalfehler wird nicht als
 Zustimmung interpretiert. Der Fake bleibt der deterministische
@@ -531,7 +543,7 @@ val auditPort: AuditPort = MemoryAudit()
 val beliefAktualisieren = BeliefAktualisieren(llm, uhr, hypothesisPort)
 val vorschlaege = AktionsVorschlagen(actionPort, konfidenzPort, auditPort)
 val waehlen = BeobachtungWaehlen(voiPort)
-val aktionGaten = AktionGaten(approvalPort)
+val aktionGaten = AktionGaten(approvalPort, auditPort, uhr)
 val zyklus = Entscheidungszyklus(waehlen, beliefAktualisieren, aktionGaten)
 val konfidenzEntscheidungszyklus = KonfidenzgebundenerEntscheidungszyklus(zyklus, konfidenzPort)
 
@@ -549,7 +561,7 @@ val controller = CodeAgentController(
 Wichtig fuer Code-Agenten:
 
 - **`AktionsVorschlagsPort` darf nur strukturierte Aktionen liefern**, keine direkten Werkzeugaufrufe.
-- **`HumanApprovalPort` für irreversible Aktionen** als sicheren Mensch-Check ausrüsten; `LocalApproval` und `RemoteUiApproval` erzwingen Nonce/Identität/Einmaligkeit auf Basis der `ApprovalAnfrage`, die CLI-Kanalwahl bleibt fail-closed, persistenter Approval-Audit bleibt Folgescope.
+- **`HumanApprovalPort` für irreversible Aktionen** als sicheren Mensch-Check ausrüsten; `LocalApproval` und `RemoteUiApproval` erzwingen Nonce/Identität/Einmaligkeit auf Basis der `ApprovalAnfrage`, die CLI-Kanalwahl bleibt fail-closed, und `AktionGaten` persistiert die Approval-Entscheidungsspur ueber `AuditPort`.
 - **`AuditPort` persistent** führen: bei jedem Schritt Belief-/Eskalationskontext speichern.
 - **`KonfidenzPort` append-only** betreiben, damit Replay und Overrides nachvollziehbar bleiben.
 
@@ -572,7 +584,10 @@ update.ereignisse.forEach(audit::anhaengen)
 
 `MemoryAudit` ist nur ein In-Memory-Adapter. Ein produktiver Adapter muss das
 append-only-Verhalten erhalten und darf vergangene Ereignisse nicht
-ueberschreiben.
+ueberschreiben. `AktionGaten` nutzt denselben Port fuer Approval-Audit:
+`ApprovalAngefragt`, `ApprovalErteilt`, `ApprovalVerweigert` und
+`ApprovalFehler` enthalten Referenzen/Digests, keine UI-Tokens oder
+Klartext-Geheimnisse.
 
 ## 9. Noch Nicht Stabil
 
@@ -581,8 +596,7 @@ Diese Punkte sind bewusst noch nicht als Nutzervertrag festgelegt:
 - Artefakt-Koordinaten und Release-Prozess.
 - Provider-spezifische LLM-Composition mit API-Key-/Modell-Konfiguration und
   echte externe Provider-Bindungen.
-- Produktives CLI-/Remote-/UI-Binding des lokalen Approval-Adapters samt
-  persistentem Approval-Audit.
+- Produktive Remote-/UI-Authentisierung und Härtung der Bediengrenze.
 - Dauerhafte Audit-Persistenz.
 
 Die Spezifikation markiert externe Port-Vertraege derzeit als `v0 (intern)`.

@@ -45,6 +45,76 @@ data class EskalationAngefordert(
     val grund: String,
 ) : Ereignis
 
+data class ApprovalAngefragt(
+    override val zeitstempel: Zeitstempel,
+    val anfrageKontextDigest: String,
+    val kanal: String,
+    val nonceReferenz: String,
+) : Ereignis {
+    init {
+        requireApprovalAuditReferenzen(anfrageKontextDigest, kanal, nonceReferenz)
+    }
+}
+
+data class ApprovalErteilt(
+    override val zeitstempel: Zeitstempel,
+    val anfrageKontextDigest: String,
+    val kanal: String,
+    val nonceReferenz: String,
+    val antwortReferenz: String,
+    val identitaetsReferenz: String,
+    val ergebnisGrund: String,
+) : Ereignis {
+    init {
+        requireApprovalAuditReferenzen(anfrageKontextDigest, kanal, nonceReferenz)
+        require(antwortReferenz.isNotBlank()) { "Approval-Antwortreferenz darf nicht leer sein" }
+        require(identitaetsReferenz.isNotBlank()) { "Approval-Identitaetsreferenz darf nicht leer sein" }
+        require(ergebnisGrund.isNotBlank()) { "Approval-Ergebnisgrund darf nicht leer sein" }
+    }
+}
+
+data class ApprovalVerweigert(
+    override val zeitstempel: Zeitstempel,
+    val anfrageKontextDigest: String,
+    val kanal: String,
+    val nonceReferenz: String,
+    val antwortReferenz: String?,
+    val identitaetsReferenz: String?,
+    val ergebnisGrund: String,
+) : Ereignis {
+    init {
+        requireApprovalAuditReferenzen(anfrageKontextDigest, kanal, nonceReferenz)
+        require(antwortReferenz == null || antwortReferenz.isNotBlank()) {
+            "Approval-Antwortreferenz darf nicht leer sein"
+        }
+        require(identitaetsReferenz == null || identitaetsReferenz.isNotBlank()) {
+            "Approval-Identitaetsreferenz darf nicht leer sein"
+        }
+        require(ergebnisGrund.isNotBlank()) { "Approval-Ergebnisgrund darf nicht leer sein" }
+    }
+}
+
+data class ApprovalFehler(
+    override val zeitstempel: Zeitstempel,
+    val anfrageKontextDigest: String,
+    val kanal: String,
+    val nonceReferenz: String,
+    val antwortReferenz: String?,
+    val identitaetsReferenz: String?,
+    val ergebnisGrund: String,
+) : Ereignis {
+    init {
+        requireApprovalAuditReferenzen(anfrageKontextDigest, kanal, nonceReferenz)
+        require(antwortReferenz == null || antwortReferenz.isNotBlank()) {
+            "Approval-Antwortreferenz darf nicht leer sein"
+        }
+        require(identitaetsReferenz == null || identitaetsReferenz.isNotBlank()) {
+            "Approval-Identitaetsreferenz darf nicht leer sein"
+        }
+        require(ergebnisGrund.isNotBlank()) { "Approval-Ergebnisgrund darf nicht leer sein" }
+    }
+}
+
 data class KonfidenzExternalisiert(
     override val zeitstempel: Zeitstempel,
     val referenz: String,
@@ -58,6 +128,16 @@ data class KonfidenzExternalisiert(
         require(quelle.isNotBlank()) { "Konfidenz-Quelle darf nicht leer sein" }
         require(version > 0) { "Konfidenz-Version muss positiv sein: $version" }
     }
+}
+
+private fun requireApprovalAuditReferenzen(
+    anfrageKontextDigest: String,
+    kanal: String,
+    nonceReferenz: String,
+) {
+    require(anfrageKontextDigest.isNotBlank()) { "Approval-Kontext-Digest darf nicht leer sein" }
+    require(kanal.isNotBlank()) { "Approval-Kanal darf nicht leer sein" }
+    require(nonceReferenz.isNotBlank()) { "Approval-Nonce-Referenz darf nicht leer sein" }
 }
 
 data class KonfidenzUeberschrieben(

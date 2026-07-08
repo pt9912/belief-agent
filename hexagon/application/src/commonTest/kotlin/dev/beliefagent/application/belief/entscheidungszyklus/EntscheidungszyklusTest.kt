@@ -7,7 +7,11 @@ import dev.beliefagent.application.belief.beobachtungwaehlen.BeobachtungWaehlen
 import dev.beliefagent.application.belief.beobachtungwaehlen.ports.BeobachtungsAuswahlPort
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditKontextDigestBerechner
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAuditSnapshot
+import dev.beliefagent.application.belief.gaten.ports.ApprovalErgebnis
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
+import dev.beliefagent.application.ports.AuditPort
 import dev.beliefagent.application.belief.ports.ExternalisierteKonfidenz
 import dev.beliefagent.application.belief.ports.KonfidenzPort
 import dev.beliefagent.application.belief.ports.KonfidenzQuelle
@@ -18,6 +22,8 @@ import dev.beliefagent.application.belief.ports.OverrideBegruendung
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
+import dev.beliefagent.domain.belief.Ereignis
+import dev.beliefagent.domain.belief.EreignisProtokoll
 import dev.beliefagent.domain.belief.Erfolgswahrscheinlichkeit
 import dev.beliefagent.domain.belief.Evidenz
 import dev.beliefagent.domain.belief.Hypothese
@@ -63,10 +69,17 @@ class EntscheidungszyklusTest {
         }
     }
     private val uhr = object : UhrPort {
-        override fun jetzt(): Zeitstempel = Zeitstempel(1L)
+        private var naechster = 1L
+
+        override fun jetzt(): Zeitstempel = Zeitstempel(naechster++)
     }
     private fun approval(ok: Boolean) = object : HumanApprovalPort {
-        override fun freigegeben(anfrage: ApprovalAnfrage): Boolean = ok
+        override fun entscheide(anfrage: ApprovalAnfrage): ApprovalErgebnis =
+            if (ok) {
+                ApprovalErgebnis.freigegeben(snapshot(anfrage, "freigegeben"))
+            } else {
+                ApprovalErgebnis.verweigert(snapshot(anfrage, "verweigert"))
+            }
     }
     private fun auswahl(vararg kandidaten: VoiKandidat) = object : BeobachtungsAuswahlPort {
         override fun kandidaten(belief: BeliefState): List<VoiKandidat> = kandidaten.toList()
@@ -75,7 +88,7 @@ class EntscheidungszyklusTest {
     private fun zyklus(port: BeobachtungsAuswahlPort, approvalOk: Boolean = true) = Entscheidungszyklus(
         BeobachtungWaehlen(port),
         BeliefAktualisieren(llm, uhr),
-        AktionGaten(approval(approvalOk)),
+        AktionGaten(approval(approvalOk), SpeichernderAuditPort(), uhr),
     )
 
     private fun konfidenzgebundenerZyklus(
@@ -102,6 +115,30 @@ class EntscheidungszyklusTest {
             stuetzendeEvidenz = listOf(beobachtung("stuetzt")),
             konfidenzReferenz = konfidenzReferenz,
         )
+
+    private class SpeichernderAuditPort : AuditPort {
+        private var protokoll = EreignisProtokoll.LEER
+
+        override fun anhaengen(ereignis: Ereignis) {
+            protokoll = protokoll.append(ereignis)
+        }
+
+        override fun lade(): EreignisProtokoll = protokoll
+    }
+
+    companion object {
+        private val digestBerechner = ApprovalAuditKontextDigestBerechner()
+
+        private fun snapshot(anfrage: ApprovalAnfrage, grund: String): ApprovalAuditSnapshot =
+            ApprovalAuditSnapshot(
+                anfrageKontextDigest = digestBerechner.digest(anfrage),
+                kanal = "test",
+                nonceReferenz = "test-nonce",
+                antwortReferenz = "test-response",
+                identitaetsReferenz = "test-operator",
+                ergebnisGrund = grund,
+            )
+    }
 
     @Test
     fun handelt_sofort_wenn_das_gate_schon_frei_ist() { // Kontrast zu VOI-001: kein Sammeln nötig
