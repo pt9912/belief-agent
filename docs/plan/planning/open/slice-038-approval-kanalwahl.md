@@ -14,22 +14,25 @@
 
 ## 1. Ziel
 
-Die Form und der Kanal der menschlichen Freigabe werden als expliziter,
-fail-closed Approval-Kanalvertrag modelliert: lokale CLI-Freigabe bleibt ein
-konkreter Kanal, weitere Kanaele werden konfigurierbar adressierbar, ohne dass
-eine extern-wirksame Aktion jemals ohne `HumanApprovalPort`-Freigabe ausgefuehrt
-werden kann.
+Die Form und der Kanal der menschlichen Freigabe werden als explizites,
+fail-closed `ARC-09`-Composition-Wiring im CLI-Root modelliert: lokale
+CLI-Freigabe bleibt ein konkreter Kanal, weitere Kanaele werden konfigurierbar
+adressierbar, ohne den Core-Port `HumanApprovalPort` zu erweitern und ohne dass
+eine extern-wirksame Aktion jemals ohne dessen Freigabe ausgefuehrt werden kann.
 
 ## 2. Definition of Done
 
-- [ ] Kanalwahl ist als kleiner Vertrag abgebildet: erlaubte Kanaele,
-  Default-Verhalten, unbekannter Kanal, nicht konfigurierter Kanal und
-  Kanalfehler sind fail-closed; der Entfall menschlicher Freigabe ist nicht
-  konfigurierbar (`LH-FA-POL-004`, `LH-QA-02`).
-- [ ] Ein Kanal-Dispatcher oder gleichwertiger Composition-Baustein waehlt
-  zwischen vorhandenen Approval-Kanaelen, ruft genau einen Kanal pro
-  `ApprovalAnfrage` auf und propagiert keine Freigabe, wenn Auswahl,
-  Kanalantwort oder Kontextbindung ungueltig sind (`LH-FA-POL-006`,
+- [ ] Kanalwahl ist ausschliesslich als CLI-/`ARC-09`-Composition-Vertrag
+  abgebildet: erlaubte Kanaele, Default-Verhalten, unbekannter Kanal, nicht
+  konfigurierter Kanal und Kanalfehler sind fail-closed; der Entfall
+  menschlicher Freigabe ist nicht konfigurierbar (`LH-FA-POL-004`, `LH-QA-02`).
+- [ ] `HumanApprovalPort` und `hexagon/application/.../gaten/ports` bleiben
+  unveraendert. Konkrete Kanaladressierung, Kanalnamen und Dispatcher-Policy
+  leben im CLI-Composition-Root und werden nicht Teil des Core-/Port-Vertrags.
+- [ ] Ein Kanal-Dispatcher oder gleichwertiger `adapters/inbound/cli`-
+  Composition-Baustein waehlt zwischen vorhandenen Approval-Kanaelen, ruft genau
+  einen Kanal pro `ApprovalAnfrage` auf und propagiert keine Freigabe, wenn
+  Auswahl, Kanalantwort oder Kontextbindung ungueltig sind (`LH-FA-POL-006`,
   `LH-QA-03`).
 - [ ] CLI-/Doku-Integration beschreibt die Kanalwahl als Konfiguration des
   Approval-Pfads, nicht als neuen Approval-Kanal: `local` ist der einzige in
@@ -41,8 +44,7 @@ werden kann.
 
 | Datei / Komponente | Aenderungs-Art | Begruendung |
 |---|---|---|
-| `hexagon/application/.../gaten/ports` oder `adapters/inbound/cli`-naher Config-Code | neu/update | Kleiner Kanalwahl-Vertrag/Config-Typ fuer `local` und spaetere Kanaele, ohne Domain-Policy zu lockern. |
-| `adapters/inbound/cli/src/main/**` | update | Composition-Root waehlt den Approval-Kanal bewusst und fail-closed. |
+| `adapters/inbound/cli/src/main/**` | update | CLI-naher Kanalwahl-Vertrag, Config-Typ und Dispatcher fuer `local` und spaetere Kanaele; konkrete Kanaladressierung bleibt `ARC-09`-Composition-Wiring. |
 | `adapters/inbound/cli/src/test/**` | update | Tests fuer unbekannten Kanal, fehlende Kanalbindung, Kanalfehler und erfolgreichen `local`-Dispatch. |
 | `.a-check.yml` | update | Falls neue Dispatcher-/Config-Komponente entsteht: Architekturkante fuer Composition-Root erlauben, fachliche Adapterkopplung weiter verbieten. |
 | `docs/user/integration.md` | update | Kanalwahl, Defaults und Grenzen dokumentieren. |
@@ -54,8 +56,9 @@ werden kann.
 
 `slice-037` liegt in `done/` und beweist das bewusste CLI-Binding des lokalen
 Approval-Adapters inklusive Executor-Grenze. Kein Slice liegt in `in-progress/`
-(WIP-Limit 1). Vor Start wird bestaetigt, dass dieser Slice keine neuen
-Remote-/UI-Kanaladapter und keine Approval-Audit-Persistenz implementiert.
+(WIP-Limit 1). Vor Start wird bestaetigt, dass dieser Slice keine Core-/Port-
+Aenderung, keine neuen Remote-/UI-Kanaladapter und keine Approval-Audit-
+Persistenz implementiert.
 
 ## 5. Closure-Trigger
 
@@ -73,6 +76,9 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
   Authentisierung und neue Failure-Modes einfuehren.
 - Persistenter Approval-Audit bleibt eigener Slice; dieser Slice darf nur
   dokumentieren, welche Ereignisse spaeter auditierbar sein muessen.
+- Kanalnamen und konkrete Adressierung duerfen nicht in
+  `hexagon/application/.../gaten/ports` wandern. Der Core sieht weiter nur
+  `HumanApprovalPort`; Kanalwahl bleibt Composition-Konfiguration.
 
 ## 7. Closure-Notiz (nach `done/`)
 
@@ -80,19 +86,19 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 8. Sub-Area-Modus-Begründung
 
-### Sub-Area: Approval-Kanalwahl / Composition
+### Sub-Area: CLI-Approval-Kanalwahl / Composition
 
 - **Modus:** Hybrid
 - **Konventionen-Dichte:** mittel. `LH-FA-POL-004` erlaubt Form und Kanal als
   konfigurierbar, verbietet aber den Entfall der Freigabe; `ARC-09` verortet
-  Binding im Composition-Root. Ein expliziter Kanalwahl-Vertrag existiert noch
-  nicht.
+  konkrete Kanaladressierung und Binding im Composition-Root. Ein expliziter
+  CLI-Kanalwahl-Vertrag existiert noch nicht.
 - **Phase-Reife:** Phase 3. `slice-036`/`037` liefern lokalen Adapter und
   Binding, aber Kanalwahl als separater Vertrag ist neu.
 - **Evidenz-/Diskrepanz-Risiko:** mittel bis hoch. Eine falsch modellierte
   Kanalwahl kann Safety-Policy lockern oder Fehlerfaelle als Freigabe behandeln.
-- **Reconciliation-Aufwand:** ein Slice fuer Vertrag, Dispatch und Doku.
-  Konkrete Remote-/UI-Kanaele und Audit-Persistenz bleiben Folge-Slices.
+- **Reconciliation-Aufwand:** ein Slice fuer CLI-Config-Vertrag, Dispatch und
+  Doku. Konkrete Remote-/UI-Kanaele und Audit-Persistenz bleiben Folge-Slices.
 
 ### Sub-Area: CLI-Composition-Root
 
