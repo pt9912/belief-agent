@@ -3,14 +3,14 @@
 **Review-Art:** Design - Design-Review gegen Architektur, Layer-Grenzen,
 Port-Schnitt und ADR-Vertraeglichkeit.
 
-**Gegenstand:** `docs/plan/planning/open/slice-038-approval-kanalwahl.md`
+**Gegenstand:** `docs/plan/planning/done/slice-038-approval-kanalwahl.md`
 
 **Skill:** `.harness/baseline/v1.4.0/regelwerk/modul-10-review-harness.md`
 @ `v1.4.0` . **Modell:** Codex GPT-5 . **Datum:** 2026-07-08
 
 **Eingangs-Kontext** (die Vertraege, gegen die geprueft wurde):
 
-- `docs/plan/planning/open/slice-038-approval-kanalwahl.md`
+- `docs/plan/planning/done/slice-038-approval-kanalwahl.md`
 - `.harness/baseline/v1.4.0/regelwerk/modul-10-review-harness.md`
 - `spec/architecture.md`
 - `docs/plan/adr/0001-hexagonal-llm-port.md`
@@ -31,7 +31,7 @@ Port-Schnitt und ADR-Vertraeglichkeit.
 
 - `kategorie`: MEDIUM
 - `quelle`: ARC-09 / ADR-0003
-- `pfad`: `docs/plan/planning/open/slice-038-approval-kanalwahl.md:44`
+- `pfad`: `docs/plan/planning/done/slice-038-approval-kanalwahl.md:44`
 - `befund`: Der Design-Schnitt laesst die Kanalwahl wahlweise im
   Application-Port-Bereich oder CLI-nah entstehen. Dadurch ist nicht
   eindeutig, ob konkrete Kanaladressierung Teil des Core-Vertrags oder reines

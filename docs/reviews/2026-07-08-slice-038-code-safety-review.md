@@ -2,7 +2,7 @@
 
 **Review-Art:** Code - geprueft gegen Slice-Plan, Spec-/Architektur-Vertraege und Modul-10-Review-Schema.
 
-**Gegenstand:** `docs/plan/planning/in-progress/slice-038-approval-kanalwahl.md`; Implementierungs-Diff `4225acf..HEAD` (`fdfd9e0`, `3a55fea`).
+**Gegenstand:** `docs/plan/planning/done/slice-038-approval-kanalwahl.md`; Implementierungs-Diff `4225acf..HEAD` (`fdfd9e0`, `3a55fea`).
 
 **Skill:** `.harness/baseline/v1.4.0/regelwerk/modul-10-review-harness.md` @ v1.4.0
 **Modell:** Codex GPT-5
@@ -13,7 +13,7 @@
 - `AGENTS.md`
 - `harness/README.md`
 - `.harness/baseline/v1.4.0/regelwerk/modul-10-review-harness.md`
-- `docs/plan/planning/in-progress/slice-038-approval-kanalwahl.md`
+- `docs/plan/planning/done/slice-038-approval-kanalwahl.md`
 - `docs/reviews/2026-07-08-slice-038-plan-review.md`
 - `docs/reviews/2026-07-08-slice-038-design-review.md`
 - `spec/lastenheft.md`: `LH-FA-POL-004`, `LH-FA-POL-006`, `LH-OUT-04`, `LH-QA-02`, `LH-QA-03`, `LH-QA-04`

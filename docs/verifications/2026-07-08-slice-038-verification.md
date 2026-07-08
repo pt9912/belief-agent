@@ -8,7 +8,7 @@
 
 **Eingangs-Kontext:**
 
-- `docs/plan/planning/in-progress/slice-038-approval-kanalwahl.md`
+- `docs/plan/planning/done/slice-038-approval-kanalwahl.md`
 - `.harness/baseline/v1.4.0/regelwerk/modul-08-agentenrollen.md`
 - `.harness/baseline/v1.4.0/regelwerk/modul-11-verification.md`
 - `spec/lastenheft.md` (`LH-FA-POL-004`, `LH-FA-POL-006`,

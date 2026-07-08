@@ -3,14 +3,14 @@
 **Review-Art:** Plan - Plan-Review gegen Spec, Accepted-ADRs,
 Planning-Harness und Safety-Grenzen.
 
-**Gegenstand:** `docs/plan/planning/open/slice-038-approval-kanalwahl.md`
+**Gegenstand:** `docs/plan/planning/done/slice-038-approval-kanalwahl.md`
 
 **Skill:** `.harness/baseline/v1.4.0/regelwerk/modul-10-review-harness.md`
 @ `v1.4.0` . **Modell:** Codex GPT-5 . **Datum:** 2026-07-08
 
 **Eingangs-Kontext** (die Vertraege, gegen die geprueft wurde):
 
-- `docs/plan/planning/open/slice-038-approval-kanalwahl.md`
+- `docs/plan/planning/done/slice-038-approval-kanalwahl.md`
 - `.harness/baseline/v1.4.0/regelwerk/modul-10-review-harness.md`
 - `harness/README.md`
 - `spec/lastenheft.md` zu `LH-FA-POL-004`, `LH-FA-POL-006`, `LH-OUT-04`,
@@ -34,7 +34,7 @@ Planning-Harness und Safety-Grenzen.
 
 - `kategorie`: MEDIUM
 - `quelle`: ARC-09 / ADR-0003
-- `pfad`: `docs/plan/planning/open/slice-038-approval-kanalwahl.md:44`
+- `pfad`: `docs/plan/planning/done/slice-038-approval-kanalwahl.md:44`
 - `befund`: Der Plan erlaubt den Kanalwahl-Vertrag entweder unter
   `hexagon/application/.../gaten/ports` oder CLI-nah. Damit bleibt offen, ob
   konkrete Kanalwahl als Core-/Port-Vertrag oder als Composition-Root-Wiring

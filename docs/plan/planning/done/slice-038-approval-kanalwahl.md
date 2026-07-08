@@ -1,6 +1,6 @@
 # Slice slice-038: Approval-Kanalwahl
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -22,19 +22,19 @@ eine extern-wirksame Aktion jemals ohne dessen Freigabe ausgefuehrt werden kann.
 
 ## 2. Definition of Done
 
-- [ ] Kanalwahl ist ausschliesslich als CLI-/`ARC-09`-Composition-Vertrag
+- [x] Kanalwahl ist ausschliesslich als CLI-/`ARC-09`-Composition-Vertrag
   abgebildet: erlaubte Kanaele, Default-Verhalten, unbekannter Kanal, nicht
   konfigurierter Kanal und Kanalfehler sind fail-closed; der Entfall
   menschlicher Freigabe ist nicht konfigurierbar (`LH-FA-POL-004`, `LH-QA-02`).
-- [ ] `HumanApprovalPort` und `hexagon/application/.../gaten/ports` bleiben
+- [x] `HumanApprovalPort` und `hexagon/application/.../gaten/ports` bleiben
   unveraendert. Konkrete Kanaladressierung, Kanalnamen und Dispatcher-Policy
   leben im CLI-Composition-Root und werden nicht Teil des Core-/Port-Vertrags.
-- [ ] Ein Kanal-Dispatcher oder gleichwertiger `adapters/inbound/cli`-
+- [x] Ein Kanal-Dispatcher oder gleichwertiger `adapters/inbound/cli`-
   Composition-Baustein waehlt zwischen vorhandenen Approval-Kanaelen, ruft genau
   einen Kanal pro `ApprovalAnfrage` auf und propagiert keine Freigabe, wenn
   Auswahl, Kanalantwort oder Kontextbindung ungueltig sind (`LH-FA-POL-006`,
   `LH-QA-03`).
-- [ ] CLI-/Doku-Integration beschreibt die Kanalwahl als Konfiguration des
+- [x] CLI-/Doku-Integration beschreibt die Kanalwahl als Konfiguration des
   Approval-Pfads, nicht als neuen Approval-Kanal: `local` ist der einzige in
   diesem Slice nutzbare konkrete Kanal; Remote-/UI-Kanaladapter und persistenter
   Approval-Audit bleiben Folgeslices. Review-/Verification-Artefakte,
@@ -82,7 +82,25 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-08. Implementiert wurde eine fail-closed
+Approval-Kanalwahl im CLI-Composition-Root: `local` ist der einzige konkrete
+Kanal dieses Slice, unbekannte Kanaele, fehlende Kanalbindungen und
+Kanalfehler propagieren keine Freigabe. `HumanApprovalPort` und
+`hexagon/application/.../gaten/ports` blieben unveraendert; konkrete
+Kanalnamen und Dispatcher-Policy liegen in `adapters/inbound/cli`.
+
+Nachtraeglich wurde die User-Doku auf Make/Docker-only korrigiert:
+`approval=local` wird ueber `make cli-demo-approval-local` demonstriert, nicht
+ueber direkte Host-Gradle-Aufrufe. Remote-/UI-Kanaladapter und persistenter
+Approval-Audit bleiben Folgeslices.
+
+Review/Verification: Plan-/Design-Review lagen vor; Code-/Safety-Review
+meldete keine Findings; Verification meldete keine DoD-Verletzung und keine
+Carveouts.
+
+Ausgefuehrte Sensors: `make test`, `git diff --check`, `make doc-check`,
+`make gates`, `make cli-demo-scenarios`, `make cli-demo-approval-local`.
+Finale Closure-Sensors: `make doc-check`, `make gates`.
 
 ## 8. Sub-Area-Modus-Begründung
 
