@@ -1,6 +1,6 @@
 # Slice slice-036: Lokaler Human-Approval-Adapter
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -21,17 +21,17 @@ lokale Identitaetsangabe gebunden und wird genau einmal konsumiert.
 
 ## 2. Definition of Done
 
-- [ ] Neuer Outbound-Adapter `adapters/outbound/approval-local` implementiert
+- [x] Neuer Outbound-Adapter `adapters/outbound/approval-local` implementiert
   `HumanApprovalPort` ohne Netz und ohne extern-wirksame Nebenwirkung:
   Anfrage-Rendering, Nonce-Erzeugung, Identitaets-/Bestaetigungs-Eingabe und
   Einmaligkeitspruefung sind testbar abstrahiert; Default und Fehlerfaelle
   verweigern fail-closed (`LH-QA-02`, `LH-FA-POL-004`).
-- [ ] Safety-Verhalten ist deterministisch getestet (`LH-QA-03`):
+- [x] Safety-Verhalten ist deterministisch getestet (`LH-QA-03`):
   falsche Nonce, fehlende Identitaet, Kontext-Digest-Mismatch, wiederverwendete
   Nonce, EOF/Abbruch und nicht-interaktive Defaults geben keine Freigabe; eine
   exakt passende Eingabe gibt nur die konkrete Anfrage frei und kann nicht fuer
   eine wert-gleiche Aktion unter anderem `BeliefState` wiederverwendet werden.
-- [ ] Build-/Arch-/Doku-Integration ist vollstaendig: Modul in
+- [x] Build-/Arch-/Doku-Integration ist vollstaendig: Modul in
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`/Coverage-Gate und
   Integrationsdoku aufgenommen; `adapters/inbound/cli` bleibt standardmaessig
   auf Fake/konfiguriertem Adapter, bis ein separater Binding-Slice den lokalen
@@ -83,7 +83,24 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-08. `adapters/outbound/approval-local` liefert einen
+lokalen `HumanApprovalPort`-Adapter mit Nonce, Kontext-Digest, lokaler
+Identitaetsangabe, exakter Bestaetigung und einmaliger Nonce-Konsumption. Der
+Adapter erzeugt keine Aktionen, fuehrt nichts aus, oeffnet keinen Netzwerkpfad
+und gibt bei fehlender oder abweichender Eingabe fail-closed `false` zurueck.
+
+Review/Verification: Plan-Review
+`docs/reviews/2026-07-08-slice-036-plan-review.md`, Design-Review
+`docs/reviews/2026-07-08-slice-036-design-review.md`, Code-/Safety-Review
+`docs/reviews/2026-07-08-slice-036-code-safety-review.md` und Verification
+`docs/verifications/2026-07-08-slice-036-verification.md` liegen vor; keine
+Findings und keine DoD-Verletzung. `make doc-check` und `make gates` liefen
+gruen.
+
+Folgegrenze: `adapters/inbound/cli` bleibt auf Fake/konfiguriertem Adapter.
+Das bewusste CLI-Binding des lokalen Approval-Adapters ist Folgeslice
+`slice-037`; persistenter Approval-Audit, Kanalwahl und Remote-/UI-Approval
+bleiben separate Folgeslices.
 
 ## 8. Sub-Area-Modus-Begründung
 
