@@ -66,8 +66,7 @@ private data class CliArgumente(
 
         private fun approvalAusArgument(argument: String): CliApprovalKonfiguration = when (argument) {
             "fake" -> CliApprovalKonfiguration.Fake(false)
-            "local" -> CliApprovalKonfiguration.Local()
-            else -> throw IllegalArgumentException("Unbekannter Approval-Modus '$argument'. Erlaubt: fake, local.")
+            else -> CliApprovalKonfiguration.Kanalwahl.auswahl(argument)
         }
     }
 }

@@ -1,6 +1,6 @@
 # Slice slice-038: Approval-Kanalwahl
 
-**Status:** open (siehe [Planning-README](../README.md)).
+**Status:** in-progress (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 

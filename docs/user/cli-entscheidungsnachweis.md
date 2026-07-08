@@ -35,9 +35,11 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   bestandener `KonfidenzGate`-Freigabe fuer irreversible Aktionen auf und
   uebergibt eine `ApprovalAnfrage` aus konkreter Aktion und aktuellem
   `BeliefState`. Der lokale Adapter `LocalApproval` bindet diese Anfrage an
-  Nonce, Identitaet und Kontext-Digest. Der CLI-Composition-Root bindet diesen
-  Adapter nur bei explizitem `approval=local`; ohne diesen Schalter gelten die
-  je Szenario gesetzten Fake-Approval-Defaults.
+  Nonce, Identitaet und Kontext-Digest. Der CLI-Composition-Root waehlt den
+  Approval-Pfad ueber einen fail-closed Kanal-Dispatcher. `approval=local`
+  waehlt den einzigen aktuell implementierten konkreten Kanal; unbekannte
+  Kanaele, fehlende Kanalbindungen und Kanalfehler geben nicht frei. Ohne
+  diesen Schalter gelten die je Szenario gesetzten Fake-Approval-Defaults.
 
 ## 2. Entscheidung je Szenario
 
@@ -90,16 +92,24 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
 ### Lokaler Approval-Pfad fuer `eskaliert`
 
 Wird dasselbe Szenario bewusst mit `approval=local` gestartet, rendert der
-CLI-Root die lokale Approval-Challenge mit Nonce, Kontext-Digest, Aktion,
-Wirkungsklasse, `p_success` und Resthypothese. Nur eine Antwort mit derselben
-Nonce, nicht leerer Identitaet, gleichem Kontext-Digest und exakter
-Bestaetigung `FREIGEBEN` gibt die Anfrage frei.
+CLI-Root ueber den Kanal-Dispatcher die lokale Approval-Challenge mit Nonce,
+Kontext-Digest, Aktion, Wirkungsklasse, `p_success` und Resthypothese. Nur eine
+Antwort mit derselben Nonce, nicht leerer Identitaet, gleichem Kontext-Digest
+und exakter Bestaetigung `FREIGEBEN` gibt die Anfrage frei.
 
 - passende lokale Freigabe:
   - `terminal=gehandelt`
   - `executed=true`
   - `executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion`
 - fehlende, falsche oder wiederverwendete lokale Freigabe:
+  - `terminal=eskaliert`
+  - `executed=false`
+  - `executor_boundary=closed`
+- `approval=remote` oder ein anderer unbekannter Kanal:
+  - `terminal=eskaliert`
+  - `executed=false`
+  - `executor_boundary=closed`
+- ausgewaehlter, aber nicht gebundener Kanal oder Kanalfehler:
   - `terminal=eskaliert`
   - `executed=false`
   - `executor_boundary=closed`

@@ -31,6 +31,7 @@ import dev.beliefagent.application.belief.entscheidungszyklus.Entscheidungszyklu
 import dev.beliefagent.application.belief.entscheidungszyklus.KonfidenzgebundenerEntscheidungszyklus
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.AktionGaten
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.application.belief.ports.KonfidenzPort
 import dev.beliefagent.application.ports.AuditPort
@@ -76,13 +77,55 @@ sealed interface CliApprovalKonfiguration {
         override val name: String = "fake"
     }
 
-    data class Local(
-        val nonceQuelle: ApprovalNonceQuelle = JvmApprovalNonceQuelle(),
-        val eingabe: ApprovalEingabe = ConsoleApprovalEingabe(),
-        val ausgabe: ApprovalAusgabe = ConsoleApprovalAusgabe(),
-        val nonceStore: InMemoryApprovalNonceStore = InMemoryApprovalNonceStore(),
+    data class Kanalwahl(
+        val kanal: CliApprovalKanalName,
+        val kanaele: Map<CliApprovalKanalName, HumanApprovalPort>,
     ) : CliApprovalKonfiguration {
-        override val name: String = "local"
+        override val name: String = kanal.anzeigeName()
+
+        companion object {
+            fun local(
+                nonceQuelle: ApprovalNonceQuelle = JvmApprovalNonceQuelle(),
+                eingabe: ApprovalEingabe = ConsoleApprovalEingabe(),
+                ausgabe: ApprovalAusgabe = ConsoleApprovalAusgabe(),
+                nonceStore: InMemoryApprovalNonceStore = InMemoryApprovalNonceStore(),
+            ): Kanalwahl = Kanalwahl(
+                kanal = CliApprovalKanalName.LOCAL,
+                kanaele = mapOf(
+                    CliApprovalKanalName.LOCAL to LocalApproval(
+                        nonceQuelle = nonceQuelle,
+                        eingabe = eingabe,
+                        ausgabe = ausgabe,
+                        nonceStore = nonceStore,
+                    ),
+                ),
+            )
+
+            fun auswahl(kanal: String): Kanalwahl =
+                Kanalwahl(kanal = CliApprovalKanalName(kanal), kanaele = local().kanaele)
+        }
+    }
+}
+
+data class CliApprovalKanalName(val wert: String) {
+    fun anzeigeName(): String = wert.ifBlank { "leer" }
+
+    companion object {
+        val LOCAL = CliApprovalKanalName("local")
+    }
+}
+
+class CliApprovalKanalDispatcher(
+    private val kanal: CliApprovalKanalName,
+    private val kanaele: Map<CliApprovalKanalName, HumanApprovalPort>,
+) : HumanApprovalPort {
+    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
+        val ausgewaehlt = kanaele[kanal] ?: return false
+        return try {
+            ausgewaehlt.freigegeben(anfrage)
+        } catch (_: Exception) {
+            false
+        }
     }
 }
 
@@ -202,11 +245,9 @@ class MonotoneFakeUhr(start: Long = 1L) : UhrPort {
 
 private fun CliApprovalKonfiguration.toHumanApprovalPort(): HumanApprovalPort = when (this) {
     is CliApprovalKonfiguration.Fake -> FakeApproval(freigegeben)
-    is CliApprovalKonfiguration.Local -> LocalApproval(
-        nonceQuelle = nonceQuelle,
-        eingabe = eingabe,
-        ausgabe = ausgabe,
-        nonceStore = nonceStore,
+    is CliApprovalKonfiguration.Kanalwahl -> CliApprovalKanalDispatcher(
+        kanal = kanal,
+        kanaele = kanaele,
     )
 }
 

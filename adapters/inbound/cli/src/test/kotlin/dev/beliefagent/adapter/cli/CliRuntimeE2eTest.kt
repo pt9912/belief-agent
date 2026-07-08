@@ -8,6 +8,8 @@ import dev.beliefagent.adapter.approvallocal.ApprovalNonceQuelle
 import dev.beliefagent.adapter.approvallocal.InMemoryApprovalNonceStore
 import dev.beliefagent.adapter.approvallocal.LocalApproval
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
+import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
@@ -195,6 +197,85 @@ class CliRuntimeE2eTest {
         assertTrue(ausgabe.contains("terminal=gehandelt"))
     }
 
+    @Test
+    fun cli_argument_unbekannter_approval_kanal_bleibt_fail_closed() {
+        val ausgabe = cliDemoAusgabe(arrayOf("eskaliert", "approval=remote"))
+
+        assertTrue(ausgabe.contains("scenario=eskaliert"))
+        assertTrue(ausgabe.contains("approval=remote"))
+        assertTrue(ausgabe.contains("terminal=eskaliert"))
+        assertTrue(ausgabe.contains("executed=false"))
+        assertTrue(ausgabe.contains("executor_boundary=closed"))
+    }
+
+    @Test
+    fun approval_kanalwahl_ohne_binding_bleibt_fail_closed() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(
+                CliApprovalKonfiguration.Kanalwahl(
+                    kanal = CliApprovalKanalName.LOCAL,
+                    kanaele = emptyMap(),
+                ),
+            ),
+        )
+
+        val ergebnis = runtime.starte()
+
+        assertIs<Zyklusergebnis.Eskaliert>(ergebnis.zyklus)
+        assertEquals(CliTerminal.ESKALIERT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("approval=local"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
+        assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun approval_kanalfehler_bleibt_fail_closed() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(
+                CliApprovalKonfiguration.Kanalwahl(
+                    kanal = CliApprovalKanalName.LOCAL,
+                    kanaele = mapOf(
+                        CliApprovalKanalName.LOCAL to object : HumanApprovalPort {
+                            override fun freigegeben(anfrage: ApprovalAnfrage): Boolean =
+                                error("approval channel failed")
+                        },
+                    ),
+                ),
+            ),
+        )
+
+        val ergebnis = runtime.starte()
+
+        assertIs<Zyklusergebnis.Eskaliert>(ergebnis.zyklus)
+        assertEquals(CliTerminal.ESKALIERT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
+        assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun approval_dispatcher_ruft_genau_einen_ausgewaehlten_kanal_auf() {
+        val local = ZaehlenApproval(freigegeben = true)
+        val remote = ZaehlenApproval(freigegeben = true)
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(
+                CliApprovalKonfiguration.Kanalwahl(
+                    kanal = CliApprovalKanalName.LOCAL,
+                    kanaele = mapOf(
+                        CliApprovalKanalName.LOCAL to local,
+                        CliApprovalKanalName("remote") to remote,
+                    ),
+                ),
+            ),
+        )
+
+        val ergebnis = runtime.starte()
+
+        assertIs<Zyklusergebnis.Gehandelt>(ergebnis.zyklus)
+        assertEquals(1, local.aufrufe)
+        assertEquals(0, remote.aufrufe)
+        assertTrue(ergebnis.executor.ausgefuehrt)
+    }
+
     private fun lokaleApprovalKonfiguration(
         nonce: String = "nonce-cli-test",
         eingabe: ApprovalEingabe = ApprovalEingabe { challenge ->
@@ -205,11 +286,21 @@ class CliRuntimeE2eTest {
                 bestaetigung = LocalApproval.BESTAETIGUNG,
             )
         },
-    ): CliApprovalKonfiguration.Local =
-        CliApprovalKonfiguration.Local(
+    ): CliApprovalKonfiguration.Kanalwahl =
+        CliApprovalKonfiguration.Kanalwahl.local(
             nonceQuelle = ApprovalNonceQuelle { ApprovalNonce(nonce) },
             eingabe = eingabe,
             ausgabe = ApprovalAusgabe {},
             nonceStore = InMemoryApprovalNonceStore(),
         )
+
+    private class ZaehlenApproval(private val freigegeben: Boolean) : HumanApprovalPort {
+        var aufrufe = 0
+            private set
+
+        override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
+            aufrufe += 1
+            return freigegeben
+        }
+    }
 }
