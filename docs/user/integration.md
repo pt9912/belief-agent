@@ -403,7 +403,9 @@ Extern-wirksame Aktionen brauchen immer beides:
 Der `HumanApprovalPort` erhaelt dafuer eine `ApprovalAnfrage` aus der konkreten
 `Aktion` und dem aktuellen `BeliefState`. Ein echter Adapter muss diese Anfrage
 als Entscheidungs-Kontext behandeln; Nonce, Identitaet und Einmaligkeit sind
-Folgescope des interaktiven Approval-Adapters.
+Teil des lokalen Adaptervertrags. Der aktuelle CLI-Composition-Root bleibt
+weiter auf Fake-/konfigurierten Approval verdrahtet, bis ein separater
+Binding-Slice den lokalen Adapter bewusst einbindet.
 
 Bei hoher Resthypothese wird nicht gehandelt, sondern gesammelt oder eskaliert.
 Bei erschoepftem Budget eskaliert der Zyklus fail-safe.
@@ -474,14 +476,15 @@ Aktuelle konkrete Implementierungen im Repo (noch nicht alles produktiv):
 | `AktionsVorschlagsPort` | `dev.beliefagent.adapter.llmaction.FakeAktionsVorschlagsPort` | Fake-Port für strukturiertes Rohvorschlag-Mapping |
 | `BeobachtungsAuswahlPort` | `dev.beliefagent.adapter.voi.FakeKandidatenquelle` | Deterministischer VOI-Port |
 | `HypothesenPort` | `dev.beliefagent.adapter.llmhypothesen.FakeHypothesenPort` | Deterministischer Re-Hypothesen-Port |
-| `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval` | Default-Verweigerung; konsumiert `ApprovalAnfrage`, entscheidet aber weiter boolesch-deterministisch |
+| `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval`; `dev.beliefagent.adapter.approvallocal.LocalApproval` | Fake bleibt CLI-Default; lokaler Adapter bindet `ApprovalAnfrage` an Nonce, Identitaet und Kontext-Digest |
 | `KonfidenzPort` | `dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort` | In-Memory, persistenznah (Replay) |
 | `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` | In-Memory, append-only |
 | `LlmPort` | `dev.beliefagent.adapter.llm.langchain4j.LangChain4jLlmPort` / `dev.beliefagent.adapter.llm.koog.KoogLlmPort` | echte LLM-Provider-Boundary für Likelihoods |
 
 Wichtig: Für produktive Ausführung sind `HumanApprovalPort`, persistente
 `KonfidenzPort`/`AuditPort` und die anderen vier Ports (außer `LlmPort`) aktuell
-noch als Fake-/Memory-Adapter im Repo enthalten.
+noch als Fake-/Memory- oder lokal-injizierbare Adapter im Repo enthalten.
+`LocalApproval` ist bewusst nicht automatisch im CLI-Composition-Root gebunden.
 
 ```kotlin
 val actionPort: AktionsVorschlagsPort = FakeAktionsVorschlagsPort(config.aktionsVorschlaege)
@@ -512,7 +515,7 @@ val controller = CodeAgentController(
 Wichtig fuer Code-Agenten:
 
 - **`AktionsVorschlagsPort` darf nur strukturierte Aktionen liefern**, keine direkten Werkzeugaufrufe.
-- **`HumanApprovalPort` für irreversible Aktionen** als sicheren Mensch-Check ausrüsten (Nonce/Identität/Einmaligkeit auf Basis der `ApprovalAnfrage`).
+- **`HumanApprovalPort` für irreversible Aktionen** als sicheren Mensch-Check ausrüsten; `LocalApproval` erzwingt Nonce/Identität/Einmaligkeit auf Basis der `ApprovalAnfrage`, persistenter Approval-Audit bleibt Folgescope.
 - **`AuditPort` persistent** führen: bei jedem Schritt Belief-/Eskalationskontext speichern.
 - **`KonfidenzPort` append-only** betreiben, damit Replay und Overrides nachvollziehbar bleiben.
 

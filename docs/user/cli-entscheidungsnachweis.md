@@ -34,7 +34,9 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
 - Approval-Kontext: `AktionGaten` ruft den `HumanApprovalPort` nur nach
   bestandener `KonfidenzGate`-Freigabe fuer irreversible Aktionen auf und
   uebergibt eine `ApprovalAnfrage` aus konkreter Aktion und aktuellem
-  `BeliefState`.
+  `BeliefState`. Der lokale Adapter `LocalApproval` bindet diese Anfrage an
+  Nonce, Identitaet und Kontext-Digest; die dokumentierten CLI-Szenarien nutzen
+  weiterhin den Fake-Approval bis zu einem separaten Binding-Slice.
 
 ## 2. Entscheidung je Szenario
 
