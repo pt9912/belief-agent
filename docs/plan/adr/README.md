@@ -10,6 +10,7 @@
 | [0006](0006-coverage-gate-scope.md) | Coverage-Gate-Scope — Gate auf application + Adapter erweitern (per Modul) | Accepted | `LH-QA-03` |
 | [0007](0007-eskalations-schwelle.md) | Eskalations-Schwelle θ_esc = 0,30 (spec-konform), entkoppelt von der Gate-Sperre | Accepted | `LH-FA-ESK-001` |
 | [0008](0008-schwellwerte-spec-konform.md) | Gate-/Resthypothese-Schwellwerte spec-konform verschärft (Supersedes `ADR-0005`) | Accepted | `LH-FA-POL-003` |
+| [0009](0009-decision-policy-konfigurationsbuendel.md) | DecisionPolicy — benanntes Konfigurations-Bündel über Gate/Zyklus/VoI, kein neuer Ausführungspfad | Proposed | `LH-FA-POL-007` |
 
 ## Konventionen
 
