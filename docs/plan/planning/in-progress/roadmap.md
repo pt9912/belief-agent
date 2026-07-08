@@ -25,7 +25,7 @@ abgeschlossen
 Bereinigung. Tracked Follow-ups (welle-05): lokaler echter Approval-Adapter mit
 Nonce/Kontextbindung (`slice-036`) und bewusstes CLI-Binding (`slice-037`),
 Approval-Kanalwahl (`slice-038`), Remote/UI-Approval-Kanal (`slice-039`),
-Approval-Audit-Persistenz (`slice-040`), dauerhafte Audit-Datenbank
+Approval-Audit-Persistenz (`slice-040`), persistenter AuditPort-Adapter
 (`slice-041`), echter Aktionsvorschlags-Provider-Adapter (`slice-042`),
 Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`), echte
 Hypothesen-Provider-Adapter (`slice-044`), echter BeobachtungsAuswahl-Adapter
@@ -37,7 +37,7 @@ provider-spezifische LLM-Konfiguration.
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → dauerhafte Audit-Datenbank (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echter BeobachtungsAuswahl-Adapter (`slice-045`) → persistenter KonfidenzPort-Adapter (`slice-046`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → persistenter AuditPort-Adapter (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echter BeobachtungsAuswahl-Adapter (`slice-045`) → persistenter KonfidenzPort-Adapter (`slice-046`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
 
 ## Meilensteine
 
@@ -147,7 +147,7 @@ flowchart LR
 | 2026-07-08 | `slice-038` in `open/` geplant: Approval-Kanalwahl | Folgeslice zu `slice-037`: Kanalwahl wird als fail-closed Vertrag/Dispatcher geplant. Konkrete Remote-/UI-Kanaladapter und persistenter Approval-Audit bleiben eigene Slices, damit Kanalwahl nicht mit Kanalimplementierung vermischt wird. |
 | 2026-07-08 | `slice-039` in `open/` geplant: Remote/UI-Approval-Kanal | Folgeslice zu `slice-038`: ein konkreter Remote/UI-Kanal wird hinter die Kanalwahl gesetzt, aber hermetisch testbar gehalten. Produktive Authentisierung und persistenter Approval-Audit bleiben getrennt, weil sie eigene Failure-Modes und Verträge einfuehren. |
 | 2026-07-08 | `slice-040` in `open/` geplant: Approval-Audit-Persistenz | Folgeslice zu `slice-039`: Anfrage, Kanalwahl, Antwortentscheidung und Fehlergrund werden append-only auditierbar. Allgemeine Audit-Datenbank/Retention und Ausfuehrungsadapter bleiben getrennt, damit die Approval-Entscheidungsspur isoliert pruefbar bleibt. |
-| 2026-07-08 | `slice-041` in `open/` geplant: dauerhafte Audit-Datenbank | Folgeslice zu `slice-040`: ein dauerhafter `AuditPort`-Adapter speichert alle Audit-Ereignisse append-only und restart-fest. Retention, Backups, Migrationen, Compliance-Exports und Runtime-Default-Binding bleiben getrennte Folgeslices. |
+| 2026-07-08 | `slice-041` in `open/` geplant: persistenter AuditPort-Adapter | Ein echter nicht-Memory-Adapter speichert Audit-Ereignisse append-only und restart-fest hinter `AuditPort`. Approval-Audit-Ereignisse aus `slice-040`, Retention, Backups, Migrationen, Compliance-Exports und Runtime-Default-Binding bleiben getrennte Folgeslices. |
 | 2026-07-08 | `slice-042` in `open/` geplant: LLM-Aktionsvorschlag-Provider-Adapter | Folgeslice zu `slice-023`/`slice-019`: ein echter, lokal testbarer Provider-/Framework-Adapter implementiert `AktionsVorschlagsPort` mit strengem JSON-Schema. CLI-Default-Binding, Live-Provider-Secrets, Gate/Freigabe und Aktionsausfuehrung bleiben getrennt. |
 | 2026-07-08 | `slice-043` in `open/` geplant: Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege | Folgeslice zu `slice-042`: der nach dem ersten Providerpfad fehlende Koog- oder LangChain4j-Adapter wird ergaenzt und beide Framework-Pfade werden gegen dieselbe Contract-Matrix verifiziert. CLI-Default-Binding, Live-Secrets, Approval und Ausfuehrung bleiben getrennt. |
 | 2026-07-08 | `slice-044` in `open/` geplant: LLM-Hypothesen-Provider-Adapter | Folgeslice zu `slice-025`/`slice-026`: ein echter, lokal testbarer Provider-/Framework-Adapter implementiert `HypothesenPort` mit strengem Kandidaten-Schema. Likelihood-Port, Aktionsvorschlaege, CLI-Default-Binding, Live-Secrets und produktive Provider-Konfiguration bleiben getrennt. |
