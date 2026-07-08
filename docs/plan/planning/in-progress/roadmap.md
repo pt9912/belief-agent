@@ -22,15 +22,18 @@ abgeschlossen
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
-Bereinigung. Tracked Follow-ups (welle-05): echter Approval-Adapter mit
-Binding, echte Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle und
+Bereinigung. Tracked Follow-ups (welle-05): lokaler echter Approval-Adapter mit
+Nonce/Kontextbindung (`slice-036`) und bewusstes CLI-Binding (`slice-037`),
+Approval-Kanalwahl (`slice-038`), Remote/UI-Approval-Kanal (`slice-039`),
+Approval-Audit-Persistenz (`slice-040`), dauerhafte Audit-Datenbank
+(`slice-041`), echte Ausfuehrungsadapter fuer das CLI-Bundle und
 provider-spezifische LLM-Konfiguration.
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Echter Approval-Adapter mit Binding auf Basis des Kontextvertrags aus `slice-035`; echte Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle; provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → dauerhafte Audit-Datenbank (`slice-041`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
 
 ## Meilensteine
 
@@ -135,3 +138,9 @@ flowchart LR
 | 2026-07-07 | `slice-033` **in `done/` abgeschlossen**: `example/code-agent` behandelt fehlerhafte Build-/Repo-Fixtures fail-closed mit expliziten Fehlerklassen M0-M5 und Exit-Code 65 | `make example-code-agent-run` und `make gates` gruen; unabhaengiger kontextfreier Review meldete zwei Medium-Befunde (Repo-Negativabdeckung, Artefaktstatus), beide integriert; Runtime-Image-Vertrag aus `slice-032` auf `/app/fixtures/*.fixture` reconcilt |
 | 2026-07-08 | `slice-035` in `open/` geplant: Human-Approval-Kontextvertrag vor echtem Approval-Adapter | Der bestehende `HumanApprovalPort` sieht nur `Aktion`; fuer den geforderten echten Approval-Adapter mit Binding muss zuerst der Entscheidungskontext (`Aktion` + aktueller `BeliefState`) in den Port-Vertrag. Realistische Build-/Repo-Beobachtungsquellen aus `slice-031`..`034` sind erledigt; naechster Stabilisierungsschritt ist Safety-Contract statt sofort externe Approval-I/O. |
 | 2026-07-08 | `slice-035` **in `done/` abgeschlossen**: Human-Approval-Port ist an `Aktion` + aktuellen `BeliefState` gebunden | `make gates` gruen; Design-/Code-Safety-Review und Verification ohne HIGH/MEDIUM-Befund; echter Approval-Adapter mit Nonce/Identitaet/Einmaligkeit bleibt Folgeslice. |
+| 2026-07-08 | `slice-036` in `open/` geplant: lokaler echter Approval-Adapter hinter `HumanApprovalPort` | `slice-035` liefert `ApprovalAnfrage(aktion, belief)`; der naechste Safety-Schritt ist ein isolierter Outbound-Adapter mit Nonce, Identitaet, Kontextbindung und Einmaligkeit. CLI-Produktivbinding bleibt separater Folgeslice, damit der Adapter-Slice pruefbar bleibt. |
+| 2026-07-08 | `slice-037` in `open/` geplant: CLI-Binding fuer lokalen Approval-Adapter | Folgeslice zu `slice-036`: der CLI-Composition-Root bindet `approval-local` bewusst und beweist die Executor-Grenze im E2E. Audit-Persistenz und Remote-/UI-Kanalwahl bleiben separiert, damit Binding und Safety-Sensorik reviewbar bleiben. |
+| 2026-07-08 | `slice-038` in `open/` geplant: Approval-Kanalwahl | Folgeslice zu `slice-037`: Kanalwahl wird als fail-closed Vertrag/Dispatcher geplant. Konkrete Remote-/UI-Kanaladapter und persistenter Approval-Audit bleiben eigene Slices, damit Kanalwahl nicht mit Kanalimplementierung vermischt wird. |
+| 2026-07-08 | `slice-039` in `open/` geplant: Remote/UI-Approval-Kanal | Folgeslice zu `slice-038`: ein konkreter Remote/UI-Kanal wird hinter die Kanalwahl gesetzt, aber hermetisch testbar gehalten. Produktive Authentisierung und persistenter Approval-Audit bleiben getrennt, weil sie eigene Failure-Modes und Verträge einfuehren. |
+| 2026-07-08 | `slice-040` in `open/` geplant: Approval-Audit-Persistenz | Folgeslice zu `slice-039`: Anfrage, Kanalwahl, Antwortentscheidung und Fehlergrund werden append-only auditierbar. Allgemeine Audit-Datenbank/Retention und Ausfuehrungsadapter bleiben getrennt, damit die Approval-Entscheidungsspur isoliert pruefbar bleibt. |
+| 2026-07-08 | `slice-041` in `open/` geplant: dauerhafte Audit-Datenbank | Folgeslice zu `slice-040`: ein dauerhafter `AuditPort`-Adapter speichert alle Audit-Ereignisse append-only und restart-fest. Retention, Backups, Migrationen, Compliance-Exports und Runtime-Default-Binding bleiben getrennte Folgeslices. |

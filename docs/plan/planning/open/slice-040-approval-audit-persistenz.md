@@ -1,0 +1,114 @@
+# Slice slice-040: Approval-Audit-Persistenz
+
+**Status:** open (siehe [Planning-README](../README.md)).
+
+**Welle:** welle-05-llm-port Stabilisierung.
+
+**Bezug:** `LH-FA-POL-004`, `LH-FA-POL-006`, `LH-FA-AUD-001`,
+`LH-FA-AUD-002`, `LH-FA-AUD-003`, `LH-OUT-04`, `LH-QA-02`, `LH-QA-03`,
+`LH-QA-04`; `ADR-0001`, `ADR-0003`; `ARC-06`, `ARC-07`, `ARC-08`, `ARC-09`.
+
+**Autor:** Codex. **Datum:** 2026-07-08.
+
+---
+
+## 1. Ziel
+
+Der Approval-Vorgang wird append-only auditierbar: Anfrage, Kanalwahl,
+Antwortentscheidung und Ablehnungs-/Fehlergrund werden als nachvollziehbare
+Audit-Ereignisse persistiert, ohne die Freigabe selbst zu umgehen oder den
+Executor-Pfad zu erweitern.
+
+## 2. Definition of Done
+
+- [ ] Approval-Audit-Ereignisse sind als stabiler Contract modelliert:
+  `ApprovalAngefragt`, `ApprovalErteilt`, `ApprovalVerweigert` und
+  `ApprovalFehler` oder gleichwertig enthalten Anfrage-/Kontext-Digest,
+  Kanal, Nonce/Antwortreferenz, Identitaetsreferenz und Ergebnisgrund, aber
+  keine sensiblen Klartext-Geheimnisse (`LH-FA-AUD-001`/`003`).
+- [ ] Der Approval-Pfad schreibt append-only ueber den bestehenden `AuditPort`
+  oder einen eng begruendeten Approval-Audit-Port; Audit-Ausfall ist fail-closed
+  fuer extern-wirksame Aktionen, wenn dadurch die Entscheidungsspur fehlen
+  wuerde (`LH-QA-02`, `LH-FA-POL-004`, `LH-OUT-04`).
+- [ ] Persistenz-/Replay-Verhalten ist deterministisch getestet (`LH-QA-03`):
+  Ereignisreihenfolge, keine Ueberschreibung, Rekonstruktion eines
+  Approval-Vorgangs, Audit-Ausfall, verweigerte Freigabe und erfolgreiche
+  Freigabe mit `Zyklusergebnis.Gehandelt.freigabe.aktion` bleiben nachvollziehbar.
+  Build-/Arch-/Doku-Integration, Review-/Verification-Artefakte,
+  `make doc-check`, `make gates` und Closure-Notiz liegen vor.
+
+## 3. Plan (vor Code)
+
+| Datei / Komponente | Aenderungs-Art | Begruendung |
+|---|---|---|
+| `hexagon/domain/src/commonMain/**/Ereignis.kt` oder approval-audit Contract | update/neu | Approval-Audit-Ereignisse append-only und rekonstruierbar modellieren (`ARC-06`). |
+| `hexagon/application/.../gaten` oder Kanal-Dispatcher aus `slice-038`/`039` | update | Audit-Ereignisse an der Stelle erzeugen, an der Anfrage, Kanalantwort und Ergebnis bekannt sind. |
+| `hexagon/application/src/commonTest/**` | update | Tests fuer Ereignisfolge, Audit-Ausfall fail-closed und keine Executor-Umgehung. |
+| `adapters/outbound/audit-memory/**` | update | Falls der bestehende Memory-Adapter neue Ereignistypen serialisieren/replayen muss. |
+| `adapters/inbound/cli/src/test/**` | update | E2E-Sicht: Approval-Audit-Spur sichtbar, ohne neue Ausfuehrungsroute. |
+| `.a-check.yml` | update | Nur falls neue Audit-/Approval-Komponente entsteht; Kanten bleiben innenorientiert. |
+| `Dockerfile` | update | Nur falls neue Module/Tests in Build-/Coverage-Stages aufgenommen werden muessen. |
+| `docs/user/integration.md` | update | Approval-Audit-Persistenz, Fail-Closed bei Audit-Ausfall und Datenschutzgrenze dokumentieren. |
+| `docs/user/cli-entscheidungsnachweis.md` | update | Entscheidungsspur um Approval-Audit-Ereignisse ergaenzen. |
+| `docs/reviews/*slice-040*` | neu | Code-/Safety-Review-Artefakt fuer Approval-Audit-Persistenz. |
+| `docs/verifications/*slice-040*` | neu | Verification-Artefakt fuer DoD, Sensoren und Replay-/Audit-Negativmatrix. |
+
+## 4. Trigger
+
+`slice-039` liegt in `done/` und liefert einen konkreten Remote/UI-Kanal hinter
+der Kanalwahl. Kein Slice liegt in `in-progress/` (WIP-Limit 1). Vor Start wird
+entschieden, ob Approval-Audit als Erweiterung des bestehenden `AuditPort` oder
+als enger Approval-Audit-Port umgesetzt wird; bei Architekturabweichung entsteht
+vor Code ein Design-Review/Folge-ADR.
+
+## 5. Closure-Trigger
+
+DoD vollstaendig + Review/Verification abgeschlossen + `make gates` gruen +
+Closure-Notiz geschrieben + Slice nach `done/` verschoben.
+
+## 6. Risiken und offene Punkte
+
+- Audit darf keine Freigabe ersetzen. Der Executor bleibt an
+  `Zyklusergebnis.Gehandelt.freigabe.aktion` gebunden.
+- Audit-Ausfall ist Safety-relevant. Wenn die Entscheidungsspur fuer
+  extern-wirksame Aktionen nicht geschrieben werden kann, muss der Pfad
+  fail-closed oder eskalierend enden.
+- Approval-Audit darf keine sensiblen Geheimnisse oder vollstaendige UI-Token
+  persistieren. Persistiert werden Referenzen/Digests, nicht Roh-Geheimnisse.
+- Allgemeine dauerhafte Audit-Datenbank, Retention-Policy und externe
+  Compliance-Exports bleiben Folgeslices, falls sie mehr als lokale
+  Persistenz-/Replay-Faehigkeit erfordern.
+
+## 7. Closure-Notiz (nach `done/`)
+
+<!-- Erst nach Abschluss fuellen. -->
+
+## 8. Sub-Area-Modus-Begründung
+
+### Sub-Area: Audit/Event-Log (`ARC-06`)
+
+- **Modus:** Hybrid
+- **Konventionen-Dichte:** hoch fuer append-only Grundregeln
+  (`LH-FA-AUD-001`/`003`, `slice-007`, `slice-010`), mittel fuer
+  Approval-spezifische Ereignisse, die noch nicht modelliert sind.
+- **Phase-Reife:** Phase 4 fuer allgemeines Audit, Phase 2-3 fuer
+  Approval-Audit. Bestehende Memory-Persistenz und Rekonstruktion sind stabil,
+  der neue Ereignistyp ist fachlich neu.
+- **Evidenz-/Diskrepanz-Risiko:** hoch. Eine fehlende oder ueberschreibbare
+  Approval-Spur wuerde `LH-FA-POL-004` praktisch schwer auditierbar machen.
+- **Reconciliation-Aufwand:** ein Slice fuer Contract, Erzeugung,
+  Memory-/Replay-Integration und Doku; produktive Datenbank/Retention bleibt
+  Folgearbeit.
+
+### Sub-Area: Approval-Kanalwahl / Remote-UI
+
+- **Modus:** Hybrid
+- **Konventionen-Dichte:** mittel. `slice-038`/`039` liefern Kanalwahl und
+  Remote/UI-Kanal; Audit-Persistenz konsumiert deren Ereignisse.
+- **Phase-Reife:** Phase 3-4 nach `slice-039`. Die Kanaluebergaenge sind
+  vorhanden, aber ihre dauerhafte Entscheidungsspur fehlt noch.
+- **Evidenz-/Diskrepanz-Risiko:** mittel bis hoch. Audit darf keine zusaetzliche
+  Freigabelogik einfuehren und darf Kontext-/Nonce-Daten nicht unsicher
+  speichern.
+- **Reconciliation-Aufwand:** mittel; Tests muessen Kanalantwort,
+  Audit-Ereignisse und Executor-Grenze zusammen pruefen.
