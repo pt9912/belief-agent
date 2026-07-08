@@ -31,10 +31,11 @@ Executor-Grenze gelangen.
   wiederverwendete Freigabe bleibt geschlossen (`LH-QA-03`).
 - [ ] Build-/Arch-/Doku-Integration ist vollstaendig:
   `adapters/inbound/cli` darf den Adapter als Composition-Root binden,
-  `.a-check.yml` bleibt gegen fachliche Adapter-zu-Adapter-Kopplung scharf,
-  `make cli-demo`/ein enger CLI-Sensor dokumentiert den lokalen Approval-Pfad,
-  User-Doku, Review-/Verification-Artefakte, `make doc-check`, `make gates` und
-  Closure-Notiz liegen vor.
+  `adapters/inbound/cli/build.gradle.kts` enthaelt die Modulabhaengigkeit auf
+  `adapters:outbound:approval-local`, `.a-check.yml` bleibt gegen fachliche
+  Adapter-zu-Adapter-Kopplung scharf, `make cli-demo`/ein enger CLI-Sensor
+  dokumentiert den lokalen Approval-Pfad, User-Doku, Review-/Verification-
+  Artefakte, `make doc-check`, `make gates` und Closure-Notiz liegen vor.
 
 ## 3. Plan (vor Code)
 
@@ -42,6 +43,7 @@ Executor-Grenze gelangen.
 |---|---|---|
 | `adapters/inbound/cli/src/main/**` | update | CLI-Konfiguration und Koin-Binding fuer `approval-local`, ohne Executor-Policy zu verschieben. |
 | `adapters/inbound/cli/src/test/**` | update | E2E-/Contract-Tests fuer lokalen Approval-Pfad, Negativpfade und unveraenderte Executor-Grenze. |
+| `adapters/inbound/cli/build.gradle.kts` | update | Gradle-Modulkante vom CLI-Composition-Root zu `adapters:outbound:approval-local` explizit aufnehmen; `make build` prueft den Modulgraphen. |
 | `.a-check.yml` | update | Composition-Root-Kante `inbound_cli -> approval-local` erlauben, sonstige Adapterkopplung weiter verbieten. |
 | `Makefile` / `Dockerfile` | update | Nur falls ein enger CLI-Sensor oder Runtime-Parameter fuer `approval-local` noetig ist. |
 | `docs/user/integration.md` | update | Bewusstes CLI-Binding, Defaults und Bediengrenze fuer lokalen Approval-Adapter dokumentieren. |
