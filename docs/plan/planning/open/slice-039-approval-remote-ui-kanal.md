@@ -36,6 +36,12 @@ eine kontext- und nonce-gebundene Antwort als menschliche Freigabe.
   einer abstrahierten Transportgrenze und wird nicht fuer lokale Gates benoetigt.
   Review-/Verification-Artefakte, `make doc-check`, `make gates` und
   Closure-Notiz liegen vor.
+- [ ] Der neue Kanal ist im bestehenden CLI-Composition-Root aus `slice-038`
+  bewusst auswählbar: `adapters/inbound/cli` bindet den Outbound-Adapter als
+  weiteren Kanal an den Dispatcher, genau ein Kanal wird pro `ApprovalAnfrage`
+  aufgerufen, unbekannte/fehlende Bindings bleiben fail-closed, und die
+  erforderliche Architektur-Kante `inbound_cli -> outbound_approval_remote_ui`
+  ist explizit in `.a-check.yml` modelliert (`ARC-09`, `ADR-0003`).
 
 ## 3. Plan (vor Code)
 
@@ -44,8 +50,10 @@ eine kontext- und nonce-gebundene Antwort als menschliche Freigabe.
 | `adapters/outbound/approval-remote-ui` | neu | Konkreter Remote/UI-Approval-Kanal hinter dem Kanalvertrag (`ARC-08`). |
 | `adapters/outbound/approval-remote-ui/src/commonMain/**` | neu | Serialisierung, Transport-Abstraktion, Antwortvalidierung, Fail-Closed-Policy. |
 | `adapters/outbound/approval-remote-ui/src/commonTest/**` | neu | Hermetische Transport-Fakes fuer Positivfall und Negativmatrix. |
+| `adapters/inbound/cli/src/main/**` | update | ARC-09-Bindepunkt: Remote/UI-Kanal im bestehenden Kanalwahl-Dispatcher aus `slice-038` registrieren und bewusst an `HumanApprovalPort` binden. |
+| `adapters/inbound/cli/src/test/**` | update | CLI-/Composition-Sensor fuer `approval=<remote-ui-kanal>` sowie Negativpfade fuer unbekannten oder nicht gebundenen Remote/UI-Kanal. |
 | `settings.gradle.kts` | update | Neues Adaptermodul registrieren. |
-| `.a-check.yml` | update | Adapterrolle und erlaubte Kanten aufnehmen; keine fachliche Adapterkopplung. |
+| `.a-check.yml` | update | Adapterrolle und erlaubte Kante `inbound_cli -> outbound_approval_remote_ui` aufnehmen; keine fachliche Adapterkopplung und keine Core-Abhaengigkeit auf Adapter. |
 | `Dockerfile` | update | Neues Modul in Build-, Test- und Coverage-Stages aufnehmen. |
 | `docs/user/integration.md` | update | Remote/UI-Kanal, lokale Testbarkeit und Produktivgrenzen dokumentieren. |
 | `docs/user/cli-entscheidungsnachweis.md` | update | Safety-Nachweis um Remote/UI-Negativpfade ergaenzen. |
@@ -57,7 +65,10 @@ eine kontext- und nonce-gebundene Antwort als menschliche Freigabe.
 `slice-038` liegt in `done/` und liefert die fail-closed Kanalwahl. Kein Slice
 liegt in `in-progress/` (WIP-Limit 1). Vor Start wird bestaetigt, ob der
 Kanaladapter in einem eigenen Modul (`approval-remote-ui`) entsteht und ob die
-Transportgrenze ohne Live-Netzwerk in Tests bedienbar ist.
+Transportgrenze ohne Live-Netzwerk in Tests bedienbar ist. Ausserdem wird vor
+Start bestaetigt, dass der Slice den neuen Kanal im CLI-Composition-Root aus
+`slice-038` registriert; ein isoliertes Outbound-Modul ohne auswählbaren
+CLI-Kanal erfuellt die DoD nicht.
 
 ## 5. Closure-Trigger
 
@@ -76,6 +87,12 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 - Persistenter Approval-Audit bleibt eigener Slice. Dieser Slice darf nur die
   auditierbaren Ereignisse/IDs benennen, nicht eine dauerhafte Speicherung
   einfuehren.
+- Ein Remote/UI-Outbound-Modul ohne CLI-Dispatcher-Binding waere nur ein
+  ungenutzter Adapter. Die Implementierung muss deshalb die ARC-09-Kante vom
+  CLI-Composition-Root zum neuen Adapter explizit herstellen und testen.
+- Die Kanalwahl darf durch den neuen Kanal keinen offenen Default erhalten:
+  `local` und der Remote/UI-Kanal bleiben explizite Auswahlwerte; fehlende
+  Konfiguration propagiert keine Freigabe.
 
 ## 7. Closure-Notiz (nach `done/`)
 
@@ -107,4 +124,5 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
   den Default nicht oeffnen und darf nicht mehrere Kanaele pro Anfrage
   konsumieren.
 - **Reconciliation-Aufwand:** gering bis mittel; neue Kante in Arch-/Doku- und
-  Build-Konfiguration.
+  Build-Konfiguration plus CLI-Composition-Test fuer die Auswahl des
+  Remote/UI-Kanals.
