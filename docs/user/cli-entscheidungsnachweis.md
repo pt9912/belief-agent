@@ -31,6 +31,10 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   [`ReHypothesenAusloeser`](../../hexagon/domain/src/commonMain/kotlin/dev/beliefagent/domain/belief/ReHypothesenAusloeser.kt),
   Kandidaten aus
   [`FakeHypothesenPort`](../../adapters/outbound/llm-hypothesen-fake/src/commonMain/kotlin/dev/beliefagent/adapter/llmhypothesen/FakeHypothesenPort.kt).
+- Approval-Kontext: `AktionGaten` ruft den `HumanApprovalPort` nur nach
+  bestandener `KonfidenzGate`-Freigabe fuer irreversible Aktionen auf und
+  uebergibt eine `ApprovalAnfrage` aus konkreter Aktion und aktuellem
+  `BeliefState`.
 
 ## 2. Entscheidung je Szenario
 
@@ -70,7 +74,8 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   2. `aktionGaten` prüft Erfolgs-/Schwelle
      `EXTERN_WIRKSAM = 0.95`.
   3. `p_success 0.95 >= 0.95` wäre gate-fähig, aber Aktion ist
-     irreversibel und keine menschliche Freigabe.
+     irreversibel und die kontextgebundene `ApprovalAnfrage` wird vom Fake
+     nicht freigegeben.
   4. `AktionGaten` wandelt auf `Eskalation` (LH-FA-POL-004).
 - Ergebnis:
   - `terminal=eskaliert`
@@ -123,7 +128,8 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
      3) Kandidat 0.3 -> Posterior `(bekannt:0.975000, unbekannt:0.006050,
         rest:0.019051)`.
   3. Nach dem dritten Schritt gilt `resthypothese ≤ 0.1` und
-     `p_success = 0.95 >= 0.95`, irreversibel + Freigabe vorhanden.
+     `p_success = 0.95 >= 0.95`, irreversibel + Freigabe fuer die aktuelle
+     `ApprovalAnfrage` vorhanden.
   4. Zyklus wird frei und führt aus.
 - Ergebnis:
   1. `terminal=gehandelt`
@@ -164,7 +170,7 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
 ```mermaid
 flowchart TD
   A["Scenario starten"] --> B["Aktionsvorschlag laden"]
-  B --> C{"KonfidenzGate\n& human approval"}
+  B --> C{"KonfidenzGate\n& ApprovalAnfrage"}
   C -->|irreversibel + keine Freigabe| D["GateEskalation\n(POL-004)"]
   C -->|Rest > 0.1 + irreversibel| E2["GateEskalation\n(POL-005)"]
   C -->|p_success < Schwelle| E["Ablehnung"]
@@ -205,6 +211,6 @@ sequenceDiagram
   C->>U: aktualisieren(beobachtung3)
   U-->>C: belief (bekannt:0.975000, unbekannt:0.006050, rest:0.019051)
   C->>G: prüfe(aktion, 0.019051)
-  G-->>C: Freigabe (Approval vorhanden)
+  G-->>C: Freigabe (ApprovalAnfrage freigegeben)
   C-->>C: terminal=gehandelt / executed=true
 ```

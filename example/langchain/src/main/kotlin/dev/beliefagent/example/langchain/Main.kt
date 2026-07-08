@@ -9,6 +9,7 @@ import dev.beliefagent.application.belief.beobachtungwaehlen.ports.BeobachtungsA
 import dev.beliefagent.application.belief.entscheidungszyklus.Entscheidungszyklus
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.AktionGaten
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.Beobachtung
@@ -113,7 +114,7 @@ private class BeliefAwareCandidatePort(
 }
 
 private object AllowingHumanApproval : HumanApprovalPort {
-    override fun freigegeben(aktion: Aktion): Boolean = true
+    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean = true
 }
 
 private class MonotoneDemoClock : UhrPort {

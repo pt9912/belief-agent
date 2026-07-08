@@ -125,7 +125,8 @@ keine Ausfuehrung; die Zyklus-Orchestrierung kann externalisierte
 Modell-Konfidenz über den Konfidenz-Port laden und vor dem Gate in eine
 gate-faehige Erfolgswahrscheinlichkeit übersetzen; *aktion-gaten* holt bei
 extern-wirksamen Aktionen die menschliche Freigabe über den Human-Approval-Port
-ein (`LH-FA-POL-004`), bevor es freigibt; *beobachtung-waehlen* liest die
+ein (`LH-FA-POL-004`) und bindet die Anfrage an die konkrete Aktion plus den
+aktuellen `BeliefState`, bevor es freigibt; *beobachtung-waehlen* liest die
 Beobachtungs-Ports zur Aufzählung verfügbarer Kandidaten. Der Inbound-Adapter
 (`cli`) verdrahtet die Outbound-Adapter an die Ports (DI) und stößt den
 Entscheidungszyklus an. Ausführung bleibt am Rand an
@@ -165,7 +166,7 @@ sequenceDiagram
     end
     Runtime->>Gate: Aktion prüfen (Erfolgswahrscheinlichkeit, Wirkungsklasse)
     opt Aktion extern-wirksam (LH-FA-POL-004)
-        Gate->>Appr: menschliche Freigabe anfordern
+        Gate->>Appr: menschliche Freigabe anfordern (Aktion + aktueller Belief)
         Appr-->>Gate: erteilt / verweigert
     end
     alt Gate gibt frei

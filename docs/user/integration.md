@@ -400,6 +400,11 @@ Extern-wirksame Aktionen brauchen immer beides:
 1. die harte Konfidenzschwelle,
 2. explizite menschliche Freigabe ueber `HumanApprovalPort`.
 
+Der `HumanApprovalPort` erhaelt dafuer eine `ApprovalAnfrage` aus der konkreten
+`Aktion` und dem aktuellen `BeliefState`. Ein echter Adapter muss diese Anfrage
+als Entscheidungs-Kontext behandeln; Nonce, Identitaet und Einmaligkeit sind
+Folgescope des interaktiven Approval-Adapters.
+
 Bei hoher Resthypothese wird nicht gehandelt, sondern gesammelt oder eskaliert.
 Bei erschoepftem Budget eskaliert der Zyklus fail-safe.
 
@@ -469,7 +474,7 @@ Aktuelle konkrete Implementierungen im Repo (noch nicht alles produktiv):
 | `AktionsVorschlagsPort` | `dev.beliefagent.adapter.llmaction.FakeAktionsVorschlagsPort` | Fake-Port für strukturiertes Rohvorschlag-Mapping |
 | `BeobachtungsAuswahlPort` | `dev.beliefagent.adapter.voi.FakeKandidatenquelle` | Deterministischer VOI-Port |
 | `HypothesenPort` | `dev.beliefagent.adapter.llmhypothesen.FakeHypothesenPort` | Deterministischer Re-Hypothesen-Port |
-| `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval` | Default-Verweigerung, boolesch |
+| `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval` | Default-Verweigerung; konsumiert `ApprovalAnfrage`, entscheidet aber weiter boolesch-deterministisch |
 | `KonfidenzPort` | `dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort` | In-Memory, persistenznah (Replay) |
 | `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` | In-Memory, append-only |
 | `LlmPort` | `dev.beliefagent.adapter.llm.langchain4j.LangChain4jLlmPort` / `dev.beliefagent.adapter.llm.koog.KoogLlmPort` | echte LLM-Provider-Boundary für Likelihoods |
@@ -507,7 +512,7 @@ val controller = CodeAgentController(
 Wichtig fuer Code-Agenten:
 
 - **`AktionsVorschlagsPort` darf nur strukturierte Aktionen liefern**, keine direkten Werkzeugaufrufe.
-- **`HumanApprovalPort` für irreversible Aktionen** als sicherer Mensch-Check ausrüsten (Nonce/Identität + Kontextbindung).
+- **`HumanApprovalPort` für irreversible Aktionen** als sicheren Mensch-Check ausrüsten (Nonce/Identität/Einmaligkeit auf Basis der `ApprovalAnfrage`).
 - **`AuditPort` persistent** führen: bei jedem Schritt Belief-/Eskalationskontext speichern.
 - **`KonfidenzPort` append-only** betreiben, damit Replay und Overrides nachvollziehbar bleiben.
 

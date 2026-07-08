@@ -6,6 +6,7 @@ import dev.beliefagent.application.belief.aktualisieren.ports.UhrPort
 import dev.beliefagent.application.belief.beobachtungwaehlen.BeobachtungWaehlen
 import dev.beliefagent.application.belief.beobachtungwaehlen.ports.BeobachtungsAuswahlPort
 import dev.beliefagent.application.belief.gaten.AktionGaten
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.application.belief.ports.ExternalisierteKonfidenz
 import dev.beliefagent.application.belief.ports.KonfidenzPort
@@ -65,7 +66,7 @@ class EntscheidungszyklusTest {
         override fun jetzt(): Zeitstempel = Zeitstempel(1L)
     }
     private fun approval(ok: Boolean) = object : HumanApprovalPort {
-        override fun freigegeben(aktion: Aktion): Boolean = ok
+        override fun freigegeben(anfrage: ApprovalAnfrage): Boolean = ok
     }
     private fun auswahl(vararg kandidaten: VoiKandidat) = object : BeobachtungsAuswahlPort {
         override fun kandidaten(belief: BeliefState): List<VoiKandidat> = kandidaten.toList()

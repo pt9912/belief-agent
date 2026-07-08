@@ -2,6 +2,7 @@ package dev.beliefagent.adapter.approval
 
 import dev.beliefagent.application.belief.gaten.AktionGaten
 import dev.beliefagent.application.belief.gaten.Aktionsfreigabe
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
 import dev.beliefagent.domain.belief.Beobachtung
@@ -31,14 +32,16 @@ class FakeApprovalTest {
     private fun belief(rest: Double) =
         BeliefState.of(listOf(Hypothese(HypotheseId("A"), 1.0 - rest)), Resthypothese(rest))
 
+    private fun anfrage() = ApprovalAnfrage(aktion(0.9), belief(0.1))
+
     @Test
     fun default_verweigert_freigabe() { // fail-safe
-        assertFalse(FakeApproval().freigegeben(aktion(0.9)))
+        assertFalse(FakeApproval().freigegeben(anfrage()))
     }
 
     @Test
     fun konfiguriert_freigegeben() {
-        assertTrue(FakeApproval(freigabe = true).freigegeben(aktion(0.9)))
+        assertTrue(FakeApproval(freigabe = true).freigegeben(anfrage()))
     }
 
     @Test

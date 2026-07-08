@@ -1,5 +1,6 @@
 package dev.beliefagent.application.belief.gaten
 
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
@@ -36,7 +37,7 @@ class AktionGaten(
             is GateEntscheidung.Eskalation -> Aktionsfreigabe.Eskaliert(entscheidung.grund)
             GateEntscheidung.Freigabe ->
                 // LH-FA-POL-004: irreversible Aktion braucht zusätzlich menschliche Freigabe.
-                if (aktion.wirkungsklasse.irreversibel && !approval.freigegeben(aktion)) {
+                if (aktion.wirkungsklasse.irreversibel && !approval.freigegeben(ApprovalAnfrage(aktion, belief))) {
                     Aktionsfreigabe.Eskaliert(
                         "irreversible Aktion ohne menschliche Freigabe (LH-FA-POL-004)",
                     )

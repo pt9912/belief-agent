@@ -24,6 +24,7 @@ import dev.beliefagent.application.belief.entscheidungszyklus.Entscheidungszyklu
 import dev.beliefagent.application.belief.entscheidungszyklus.KonfidenzgebundenerEntscheidungszyklus
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.AktionGaten
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.application.belief.ports.KonfidenzPort
 import dev.beliefagent.application.ports.AuditPort
@@ -281,7 +282,7 @@ private class StaticHypothesenPort : HypothesenPort {
 }
 
 private class StaticApproval(private val freigabe: Boolean) : HumanApprovalPort {
-    override fun freigegeben(aktion: Aktion): Boolean = freigabe
+    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean = freigabe
 }
 
 private class MonotoneDemoClock(start: Long = 1L) : UhrPort {

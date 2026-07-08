@@ -1,5 +1,6 @@
 package dev.beliefagent.application.belief.gaten
 
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
 import dev.beliefagent.domain.belief.Aktion
 import dev.beliefagent.domain.belief.BeliefState
@@ -13,6 +14,7 @@ import dev.beliefagent.domain.belief.Resthypothese
 import dev.beliefagent.domain.belief.Wirkungsklasse
 import dev.beliefagent.domain.belief.Zeitstempel
 import kotlin.test.Test
+import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 
 /**
@@ -30,15 +32,26 @@ class AktionGatenTest {
     )
 
     private fun approval(ja: Boolean) = object : HumanApprovalPort {
-        override fun freigegeben(aktion: Aktion) = ja
+        override fun freigegeben(anfrage: ApprovalAnfrage) = ja
+    }
+
+    private class RecordingApproval(private val ja: Boolean) : HumanApprovalPort {
+        val anfragen = mutableListOf<ApprovalAnfrage>()
+
+        override fun freigegeben(anfrage: ApprovalAnfrage): Boolean {
+            anfragen += anfrage
+            return ja
+        }
     }
 
     @Test
     fun gate_wird_nicht_umgangen_ablehnung_bleibt_ablehnung() { // LH-FA-POL-006
         // Niedrige Erfolgs-P -> Gate lehnt ab; aktion-gaten hebt das NICHT zur Freigabe an.
+        val approval = RecordingApproval(ja = true)
         assertTrue(
-            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.1), belief(0.1)) is Aktionsfreigabe.Abgelehnt,
+            AktionGaten(approval).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.1), belief(0.1)) is Aktionsfreigabe.Abgelehnt,
         )
+        assertEquals(0, approval.anfragen.size)
     }
 
     @Test
@@ -55,6 +68,20 @@ class AktionGatenTest {
     }
 
     @Test
+    fun approval_anfrage_enthaelt_aktion_und_aktuellen_belief() { // LH-FA-POL-004 / LH-FA-POL-006
+        val approval = RecordingApproval(ja = true)
+        val aktion = aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95)
+        val belief = belief(0.1)
+
+        assertTrue(AktionGaten(approval).pruefe(aktion, belief) is Aktionsfreigabe.Freigegeben)
+
+        assertEquals(1, approval.anfragen.size)
+        assertEquals(aktion, approval.anfragen.single().aktion)
+        assertTrue(approval.anfragen.single().belief === belief)
+        assertEquals(0.1, approval.anfragen.single().belief.resthypothese.wahrscheinlichkeit)
+    }
+
+    @Test
     fun reversible_freigabe_braucht_keine_menschliche_freigabe() {
         // repository-wirksam ist reversibel -> Freigegeben ohne Approval.
         assertTrue(
@@ -65,8 +92,10 @@ class AktionGatenTest {
     @Test
     fun gate_eskalation_bleibt_unabhaengig_von_freigabe() { // LH-FA-POL-005 dominiert
         // extern-wirksam + hohe Resthypothese -> Gate eskaliert; Approval ändert nichts.
+        val approval = RecordingApproval(ja = true)
         assertTrue(
-            AktionGaten(approval(true)).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.6)) is Aktionsfreigabe.Eskaliert,
+            AktionGaten(approval).pruefe(aktion(Wirkungsklasse.EXTERN_WIRKSAM, 0.95), belief(0.6)) is Aktionsfreigabe.Eskaliert,
         )
+        assertEquals(0, approval.anfragen.size)
     }
 }

@@ -1,7 +1,7 @@
 package dev.beliefagent.adapter.approval
 
+import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
-import dev.beliefagent.domain.belief.Aktion
 
 /**
  * Deterministischer Fake-Approval-Adapter (ARC-08): steht in welle-03 für die
@@ -11,5 +11,5 @@ import dev.beliefagent.domain.belief.Aktion
  * interaktiver Adapter folgt später.
  */
 class FakeApproval(private val freigabe: Boolean = false) : HumanApprovalPort {
-    override fun freigegeben(aktion: Aktion): Boolean = freigabe
+    override fun freigegeben(anfrage: ApprovalAnfrage): Boolean = freigabe
 }
