@@ -67,6 +67,7 @@ edges:
   - {from: inbound_cli, to: outbound_observation_fake}
   - {from: inbound_cli, to: outbound_audit_memory}
   - {from: inbound_cli, to: outbound_approval_fake}
+  - {from: inbound_cli, to: outbound_approval_local}
   - {from: inbound_cli, to: outbound_voi_fake}
   - {from: inbound_cli, to: outbound_llm_hypothesen_fake}
   - {from: inbound_cli, to: outbound_konfidenz_memory}

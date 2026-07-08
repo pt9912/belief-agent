@@ -8,7 +8,7 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
 
 ## 1. Datenquellen
 
-- Eingangszustand je Szenario: `prior`, `budget`, `approvalFreigegeben`,
+- Eingangszustand je Szenario: `prior`, `budget`, `approval`,
   `aktionsVorschlaege`, `voiKandidaten` aus
   [`StandardCliSzenarien.kt`](../../adapters/inbound/cli/src/main/kotlin/dev/beliefagent/adapter/cli/StandardCliSzenarien.kt).
 - Roh-Aktionsvorschlag:
@@ -35,8 +35,9 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   bestandener `KonfidenzGate`-Freigabe fuer irreversible Aktionen auf und
   uebergibt eine `ApprovalAnfrage` aus konkreter Aktion und aktuellem
   `BeliefState`. Der lokale Adapter `LocalApproval` bindet diese Anfrage an
-  Nonce, Identitaet und Kontext-Digest; die dokumentierten CLI-Szenarien nutzen
-  weiterhin den Fake-Approval bis zu einem separaten Binding-Slice.
+  Nonce, Identitaet und Kontext-Digest. Der CLI-Composition-Root bindet diesen
+  Adapter nur bei explizitem `approval=local`; ohne diesen Schalter gelten die
+  je Szenario gesetzten Fake-Approval-Defaults.
 
 ## 2. Entscheidung je Szenario
 
@@ -46,7 +47,7 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   - `prior = {hypothese=0.9, resthypothese=0.1}`
   - `p_success = 0.8`
   - `wirkungsklasse = ARBEITSBEREICH_LOKAL`
-  - `approvalFreigegeben = false`
+  - `approval = fake(false)`
   - `budget = 3` (Default)
   - `voiKandidaten = []` (keine Sammlung nötig)
 - Gate-Pfad:
@@ -67,7 +68,7 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   - `prior = {hypothese=0.9, resthypothese=0.1}`
   - `p_success = 0.95`
   - `wirkungsklasse = EXTERN_WIRKSAM`
-  - `approvalFreigegeben = false`
+  - `approval = fake(false)`
   - `budget = 3` (Default)
   - `voiKandidaten = []`
 - Gate-Pfad:
@@ -86,13 +87,30 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   - `executor_boundary=closed`
   - `resthypothese=0.100000`
 
+### Lokaler Approval-Pfad fuer `eskaliert`
+
+Wird dasselbe Szenario bewusst mit `approval=local` gestartet, rendert der
+CLI-Root die lokale Approval-Challenge mit Nonce, Kontext-Digest, Aktion,
+Wirkungsklasse, `p_success` und Resthypothese. Nur eine Antwort mit derselben
+Nonce, nicht leerer Identitaet, gleichem Kontext-Digest und exakter
+Bestaetigung `FREIGEBEN` gibt die Anfrage frei.
+
+- passende lokale Freigabe:
+  - `terminal=gehandelt`
+  - `executed=true`
+  - `executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion`
+- fehlende, falsche oder wiederverwendete lokale Freigabe:
+  - `terminal=eskaliert`
+  - `executed=false`
+  - `executor_boundary=closed`
+
 ## 2.3 `abgelehnt`
 
 - Input:
   - `prior = {hypothese=0.9, resthypothese=0.1}`
   - `p_success = 0.3`
   - `wirkungsklasse = ARBEITSBEREICH_LOKAL`
-  - `approvalFreigegeben = false`
+  - `approval = fake(false)`
   - `budget = 3`
   - `voiKandidaten = []`
 - Gate-Pfad:
@@ -115,7 +133,7 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   - `prior = {hypothese=0.05, resthypothese=0.95}`
   - `p_success = 0.95`
   - `wirkungsklasse = EXTERN_WIRKSAM`
-  - `approvalFreigegeben = true`
+  - `approval = fake(true)`
   - `budget = 5`
   - `voiKandidaten`: drei Kandidaten:
     `diskriminierung = [0.5, 0.4, 0.3]`, Kosten je `1.0`.

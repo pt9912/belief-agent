@@ -72,7 +72,7 @@ object StandardCliSzenarien {
     ) = CliRuntimeKonfiguration(
         prior = prior,
         budget = budget,
-        approvalFreigegeben = approval,
+        approval = CliApprovalKonfiguration.Fake(approval),
         bekannteEvidenz = mapOf(evidenzRef to evidenz),
         voiKandidaten = voiKandidaten,
         szenario = szenario,

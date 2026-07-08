@@ -1,6 +1,14 @@
 package dev.beliefagent.adapter.cli
 
 import dev.beliefagent.adapter.approval.FakeApproval
+import dev.beliefagent.adapter.approvallocal.ApprovalAntwort
+import dev.beliefagent.adapter.approvallocal.ApprovalAusgabe
+import dev.beliefagent.adapter.approvallocal.ApprovalChallenge
+import dev.beliefagent.adapter.approvallocal.ApprovalEingabe
+import dev.beliefagent.adapter.approvallocal.ApprovalNonce
+import dev.beliefagent.adapter.approvallocal.ApprovalNonceQuelle
+import dev.beliefagent.adapter.approvallocal.InMemoryApprovalNonceStore
+import dev.beliefagent.adapter.approvallocal.LocalApproval
 import dev.beliefagent.adapter.audit.MemoryAudit
 import dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort
 import dev.beliefagent.adapter.llm.FakeLlm
@@ -34,6 +42,7 @@ import dev.beliefagent.domain.eskalation.Budget
 import dev.beliefagent.domain.eskalation.Eskalationsgrund
 import dev.beliefagent.domain.voi.VoiKandidat
 import java.util.Locale
+import java.util.UUID
 import org.koin.core.Koin
 import org.koin.core.KoinApplication
 import org.koin.core.qualifier.named
@@ -52,10 +61,30 @@ data class CliRuntimeKonfiguration(
     val aktionsVorschlaege: List<FakeAktionsVorschlagKonfiguration>,
     val bekannteEvidenz: Map<EvidenzReferenz, Beobachtung>,
     val voiKandidaten: List<VoiKandidat> = emptyList(),
-    val approvalFreigegeben: Boolean = false,
+    val approval: CliApprovalKonfiguration = CliApprovalKonfiguration.Fake(false),
     val startZeit: Long = 1L,
     val szenario: String = "custom",
-)
+) {
+    fun mitApproval(approval: CliApprovalKonfiguration): CliRuntimeKonfiguration =
+        copy(approval = approval)
+}
+
+sealed interface CliApprovalKonfiguration {
+    val name: String
+
+    data class Fake(val freigegeben: Boolean) : CliApprovalKonfiguration {
+        override val name: String = "fake"
+    }
+
+    data class Local(
+        val nonceQuelle: ApprovalNonceQuelle = JvmApprovalNonceQuelle(),
+        val eingabe: ApprovalEingabe = ConsoleApprovalEingabe(),
+        val ausgabe: ApprovalAusgabe = ConsoleApprovalAusgabe(),
+        val nonceStore: InMemoryApprovalNonceStore = InMemoryApprovalNonceStore(),
+    ) : CliApprovalKonfiguration {
+        override val name: String = "local"
+    }
+}
 
 data class CliLaufErgebnis(
     val terminal: CliTerminal,
@@ -111,6 +140,7 @@ private fun sichtbareAusgabe(
     executor: ExecutorErgebnis,
 ): String = buildString {
     appendLine("scenario=${config.szenario}")
+    appendLine("approval=${config.approval.name}")
     appendLine("terminal=${executor.terminal.name.lowercase()}")
     appendLine("executed=${executor.ausgefuehrt}")
     when (zyklus) {
@@ -151,7 +181,7 @@ fun cliModule(config: CliRuntimeKonfiguration) = module {
     single<BeobachtungsPort> { FakeBeobachtungsQuelle(emptyList()) }
     single<BeobachtungsAuswahlPort> { FakeKandidatenquelle(config.voiKandidaten) }
     single<AktionsVorschlagsPort> { FakeAktionsVorschlagsPort(config.aktionsVorschlaege) }
-    single<HumanApprovalPort> { FakeApproval(config.approvalFreigegeben) }
+    single<HumanApprovalPort> { config.approval.toHumanApprovalPort() }
     single { BeliefAktualisieren(get(), get(), get()) }
     single { BeobachtungWaehlen(get()) }
     single { AktionGaten(get()) }
@@ -168,4 +198,47 @@ class MonotoneFakeUhr(start: Long = 1L) : UhrPort {
     private var naechster = start
 
     override fun jetzt(): Zeitstempel = Zeitstempel(naechster++)
+}
+
+private fun CliApprovalKonfiguration.toHumanApprovalPort(): HumanApprovalPort = when (this) {
+    is CliApprovalKonfiguration.Fake -> FakeApproval(freigegeben)
+    is CliApprovalKonfiguration.Local -> LocalApproval(
+        nonceQuelle = nonceQuelle,
+        eingabe = eingabe,
+        ausgabe = ausgabe,
+        nonceStore = nonceStore,
+    )
+}
+
+class JvmApprovalNonceQuelle : ApprovalNonceQuelle {
+    override fun naechsteNonce(): ApprovalNonce = ApprovalNonce(UUID.randomUUID().toString())
+}
+
+class ConsoleApprovalAusgabe(
+    private val schreibeZeile: (String) -> Unit = ::println,
+) : ApprovalAusgabe {
+    override fun schreibe(challenge: ApprovalChallenge) {
+        schreibeZeile(challenge.text)
+    }
+}
+
+class ConsoleApprovalEingabe(
+    private val leseZeile: () -> String? = ::readlnOrNull,
+) : ApprovalEingabe {
+    override fun lese(challenge: ApprovalChallenge): ApprovalAntwort? {
+        println("nonce:")
+        val nonce = leseZeile() ?: return null
+        println("identity:")
+        val identitaet = leseZeile() ?: return null
+        println("context_digest:")
+        val kontextDigest = leseZeile() ?: return null
+        println("confirmation (${LocalApproval.BESTAETIGUNG}):")
+        val bestaetigung = leseZeile() ?: return null
+        return ApprovalAntwort(
+            nonce = nonce,
+            identitaet = identitaet,
+            kontextDigest = kontextDigest,
+            bestaetigung = bestaetigung,
+        )
+    }
 }

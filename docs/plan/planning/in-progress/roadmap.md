@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Keine aktive Welle. **Letzte Änderung:** 2026-07-08.
+**Status:** welle-05-llm-port Stabilisierung aktiv. **Letzte Änderung:** 2026-07-08.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,8 +10,8 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-Keine aktive Welle. `slice-036` ist abgeschlossen; naechster geplanter Slice:
-[`slice-037-cli-approval-binding`](../open/slice-037-cli-approval-binding.md).
+`welle-05-llm-port Stabilisierung` ist aktiv. Aktueller Slice:
+[`slice-037-cli-approval-binding`](slice-037-cli-approval-binding.md).
 
 `slice-036` ist als lokaler Human-Approval-Adapter auf `done/` abgeschlossen
 ([`slice-036-approval-local-adapter`](../done/slice-036-approval-local-adapter.md)).

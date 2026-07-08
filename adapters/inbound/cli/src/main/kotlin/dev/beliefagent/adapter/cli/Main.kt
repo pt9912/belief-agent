@@ -32,16 +32,42 @@ enum class CliSzenario(val id: String) {
 }
 
 fun cliDemoAusgabe(args: Array<String>): String {
-    val szenarien = if (args.isEmpty()) {
-        listOf(CliSzenario.GEHANDELT)
-    } else {
-        args.flatMap { CliSzenario.ausArgument(it) }
-    }
-    return szenarien.joinToString(separator = "\n\n") { szenario ->
-        CliRuntime.ausKonfiguration(szenario.konfiguration()).starte().sichtbareAusgabe
+    val argumente = CliArgumente.parse(args)
+    return argumente.szenarien.joinToString(separator = "\n\n") { szenario ->
+        val konfiguration = argumente.approval
+            ?.let { szenario.konfiguration().mitApproval(it) }
+            ?: szenario.konfiguration()
+        CliRuntime.ausKonfiguration(konfiguration).starte().sichtbareAusgabe
     }
 }
 
 fun main(args: Array<String>) {
     println(cliDemoAusgabe(args))
+}
+
+private data class CliArgumente(
+    val szenarien: List<CliSzenario>,
+    val approval: CliApprovalKonfiguration?,
+) {
+    companion object {
+        fun parse(args: Array<String>): CliArgumente {
+            val approval = args
+                .firstOrNull { it.startsWith("approval=") }
+                ?.substringAfter("=")
+                ?.let(::approvalAusArgument)
+            val szenarioArgumente = args.filterNot { it.startsWith("approval=") }
+            val szenarien = if (szenarioArgumente.isEmpty()) {
+                listOf(CliSzenario.GEHANDELT)
+            } else {
+                szenarioArgumente.flatMap { CliSzenario.ausArgument(it) }
+            }
+            return CliArgumente(szenarien = szenarien, approval = approval)
+        }
+
+        private fun approvalAusArgument(argument: String): CliApprovalKonfiguration = when (argument) {
+            "fake" -> CliApprovalKonfiguration.Fake(false)
+            "local" -> CliApprovalKonfiguration.Local()
+            else -> throw IllegalArgumentException("Unbekannter Approval-Modus '$argument'. Erlaubt: fake, local.")
+        }
+    }
 }

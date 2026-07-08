@@ -18,6 +18,7 @@ dependencies {
     implementation(project(":adapters:outbound:observation-fake"))
     implementation(project(":adapters:outbound:audit-memory"))
     implementation(project(":adapters:outbound:approval-fake"))
+    implementation(project(":adapters:outbound:approval-local"))
     implementation(project(":adapters:outbound:voi-fake"))
     implementation(project(":adapters:outbound:llm-hypothesen-fake"))
     implementation(project(":adapters:outbound:konfidenz-memory"))

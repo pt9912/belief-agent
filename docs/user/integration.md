@@ -116,6 +116,18 @@ Für die vollständige Datenspur je Szenario (Inputwerte, Gate-Berechnungen,
 Sammelpfad und Ausführungsgrenze) siehe
 [`CLI-Entscheidungsnachweis`](./cli-entscheidungsnachweis.md).
 
+Der CLI-Root kann den Approval-Adapter bewusst waehlen:
+
+```sh
+./gradlew :adapters:inbound:cli:run --args='eskaliert approval=local'
+```
+
+Ohne `approval=local` bleiben die Szenarien bei ihrer expliziten
+Fake-Konfiguration. `approval=local` bindet `LocalApproval` an den
+`HumanApprovalPort`: Nonce, Kontext-Digest, Identitaet und die Bestaetigung
+`FREIGEBEN` muessen zur angezeigten Anfrage passen. EOF, leere/falsche Eingabe
+oder wiederverwendete Nonce bleiben fail-closed und fuehren nicht aus.
+
 ## 3. Ports Implementieren
 
 Adapter binden an diese Ports:
@@ -403,9 +415,9 @@ Extern-wirksame Aktionen brauchen immer beides:
 Der `HumanApprovalPort` erhaelt dafuer eine `ApprovalAnfrage` aus der konkreten
 `Aktion` und dem aktuellen `BeliefState`. Ein echter Adapter muss diese Anfrage
 als Entscheidungs-Kontext behandeln; Nonce, Identitaet und Einmaligkeit sind
-Teil des lokalen Adaptervertrags. Der aktuelle CLI-Composition-Root bleibt
-weiter auf Fake-/konfigurierten Approval verdrahtet, bis ein separater
-Binding-Slice den lokalen Adapter bewusst einbindet.
+Teil des lokalen Adaptervertrags. Der CLI-Composition-Root bindet den lokalen
+Adapter nur bei explizitem `approval=local`; der Fake bleibt der
+deterministische Szenario-/Default-Pfad.
 
 Bei hoher Resthypothese wird nicht gehandelt, sondern gesammelt oder eskaliert.
 Bei erschoepftem Budget eskaliert der Zyklus fail-safe.
@@ -484,7 +496,7 @@ Aktuelle konkrete Implementierungen im Repo (noch nicht alles produktiv):
 Wichtig: Für produktive Ausführung sind `HumanApprovalPort`, persistente
 `KonfidenzPort`/`AuditPort` und die anderen vier Ports (außer `LlmPort`) aktuell
 noch als Fake-/Memory- oder lokal-injizierbare Adapter im Repo enthalten.
-`LocalApproval` ist bewusst nicht automatisch im CLI-Composition-Root gebunden.
+`LocalApproval` ist bewusst nur im CLI-Modus `approval=local` gebunden.
 
 ```kotlin
 val actionPort: AktionsVorschlagsPort = FakeAktionsVorschlagsPort(config.aktionsVorschlaege)

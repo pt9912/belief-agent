@@ -1,5 +1,12 @@
 package dev.beliefagent.adapter.cli
 
+import dev.beliefagent.adapter.approvallocal.ApprovalAntwort
+import dev.beliefagent.adapter.approvallocal.ApprovalAusgabe
+import dev.beliefagent.adapter.approvallocal.ApprovalEingabe
+import dev.beliefagent.adapter.approvallocal.ApprovalNonce
+import dev.beliefagent.adapter.approvallocal.ApprovalNonceQuelle
+import dev.beliefagent.adapter.approvallocal.InMemoryApprovalNonceStore
+import dev.beliefagent.adapter.approvallocal.LocalApproval
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -103,4 +110,106 @@ class CliRuntimeE2eTest {
         assertEquals(ExecutorErgebnis(false, CliTerminal.ESKALIERT), executor.verarbeite(eskaliert))
         assertEquals(emptyList(), ausfuehrung.ausgefuehrteAktionen())
     }
+
+    @Test
+    fun lokales_approval_ohne_eingabe_bleibt_eskaliert_und_fuehrt_nicht_aus() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(
+                lokaleApprovalKonfiguration(eingabe = ApprovalEingabe { null }),
+            ),
+        )
+
+        val ergebnis = runtime.starte()
+
+        assertIs<Zyklusergebnis.Eskaliert>(ergebnis.zyklus)
+        assertEquals(CliTerminal.ESKALIERT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("approval=local"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executor_boundary=closed"))
+        assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun lokales_approval_mit_passender_antwort_nutzt_bestehende_executor_grenze() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(lokaleApprovalKonfiguration()),
+        )
+
+        val ergebnis = runtime.starte()
+
+        val gehandelt = assertIs<Zyklusergebnis.Gehandelt>(ergebnis.zyklus)
+        assertEquals(CliTerminal.GEHANDELT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("approval=local"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=true"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion"))
+        assertEquals(listOf(gehandelt.freigabe.aktion), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun lokales_approval_mit_falscher_nonce_bleibt_geschlossen() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(
+                lokaleApprovalKonfiguration(
+                    eingabe = ApprovalEingabe { challenge ->
+                        ApprovalAntwort(
+                            nonce = "falsch",
+                            identitaet = "operator",
+                            kontextDigest = challenge.kontextDigest.wert,
+                            bestaetigung = LocalApproval.BESTAETIGUNG,
+                        )
+                    },
+                ),
+            ),
+        )
+
+        val ergebnis = runtime.starte()
+
+        assertIs<Zyklusergebnis.Eskaliert>(ergebnis.zyklus)
+        assertEquals(CliTerminal.ESKALIERT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
+        assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun lokales_approval_kann_nicht_mit_wiederverwendeter_nonce_erneut_ausfuehren() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(lokaleApprovalKonfiguration()),
+        )
+
+        val ersterLauf = runtime.starte()
+        val zweiterLauf = runtime.starte()
+
+        val ersterGehandelt = assertIs<Zyklusergebnis.Gehandelt>(ersterLauf.zyklus)
+        assertIs<Zyklusergebnis.Eskaliert>(zweiterLauf.zyklus)
+        assertEquals(CliTerminal.GEHANDELT, ersterLauf.terminal)
+        assertEquals(CliTerminal.ESKALIERT, zweiterLauf.terminal)
+        assertEquals(listOf(ersterGehandelt.freigabe.aktion), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun cli_argument_approval_local_ist_explizit_und_interaktiv_gebunden() {
+        val ausgabe = cliDemoAusgabe(arrayOf("gehandelt", "approval=local"))
+
+        assertTrue(ausgabe.contains("scenario=gehandelt"))
+        assertTrue(ausgabe.contains("approval=local"))
+        assertTrue(ausgabe.contains("terminal=gehandelt"))
+    }
+
+    private fun lokaleApprovalKonfiguration(
+        nonce: String = "nonce-cli-test",
+        eingabe: ApprovalEingabe = ApprovalEingabe { challenge ->
+            ApprovalAntwort(
+                nonce = challenge.nonce.wert,
+                identitaet = "operator",
+                kontextDigest = challenge.kontextDigest.wert,
+                bestaetigung = LocalApproval.BESTAETIGUNG,
+            )
+        },
+    ): CliApprovalKonfiguration.Local =
+        CliApprovalKonfiguration.Local(
+            nonceQuelle = ApprovalNonceQuelle { ApprovalNonce(nonce) },
+            eingabe = eingabe,
+            ausgabe = ApprovalAusgabe {},
+            nonceStore = InMemoryApprovalNonceStore(),
+        )
 }
