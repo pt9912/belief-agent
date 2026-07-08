@@ -1,6 +1,6 @@
 # Slice slice-040: Approval-Audit-Persistenz
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -103,7 +103,19 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-08. Implementiert wurde eine append-only
+Approval-Audit-Spur ueber den bestehenden `AuditPort`: `HumanApprovalPort`
+liefert ein adapterfreies `ApprovalErgebnis` mit `ApprovalAuditSnapshot`,
+`AktionGaten` schreibt `ApprovalAngefragt` plus Ergebnisereignis und bleibt bei
+Audit-Ausfall fail-closed. Local-, Remote/UI- und Fake-Approval sowie CLI- und
+Example-Bindings sind auf den neuen Vertrag angepasst.
+
+Review-/Verification-Artefakte:
+`docs/reviews/2026-07-08-slice-040-code-safety-review.md` und
+`docs/verifications/2026-07-08-slice-040-verification.md`. Ausgefuehrte
+Sensoren laut Implementierung/Verification: `git diff --check`, `make test`,
+`make doc-check`, `make cli-demo-approval-remote-ui` und `make gates` gruen.
+Keine Carveouts.
 
 ## 8. Sub-Area-Modus-Begründung
 
