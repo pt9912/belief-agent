@@ -3,11 +3,14 @@
 ## Was ist belief-agent?
 
 `belief-agent` ist ein Agenten-Framework, das **Unsicherheit explizit
-modelliert**: Statt Schritt für Schritt eine angenommene Wahrheit
-auszuführen, führt es eine Wahrscheinlichkeitsverteilung über konkurrierende
-Hypothesen (Belief State), beschafft gezielt Information und sichert
-irreversible Aktionen durch Konfidenzschwellen ab. Leitsatz: **Der Agent
-weiß, wann er nicht genug weiß.**
+modelliert**. Vereinfacht: **Der Agent speichert nicht Antworten, sondern
+konkurrierende Erklärungen.** Der *Belief State* ist dabei nichts
+Mathematisch-Mystisches, sondern schlicht **strukturierte Unsicherheit** —
+welche Erklärungen im Rennen sind und wie stark jede gerade zählt. Statt
+Schritt für Schritt eine angenommene Wahrheit auszuführen, beschafft der
+Agent gezielt Information und sichert irreversible Aktionen durch
+Konfidenzschwellen ab. Leitsatz: **Der Agent weiß, wann er nicht genug
+weiß.**
 
 ## Was kann ich heute tun?
 
@@ -47,12 +50,43 @@ linear-gaußscher Schätzverfahren gemeint: ein Zustand wird als Vektor mit
 Unsicherheit fortgeschrieben, typischerweise für Messreihen wie Position,
 Geschwindigkeit oder Sensorwerte. `belief-agent` modelliert Repository- und
 Agentenprobleme stattdessen als konkurrierende diskrete Erklärungen mit
-Wahrscheinlichkeiten. Der Belief State ist deshalb eine normierte Verteilung
-über Hypothesen plus Pflicht-Resthypothese `other`; Beobachtungen gewichten
-diese Hypothesen bayesianisch neu. Diese Abgrenzung ist ein expliziter
-Out-of-Scope-Vertrag: kein Kalmanfilter, sondern diskreter Hypothesen-Belief
+Wahrscheinlichkeiten. Damit wird die oben genannte *strukturierte
+Unsicherheit* präzise: Welche Erklärungen im Rennen sind und wie stark jede
+zählt, ist technisch nichts anderes als eine normierte Verteilung über
+Hypothesen plus Pflicht-Resthypothese `other` — der Belief State.
+Beobachtungen gewichten diese Hypothesen bayesianisch neu. Diese Abgrenzung
+ist ein expliziter Out-of-Scope-Vertrag: kein Kalmanfilter, sondern
+diskreter Hypothesen-Belief
 ([`LH-OUT-02`](spec/lastenheft.md#lh-out-02--kein-kalmanfilter); Glossar:
 [`Belief State`](spec/lastenheft.md#4-begriffe-glossar)).
+
+## Welche Information? — nicht nur *ob*, sondern *was*
+
+Die meisten Agenten melden bei Unsicherheit bestenfalls „brauche mehr
+Evidenz". `belief-agent` beantwortet die schärfere Frage: **welche**
+Beobachtung trennt die aktuellen Top-Hypothesen am effizientesten?
+
+**Real heute** (`VoiSelektor` + `BeobachtungWaehlen` — rein, deterministisch,
+fail-closed): Der Agent wählt aus den Kandidaten die informativste Beobachtung
+nach **erwartetem Gewinn je Kosten** — der Gewinn ist die erwartete Trennung
+der zwei wahrscheinlichsten Hypothesen. Illustrativ (kein `make`-Output):
+
+```text
+Belief:                A 42 %  ·  B 38 %  ·  other 5 % …
+Bester Diskriminator:  IntegrationTest #17
+                       erwartete Top-2-Trennung +0.31 je Kosten 1.0
+```
+
+Bewusst ausgelagert (`ADR-0001`): die *Schätzung* der Trennschärfe pro
+Kandidat rechnet der Kern nicht selbst — heute liefert sie ein
+deterministischer Fake (welle-04), welle-05 externalisiert sie ans LLM. Keine
+globale Policy, kein Zufall: eine bewusst lokale, gierige Heuristik
+(`LH-FA-VOI-004`).
+
+**Nächster Schritt:** erwartete **Entropiereduktion** als Gütemaß (die
+Shannon-Entropie liegt als Maß bereits vor) über **reale**
+Beobachtungsquellen — Build-Report, Git — statt Fake-Kandidaten (slice-045),
+und diese Wahl im CLI-Output sichtbar machen.
 
 ## Kerngedanke
 
