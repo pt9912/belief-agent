@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Ruhe. **Letzte Änderung:** 2026-07-07.
+**Status:** Ruhe. **Letzte Änderung:** 2026-07-08.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,23 +10,24 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-**Keine aktive Welle.** `slice-030` ist als gezielter Demo-Slice zum
-CLI-Composition-Root auf `done/` abgeschlossen
-([`slice-030-cli-szenario-demo`](../done/slice-030-cli-szenario-demo.md)).
+**Keine aktive Welle.** `slice-033` ist als gezielter Code-Agent-
+Fehlerverifikationsslice auf `done/` abgeschlossen
+([`slice-033-code-agent-fixture-fehlerverifikation`](../done/slice-033-code-agent-fixture-fehlerverifikation.md)).
 
 `welle-04-voi-eskalation` ist **abgeschlossen** (2026-07-06;
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
-Bereinigung. Tracked Follow-ups (welle-05): echter Approval-Adapter mit Binding,
-echte Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle und realistische
-Build-/Repo-Beobachtungsquellen fuer `example/code-agent` (`slice-031`..`034`).
+Bereinigung. Tracked Follow-ups (welle-05): Approval-Kontextvertrag als
+Vorbereitung fuer echten Approval-Adapter mit Binding (`slice-035`), echte
+Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle und provider-spezifische
+LLM-Konfiguration.
 
 ## Nächste Wellen
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Echte Approval-, Ausfuehrungs- und Persistenzadapter fuer das CLI-Bundle; provider-spezifische LLM-Konfiguration; realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` (`slice-031`..`034`) | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Approval-Kontextvertrag (`slice-035`) als Voraussetzung fuer echten Approval-Adapter mit Binding; echte Ausfuehrungs-/Persistenzadapter fuer das CLI-Bundle; provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
 
 ## Meilensteine
 
@@ -129,3 +130,4 @@ flowchart LR
 | 2026-07-07 | `slice-034` **in `done/` abgeschlossen**: `observation-git-local` hat explizite Git-Source-Strategien `fixture`, `cli` und `jgit` hinter `GitSourceConfig`/`GitStatusQuellenFactory`, ohne stillen Fallback | `make gates` grün; JGit als gepinnte Adapter-Dependency; CLI-Pfad prueft `git --version` und macht Diagnose sichtbar; Resume → `slice-032` Code-Agent-Binding |
 | 2026-07-07 | `slice-032` **in `done/` abgeschlossen**: `example/code-agent` bindet konkrete Build-/Repo-Beobachtungsadapter ueber Fixture-Defaults und erzeugt ein direkt startbares Runtime-Image | `make example-code-agent`, `docker run --rm belief-agent:example-code-agent` und `make gates` gruen; `.a-check.yml` erlaubt nur Example-Kanten zu `observation-build-report`/`observation-git-local`; Resume → `slice-033` Fixture-Fehlerverifikation |
 | 2026-07-07 | `slice-033` **in `done/` abgeschlossen**: `example/code-agent` behandelt fehlerhafte Build-/Repo-Fixtures fail-closed mit expliziten Fehlerklassen M0-M5 und Exit-Code 65 | `make example-code-agent-run` und `make gates` gruen; unabhaengiger kontextfreier Review meldete zwei Medium-Befunde (Repo-Negativabdeckung, Artefaktstatus), beide integriert; Runtime-Image-Vertrag aus `slice-032` auf `/app/fixtures/*.fixture` reconcilt |
+| 2026-07-08 | `slice-035` in `open/` geplant: Human-Approval-Kontextvertrag vor echtem Approval-Adapter | Der bestehende `HumanApprovalPort` sieht nur `Aktion`; fuer den geforderten echten Approval-Adapter mit Binding muss zuerst der Entscheidungskontext (`Aktion` + aktueller `BeliefState`) in den Port-Vertrag. Realistische Build-/Repo-Beobachtungsquellen aus `slice-031`..`034` sind erledigt; naechster Stabilisierungsschritt ist Safety-Contract statt sofort externe Approval-I/O. |
