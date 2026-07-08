@@ -7,6 +7,12 @@ import dev.beliefagent.adapter.approvallocal.ApprovalNonce
 import dev.beliefagent.adapter.approvallocal.ApprovalNonceQuelle
 import dev.beliefagent.adapter.approvallocal.InMemoryApprovalNonceStore
 import dev.beliefagent.adapter.approvallocal.LocalApproval
+import dev.beliefagent.adapter.approvalremoteui.InMemoryRemoteApprovalNonceStore
+import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalAntwort
+import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalNonce
+import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalNonceQuelle
+import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalTransport
+import dev.beliefagent.adapter.approvalremoteui.RemoteUiApproval
 import dev.beliefagent.application.belief.entscheidungszyklus.Zyklusergebnis
 import dev.beliefagent.application.belief.gaten.ports.ApprovalAnfrage
 import dev.beliefagent.application.belief.gaten.ports.HumanApprovalPort
@@ -209,6 +215,52 @@ class CliRuntimeE2eTest {
     }
 
     @Test
+    fun cli_argument_approval_remote_ui_ist_explizit_und_default_fail_closed() {
+        val ausgabe = cliDemoAusgabe(arrayOf("eskaliert", "approval=remote-ui"))
+
+        assertTrue(ausgabe.contains("scenario=eskaliert"))
+        assertTrue(ausgabe.contains("approval=remote-ui"))
+        assertTrue(ausgabe.contains("terminal=eskaliert"))
+        assertTrue(ausgabe.contains("executed=false"))
+        assertTrue(ausgabe.contains("executor_boundary=closed"))
+    }
+
+    @Test
+    fun remote_ui_approval_mit_passender_antwort_nutzt_bestehende_executor_grenze() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(remoteUiApprovalKonfiguration()),
+        )
+
+        val ergebnis = runtime.starte()
+
+        val gehandelt = assertIs<Zyklusergebnis.Gehandelt>(ergebnis.zyklus)
+        assertEquals(CliTerminal.GEHANDELT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("approval=remote-ui"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=true"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion"))
+        assertEquals(listOf(gehandelt.freigabe.aktion), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
+    fun remote_ui_approval_mit_transportfehler_bleibt_fail_closed() {
+        val runtime = CliRuntime.ausKonfiguration(
+            StandardCliSzenarien.eskaliert().mitApproval(
+                remoteUiApprovalKonfiguration(
+                    transport = RemoteApprovalTransport { error("remote unavailable") },
+                ),
+            ),
+        )
+
+        val ergebnis = runtime.starte()
+
+        assertIs<Zyklusergebnis.Eskaliert>(ergebnis.zyklus)
+        assertEquals(CliTerminal.ESKALIERT, ergebnis.terminal)
+        assertTrue(ergebnis.sichtbareAusgabe.contains("approval=remote-ui"))
+        assertTrue(ergebnis.sichtbareAusgabe.contains("executed=false"))
+        assertEquals(emptyList(), runtime.ausgefuehrteAktionen())
+    }
+
+    @Test
     fun approval_kanalwahl_ohne_binding_bleibt_fail_closed() {
         val runtime = CliRuntime.ausKonfiguration(
             StandardCliSzenarien.eskaliert().mitApproval(
@@ -292,6 +344,26 @@ class CliRuntimeE2eTest {
             eingabe = eingabe,
             ausgabe = ApprovalAusgabe {},
             nonceStore = InMemoryApprovalNonceStore(),
+        )
+
+    private fun remoteUiApprovalKonfiguration(
+        nonce: String = "nonce-remote-cli-test",
+        transport: RemoteApprovalTransport = RemoteApprovalTransport { auftrag ->
+            listOf(
+                RemoteApprovalAntwort(
+                    nonce = auftrag.nonce.wert,
+                    identitaet = "operator",
+                    kontextDigest = auftrag.kontextDigest.wert,
+                    bestaetigung = RemoteUiApproval.BESTAETIGUNG,
+                ),
+            )
+        },
+    ): CliApprovalKonfiguration.Kanalwahl =
+        CliApprovalKonfiguration.Kanalwahl.remoteUi(
+            remoteNonceQuelle = RemoteApprovalNonceQuelle { RemoteApprovalNonce(nonce) },
+            remoteTransport = transport,
+            remoteErlaubteIdentitaeten = setOf("operator"),
+            remoteNonceStore = InMemoryRemoteApprovalNonceStore(),
         )
 
     private class ZaehlenApproval(private val freigegeben: Boolean) : HumanApprovalPort {

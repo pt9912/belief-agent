@@ -28,6 +28,7 @@ layers:
   outbound_audit_memory: ["adapters/outbound/audit-memory/**"]
   outbound_approval_fake: ["adapters/outbound/approval-fake/**"]
   outbound_approval_local: ["adapters/outbound/approval-local/**"]
+  outbound_approval_remote_ui: ["adapters/outbound/approval-remote-ui/**"]
   outbound_voi_fake: ["adapters/outbound/voi-fake/**"]
   outbound_llm_hypothesen_fake: ["adapters/outbound/llm-hypothesen-fake/**"]
   outbound_konfidenz_memory: ["adapters/outbound/konfidenz-memory/**"]
@@ -54,6 +55,8 @@ edges:
   - {from: outbound_approval_fake, to: domain}
   - {from: outbound_approval_local, to: application}
   - {from: outbound_approval_local, to: domain}
+  - {from: outbound_approval_remote_ui, to: application}
+  - {from: outbound_approval_remote_ui, to: domain}
   - {from: outbound_voi_fake, to: application}
   - {from: outbound_voi_fake, to: domain}
   - {from: outbound_llm_hypothesen_fake, to: application}
@@ -68,6 +71,7 @@ edges:
   - {from: inbound_cli, to: outbound_audit_memory}
   - {from: inbound_cli, to: outbound_approval_fake}
   - {from: inbound_cli, to: outbound_approval_local}
+  - {from: inbound_cli, to: outbound_approval_remote_ui}
   - {from: inbound_cli, to: outbound_voi_fake}
   - {from: inbound_cli, to: outbound_llm_hypothesen_fake}
   - {from: inbound_cli, to: outbound_konfidenz_memory}
@@ -103,6 +107,7 @@ resolution:
       - "adapters/outbound/audit-memory/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/approval-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/approval-local/src/commonMain/kotlin/dev/beliefagent"
+      - "adapters/outbound/approval-remote-ui/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/voi-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/llm-hypothesen-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/konfidenz-memory/src/commonMain/kotlin/dev/beliefagent"

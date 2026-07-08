@@ -85,3 +85,7 @@ cli-demo-scenarios: ## CLI-Demo fuer handeln/eskalieren/ablehnen/sammeln
 .PHONY: cli-demo-approval-local
 cli-demo-approval-local: ## CLI-Demo fuer lokalen Approval-Kanal (EOF fail-closed)
 	docker build --no-cache-filter cli-demo-approval-local --progress plain --target cli-demo-approval-local -t $(IMAGE):cli-demo-approval-local .
+
+.PHONY: cli-demo-approval-remote-ui
+cli-demo-approval-remote-ui: ## CLI-Demo fuer Remote/UI-Approval-Kanal (EOF fail-closed)
+	docker build --no-cache-filter cli-demo-approval-remote-ui --progress plain --target cli-demo-approval-remote-ui -t $(IMAGE):cli-demo-approval-remote-ui .

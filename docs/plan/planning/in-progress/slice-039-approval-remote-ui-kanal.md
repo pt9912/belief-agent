@@ -1,6 +1,6 @@
 # Slice slice-039: Remote/UI-Approval-Kanal
 
-**Status:** open (siehe [Planning-README](../README.md)).
+**Status:** in-progress (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 

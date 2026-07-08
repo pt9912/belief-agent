@@ -120,6 +120,7 @@ Der CLI-Root kann den Approval-Adapter bewusst waehlen:
 
 ```sh
 make cli-demo-approval-local
+make cli-demo-approval-remote-ui
 ```
 
 Ohne `approval=local` bleiben die Szenarien bei ihrer expliziten
@@ -129,11 +130,20 @@ Kontext-Digest, Identitaet und die Bestaetigung `FREIGEBEN` muessen zur
 angezeigten Anfrage passen. EOF, leere/falsche Eingabe oder wiederverwendete
 Nonce bleiben fail-closed und fuehren nicht aus.
 
+`approval=remote-ui` waehlt den Remote/UI-Kanal
+`RemoteUiApproval`. Dieser Adapter serialisiert die `ApprovalAnfrage` fuer eine
+abstrahierte Bediengrenze, erzeugt Nonce und Kontext-Digest und akzeptiert nur
+eine einzelne Antwort mit erlaubter Identitaet, passender Nonce, passendem
+Digest und Bestaetigung `FREIGEBEN`. Der im CLI-Demo gebundene Transport ist
+netzfrei und liefert keine Antwort; die Demo bleibt deshalb fail-closed.
+Produktive Netzwerk-/UI-Transporte, starke Authentisierung und persistenter
+Approval-Audit bleiben Folge-Scope.
+
 Die Kanalwahl ist nur CLI-Composition-Konfiguration. Der Core sieht weiterhin
 nur `HumanApprovalPort`; konkrete Kanalnamen sind kein Port-Vertrag.
-`local` ist aktuell der einzige konkrete Kanal. Unbekannte Kanaele,
+`local` und `remote-ui` sind aktuell konkrete Kanaele. Unbekannte Kanaele,
 nicht konfigurierte Kanaele und Kanalfehler gelten als verweigerte Freigabe.
-Remote-/UI-Kanaele und persistenter Approval-Audit bleiben Folgeslices.
+Persistenter Approval-Audit bleibt Folgescope.
 
 ## 3. Ports Implementieren
 
@@ -422,11 +432,12 @@ Extern-wirksame Aktionen brauchen immer beides:
 Der `HumanApprovalPort` erhaelt dafuer eine `ApprovalAnfrage` aus der konkreten
 `Aktion` und dem aktuellen `BeliefState`. Ein echter Adapter muss diese Anfrage
 als Entscheidungs-Kontext behandeln; Nonce, Identitaet und Einmaligkeit sind
-Teil des lokalen Adaptervertrags. Der CLI-Composition-Root bindet Approval ueber
-eine fail-closed Kanalwahl: `approval=local` waehlt den einzigen aktuell
-nutzbaren Kanal, unbekannte oder ungebundene Kanaele geben nicht frei, und ein
-Kanalfehler wird nicht als Zustimmung interpretiert. Der Fake bleibt der
-deterministische Szenario-/Default-Pfad.
+Teil des Adaptervertrags. Der CLI-Composition-Root bindet Approval ueber eine
+fail-closed Kanalwahl: `approval=local` waehlt den lokalen Kanal,
+`approval=remote-ui` den transportabstrahierten Remote/UI-Kanal; unbekannte oder
+ungebundene Kanaele geben nicht frei, und ein Kanalfehler wird nicht als
+Zustimmung interpretiert. Der Fake bleibt der deterministische
+Szenario-/Default-Pfad.
 
 Bei hoher Resthypothese wird nicht gehandelt, sondern gesammelt oder eskaliert.
 Bei erschoepftem Budget eskaliert der Zyklus fail-safe.
@@ -497,7 +508,7 @@ Aktuelle konkrete Implementierungen im Repo (noch nicht alles produktiv):
 | `AktionsVorschlagsPort` | `dev.beliefagent.adapter.llmaction.FakeAktionsVorschlagsPort` | Fake-Port für strukturiertes Rohvorschlag-Mapping |
 | `BeobachtungsAuswahlPort` | `dev.beliefagent.adapter.voi.FakeKandidatenquelle` | Deterministischer VOI-Port |
 | `HypothesenPort` | `dev.beliefagent.adapter.llmhypothesen.FakeHypothesenPort` | Deterministischer Re-Hypothesen-Port |
-| `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval`; `dev.beliefagent.adapter.approvallocal.LocalApproval` | Fake bleibt CLI-Default; lokaler Adapter bindet `ApprovalAnfrage` an Nonce, Identitaet und Kontext-Digest |
+| `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval`; `dev.beliefagent.adapter.approvallocal.LocalApproval`; `dev.beliefagent.adapter.approvalremoteui.RemoteUiApproval` | Fake bleibt CLI-Default; lokale und Remote/UI-Kanaele binden `ApprovalAnfrage` an Nonce, Identitaet und Kontext-Digest |
 | `KonfidenzPort` | `dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort` | In-Memory, persistenznah (Replay) |
 | `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` | In-Memory, append-only |
 | `LlmPort` | `dev.beliefagent.adapter.llm.langchain4j.LangChain4jLlmPort` / `dev.beliefagent.adapter.llm.koog.KoogLlmPort` | echte LLM-Provider-Boundary für Likelihoods |
@@ -506,7 +517,8 @@ Wichtig: Für produktive Ausführung sind `HumanApprovalPort`, persistente
 `KonfidenzPort`/`AuditPort` und die anderen vier Ports (außer `LlmPort`) aktuell
 noch als Fake-/Memory- oder lokal-injizierbare Adapter im Repo enthalten.
 `LocalApproval` ist bewusst nur ueber die CLI-Kanalwahl `approval=local`
-gebunden; weitere Approval-Kanaele sind noch nicht implementiert.
+gebunden; `RemoteUiApproval` ueber `approval=remote-ui`. Der Remote/UI-Adapter
+hat eine abstrahierte Transportgrenze; lokale Gates nutzen keinen Live-Dienst.
 
 ```kotlin
 val actionPort: AktionsVorschlagsPort = FakeAktionsVorschlagsPort(config.aktionsVorschlaege)
@@ -537,7 +549,7 @@ val controller = CodeAgentController(
 Wichtig fuer Code-Agenten:
 
 - **`AktionsVorschlagsPort` darf nur strukturierte Aktionen liefern**, keine direkten Werkzeugaufrufe.
-- **`HumanApprovalPort` für irreversible Aktionen** als sicheren Mensch-Check ausrüsten; `LocalApproval` erzwingt Nonce/Identität/Einmaligkeit auf Basis der `ApprovalAnfrage`, die CLI-Kanalwahl bleibt fail-closed, persistenter Approval-Audit bleibt Folgescope.
+- **`HumanApprovalPort` für irreversible Aktionen** als sicheren Mensch-Check ausrüsten; `LocalApproval` und `RemoteUiApproval` erzwingen Nonce/Identität/Einmaligkeit auf Basis der `ApprovalAnfrage`, die CLI-Kanalwahl bleibt fail-closed, persistenter Approval-Audit bleibt Folgescope.
 - **`AuditPort` persistent** führen: bei jedem Schritt Belief-/Eskalationskontext speichern.
 - **`KonfidenzPort` append-only** betreiben, damit Replay und Overrides nachvollziehbar bleiben.
 

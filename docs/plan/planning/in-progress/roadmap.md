@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Keine aktive Welle. **Letzte Änderung:** 2026-07-08.
+**Status:** welle-05-llm-port Stabilisierung in progress. **Letzte Änderung:** 2026-07-08.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,8 +10,12 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-Keine aktive Welle. `slice-038` ist abgeschlossen; naechster geplanter Slice:
-[`slice-039-approval-remote-ui-kanal`](../open/slice-039-approval-remote-ui-kanal.md).
+`slice-039-approval-remote-ui-kanal` ist in Umsetzung:
+[`slice-039-approval-remote-ui-kanal`](./slice-039-approval-remote-ui-kanal.md).
+
+`slice-038` ist abgeschlossen; aktueller Stabilisierungsschritt ist der
+hermetisch testbare Remote/UI-Approval-Kanal hinter der fail-closed
+Kanalwahl.
 
 `slice-038` ist als fail-closed Approval-Kanalwahl im CLI-Composition-Root auf
 `done/` abgeschlossen

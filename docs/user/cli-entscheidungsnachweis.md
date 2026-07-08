@@ -35,11 +35,13 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   bestandener `KonfidenzGate`-Freigabe fuer irreversible Aktionen auf und
   uebergibt eine `ApprovalAnfrage` aus konkreter Aktion und aktuellem
   `BeliefState`. Der lokale Adapter `LocalApproval` bindet diese Anfrage an
-  Nonce, Identitaet und Kontext-Digest. Der CLI-Composition-Root waehlt den
-  Approval-Pfad ueber einen fail-closed Kanal-Dispatcher. `approval=local`
-  waehlt den einzigen aktuell implementierten konkreten Kanal; unbekannte
-  Kanaele, fehlende Kanalbindungen und Kanalfehler geben nicht frei. Ohne
-  diesen Schalter gelten die je Szenario gesetzten Fake-Approval-Defaults.
+  Nonce, Identitaet und Kontext-Digest; der Remote/UI-Adapter
+  `RemoteUiApproval` tut dasselbe hinter einer abstrahierten Transportgrenze.
+  Der CLI-Composition-Root waehlt den Approval-Pfad ueber einen fail-closed
+  Kanal-Dispatcher. `approval=local` waehlt den lokalen Kanal,
+  `approval=remote-ui` den Remote/UI-Kanal; unbekannte Kanaele, fehlende
+  Kanalbindungen und Kanalfehler geben nicht frei. Ohne diesen Schalter gelten
+  die je Szenario gesetzten Fake-Approval-Defaults.
 
 ## 2. Entscheidung je Szenario
 
@@ -114,6 +116,25 @@ und exakter Bestaetigung `FREIGEBEN` gibt die Anfrage frei.
   - `executed=false`
   - `executor_boundary=closed`
 
+### Remote/UI-Approval-Pfad fuer `eskaliert`
+
+Wird dasselbe Szenario bewusst mit `approval=remote-ui` gestartet, baut der
+CLI-Root einen `RemoteUiApproval`-Kanal hinter dem Dispatcher. Der Kanal
+serialisiert Aktion, Wirkungsklasse, `p_success`, Resthypothese, Nonce und
+Kontext-Digest fuer den abstrahierten Transport. Lokale Demo- und Gate-Laeufe
+nutzen keinen Live-Remote-Dienst; ohne Transportantwort bleibt der Pfad
+fail-closed.
+
+- passende Remote/UI-Freigabe in hermetischen Tests:
+  - `terminal=gehandelt`
+  - `executed=true`
+  - `executor_boundary=Zyklusergebnis.Gehandelt.freigabe.aktion`
+- Timeout/EOF, Transportfehler, unbekannte Identitaet, falsche Nonce,
+  Kontext-Digest-Mismatch, Replay oder doppelte Antwort:
+  - `terminal=eskaliert`
+  - `executed=false`
+  - `executor_boundary=closed`
+
 ## 2.3 `abgelehnt`
 
 - Input:
@@ -173,6 +194,10 @@ und exakter Bestaetigung `FREIGEBEN` gibt die Anfrage frei.
 - `make cli-demo` (zeigt nur `scenario=gehandelt`/positivpfad).
 - `make cli-demo-scenarios` (zeigt alle vier Szenarien inklusive `executed=false` bei
   eskalierten/abgelehnten Fällen).
+- `make cli-demo-approval-local` (zeigt den lokalen Approval-Kanal ohne Eingabe
+  als fail-closed).
+- `make cli-demo-approval-remote-ui` (zeigt den Remote/UI-Kanal mit
+  netzfreiem Default-Transport als fail-closed).
 - `make cli-demo-scenarios`-Ausgabe enthält die Daten exakt in den Feldern
   `scenario`, `terminal`, `executed`, `reason`, `executor_boundary`,
   `resthypothese`.

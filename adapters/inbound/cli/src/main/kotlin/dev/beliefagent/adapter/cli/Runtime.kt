@@ -9,6 +9,11 @@ import dev.beliefagent.adapter.approvallocal.ApprovalNonce
 import dev.beliefagent.adapter.approvallocal.ApprovalNonceQuelle
 import dev.beliefagent.adapter.approvallocal.InMemoryApprovalNonceStore
 import dev.beliefagent.adapter.approvallocal.LocalApproval
+import dev.beliefagent.adapter.approvalremoteui.InMemoryRemoteApprovalNonceStore
+import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalNonce
+import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalNonceQuelle
+import dev.beliefagent.adapter.approvalremoteui.RemoteApprovalTransport
+import dev.beliefagent.adapter.approvalremoteui.RemoteUiApproval
 import dev.beliefagent.adapter.audit.MemoryAudit
 import dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort
 import dev.beliefagent.adapter.llm.FakeLlm
@@ -89,20 +94,73 @@ sealed interface CliApprovalKonfiguration {
                 eingabe: ApprovalEingabe = ConsoleApprovalEingabe(),
                 ausgabe: ApprovalAusgabe = ConsoleApprovalAusgabe(),
                 nonceStore: InMemoryApprovalNonceStore = InMemoryApprovalNonceStore(),
+                remoteNonceQuelle: RemoteApprovalNonceQuelle = JvmRemoteApprovalNonceQuelle(),
+                remoteTransport: RemoteApprovalTransport = RemoteApprovalTransport { emptyList() },
+                remoteErlaubteIdentitaeten: Set<String> = setOf("operator"),
+                remoteNonceStore: InMemoryRemoteApprovalNonceStore = InMemoryRemoteApprovalNonceStore(),
             ): Kanalwahl = Kanalwahl(
                 kanal = CliApprovalKanalName.LOCAL,
-                kanaele = mapOf(
-                    CliApprovalKanalName.LOCAL to LocalApproval(
-                        nonceQuelle = nonceQuelle,
-                        eingabe = eingabe,
-                        ausgabe = ausgabe,
-                        nonceStore = nonceStore,
-                    ),
+                kanaele = kanaele(
+                    nonceQuelle = nonceQuelle,
+                    eingabe = eingabe,
+                    ausgabe = ausgabe,
+                    nonceStore = nonceStore,
+                    remoteNonceQuelle = remoteNonceQuelle,
+                    remoteTransport = remoteTransport,
+                    remoteErlaubteIdentitaeten = remoteErlaubteIdentitaeten,
+                    remoteNonceStore = remoteNonceStore,
+                ),
+            )
+
+            fun remoteUi(
+                nonceQuelle: ApprovalNonceQuelle = JvmApprovalNonceQuelle(),
+                eingabe: ApprovalEingabe = ConsoleApprovalEingabe(),
+                ausgabe: ApprovalAusgabe = ConsoleApprovalAusgabe(),
+                nonceStore: InMemoryApprovalNonceStore = InMemoryApprovalNonceStore(),
+                remoteNonceQuelle: RemoteApprovalNonceQuelle = JvmRemoteApprovalNonceQuelle(),
+                remoteTransport: RemoteApprovalTransport = RemoteApprovalTransport { emptyList() },
+                remoteErlaubteIdentitaeten: Set<String> = setOf("operator"),
+                remoteNonceStore: InMemoryRemoteApprovalNonceStore = InMemoryRemoteApprovalNonceStore(),
+            ): Kanalwahl = Kanalwahl(
+                kanal = CliApprovalKanalName.REMOTE_UI,
+                kanaele = kanaele(
+                    nonceQuelle = nonceQuelle,
+                    eingabe = eingabe,
+                    ausgabe = ausgabe,
+                    nonceStore = nonceStore,
+                    remoteNonceQuelle = remoteNonceQuelle,
+                    remoteTransport = remoteTransport,
+                    remoteErlaubteIdentitaeten = remoteErlaubteIdentitaeten,
+                    remoteNonceStore = remoteNonceStore,
                 ),
             )
 
             fun auswahl(kanal: String): Kanalwahl =
                 Kanalwahl(kanal = CliApprovalKanalName(kanal), kanaele = local().kanaele)
+
+            private fun kanaele(
+                nonceQuelle: ApprovalNonceQuelle,
+                eingabe: ApprovalEingabe,
+                ausgabe: ApprovalAusgabe,
+                nonceStore: InMemoryApprovalNonceStore,
+                remoteNonceQuelle: RemoteApprovalNonceQuelle,
+                remoteTransport: RemoteApprovalTransport,
+                remoteErlaubteIdentitaeten: Set<String>,
+                remoteNonceStore: InMemoryRemoteApprovalNonceStore,
+            ): Map<CliApprovalKanalName, HumanApprovalPort> = mapOf(
+                CliApprovalKanalName.LOCAL to LocalApproval(
+                    nonceQuelle = nonceQuelle,
+                    eingabe = eingabe,
+                    ausgabe = ausgabe,
+                    nonceStore = nonceStore,
+                ),
+                CliApprovalKanalName.REMOTE_UI to RemoteUiApproval(
+                    nonceQuelle = remoteNonceQuelle,
+                    transport = remoteTransport,
+                    erlaubteIdentitaeten = remoteErlaubteIdentitaeten,
+                    nonceStore = remoteNonceStore,
+                ),
+            )
         }
     }
 }
@@ -112,6 +170,7 @@ data class CliApprovalKanalName(val wert: String) {
 
     companion object {
         val LOCAL = CliApprovalKanalName("local")
+        val REMOTE_UI = CliApprovalKanalName("remote-ui")
     }
 }
 
@@ -253,6 +312,10 @@ private fun CliApprovalKonfiguration.toHumanApprovalPort(): HumanApprovalPort = 
 
 class JvmApprovalNonceQuelle : ApprovalNonceQuelle {
     override fun naechsteNonce(): ApprovalNonce = ApprovalNonce(UUID.randomUUID().toString())
+}
+
+class JvmRemoteApprovalNonceQuelle : RemoteApprovalNonceQuelle {
+    override fun naechsteNonce(): RemoteApprovalNonce = RemoteApprovalNonce(UUID.randomUUID().toString())
 }
 
 class ConsoleApprovalAusgabe(
