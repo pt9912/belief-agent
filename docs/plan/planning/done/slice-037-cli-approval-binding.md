@@ -1,6 +1,6 @@
 # Slice slice-037: CLI-Binding fuer lokalen Approval-Adapter
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -20,16 +20,16 @@ Executor-Grenze gelangen.
 
 ## 2. Definition of Done
 
-- [ ] `adapters/inbound/cli` bietet eine explizite Konfiguration fuer
+- [x] `adapters/inbound/cli` bietet eine explizite Konfiguration fuer
   `approval=fake|local` oder gleichwertig; Default bleibt fail-closed und
   netzfrei. Das Binding waehlt `approval-local` nur bewusst und verdrahtet keine
   neue Ausfuehrungsroute am Gate vorbei (`LH-FA-POL-006`, `LH-OUT-04`).
-- [ ] CLI-/Runtime-Tests belegen die Safety-Grenze: ohne passende lokale
+- [x] CLI-/Runtime-Tests belegen die Safety-Grenze: ohne passende lokale
   Freigabe bleibt `terminal=eskaliert`/`executed=false`; mit passender
   Nonce/Identitaet/Kontextbestaetigung wird genau der bestehende
   `Zyklusergebnis.Gehandelt.freigabe.aktion`-Pfad genutzt; falsche oder
   wiederverwendete Freigabe bleibt geschlossen (`LH-QA-03`).
-- [ ] Build-/Arch-/Doku-Integration ist vollstaendig:
+- [x] Build-/Arch-/Doku-Integration ist vollstaendig:
   `adapters/inbound/cli` darf den Adapter als Composition-Root binden,
   `adapters/inbound/cli/build.gradle.kts` enthaelt die Modulabhaengigkeit auf
   `adapters:outbound:approval-local`, `.a-check.yml` bleibt gegen fachliche
@@ -79,7 +79,24 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-08. `adapters/inbound/cli` bindet den lokalen
+Approval-Adapter jetzt bewusst ueber `approval=local`; ohne diesen Schalter
+bleiben die Szenario-Defaults auf den deterministischen Fake-Approvals. Das
+Binding ersetzt nur den `HumanApprovalPort` hinter `AktionGaten` und erzeugt
+keinen neuen Executor-Pfad.
+
+Review/Verification: Plan-Review
+`docs/reviews/2026-07-08-slice-037-plan-review.md`, Design-Review
+`docs/reviews/2026-07-08-slice-037-design-review.md`, Code-/Safety-Review
+`docs/reviews/2026-07-08-slice-037-code-safety-review.md` und Verification
+`docs/verifications/2026-07-08-slice-037-verification.md` liegen vor; keine
+offenen Findings und keine DoD-Verletzung. `make cli-demo`, `make
+cli-demo-scenarios`, `make test`, `make doc-check` und `make gates` liefen
+gruen.
+
+Folgegrenze: Approval-Kanalwahl, Remote-/UI-Approval und persistenter
+Approval-Audit bleiben Folgeslices. Ausfuehrung bleibt weiterhin ausschliesslich
+an `Zyklusergebnis.Gehandelt.freigabe.aktion` gebunden.
 
 ## 8. Sub-Area-Modus-Begründung
 

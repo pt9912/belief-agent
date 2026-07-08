@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** welle-05-llm-port Stabilisierung aktiv. **Letzte Änderung:** 2026-07-08.
+**Status:** Keine aktive Welle. **Letzte Änderung:** 2026-07-08.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,8 +10,12 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-`welle-05-llm-port Stabilisierung` ist aktiv. Aktueller Slice:
-[`slice-037-cli-approval-binding`](slice-037-cli-approval-binding.md).
+Keine aktive Welle. `slice-037` ist abgeschlossen; naechster geplanter Slice:
+[`slice-038-approval-kanalwahl`](../open/slice-038-approval-kanalwahl.md).
+
+`slice-037` ist als CLI-Binding fuer den lokalen Approval-Adapter auf `done/`
+abgeschlossen
+([`slice-037-cli-approval-binding`](../done/slice-037-cli-approval-binding.md)).
 
 `slice-036` ist als lokaler Human-Approval-Adapter auf `done/` abgeschlossen
 ([`slice-036-approval-local-adapter`](../done/slice-036-approval-local-adapter.md)).
@@ -27,8 +31,8 @@ abgeschlossen
 [Ergebnisse](../done/welle-04-voi-eskalation-results.md)).
 
 **Offen im Blick:** `B4` (M2-Formulierung in welle-02/03/04) optionale Konventions-
-Bereinigung. Tracked Follow-ups (welle-05): bewusstes CLI-Binding
-(`slice-037`), Approval-Kanalwahl (`slice-038`), Remote/UI-Approval-Kanal (`slice-039`),
+Bereinigung. Tracked Follow-ups (welle-05): Approval-Kanalwahl (`slice-038`),
+Remote/UI-Approval-Kanal (`slice-039`),
 Approval-Audit-Persistenz (`slice-040`), persistenter AuditPort-Adapter
 (`slice-041`), echter Aktionsvorschlags-Provider-Adapter (`slice-042`),
 Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`), echte
@@ -44,7 +48,7 @@ provider-spezifische LLM-Konfiguration.
 
 | Welle | Trigger | Wichtigste Slices | Geschätzter Aufwand |
 |---|---|---|---|
-| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`, done) → bewusstes CLI-Binding (`slice-037`) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → persistenter AuditPort-Adapter (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echter BeobachtungsAuswahl-Adapter (`slice-045`) → persistenter KonfidenzPort-Adapter (`slice-046`) → echter UhrPort-Systemadapter (`slice-047`) → Koog/LangChain4j-Paritaet fuer Hypothesen-Provider (`slice-048`) → Code-Agent BeobachtungsAuswahl-Composition (`slice-049`) → CLI-BeobachtungsAuswahl-Default-Binding (`slice-050`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
+| welle-05-llm-port Stabilisierung | `slice-024` done (erfüllt) | Lokaler echter Approval-Adapter auf Basis des Kontextvertrags aus `slice-035` (`slice-036`, done) → bewusstes CLI-Binding (`slice-037`, done) → Approval-Kanalwahl (`slice-038`) → Remote/UI-Approval-Kanal (`slice-039`) → Approval-Audit-Persistenz (`slice-040`) → persistenter AuditPort-Adapter (`slice-041`) → echter Aktionsvorschlags-Provider-Adapter (`slice-042`) → Koog/LangChain4j-Paritaet fuer Aktionsvorschlaege (`slice-043`) → echter Hypothesen-Provider-Adapter (`slice-044`) → echter BeobachtungsAuswahl-Adapter (`slice-045`) → persistenter KonfidenzPort-Adapter (`slice-046`) → echter UhrPort-Systemadapter (`slice-047`) → Koog/LangChain4j-Paritaet fuer Hypothesen-Provider (`slice-048`) → Code-Agent BeobachtungsAuswahl-Composition (`slice-049`) → CLI-BeobachtungsAuswahl-Default-Binding (`slice-050`) → echte Ausfuehrungsadapter fuer das CLI-Bundle und provider-spezifische LLM-Konfiguration. Realistische Build-/Repo-Beobachtungsquellen fuer `example/code-agent` sind durch `slice-031`..`034` abgeschlossen. | M |
 
 ## Meilensteine
 
@@ -152,6 +156,7 @@ flowchart LR
 | 2026-07-08 | `slice-036` in `open/` geplant: lokaler echter Approval-Adapter hinter `HumanApprovalPort` | `slice-035` liefert `ApprovalAnfrage(aktion, belief)`; der naechste Safety-Schritt ist ein isolierter Outbound-Adapter mit Nonce, Identitaet, Kontextbindung und Einmaligkeit. CLI-Produktivbinding bleibt separater Folgeslice, damit der Adapter-Slice pruefbar bleibt. |
 | 2026-07-08 | `slice-036` **in `done/` abgeschlossen**: lokaler Human-Approval-Adapter mit Nonce, Identitaet, Kontext-Digest und Einmaligkeit | `make gates` gruen; Code-/Safety-Review und Verification ohne Findings/DoD-Verletzung; CLI bleibt bewusst auf Fake/konfiguriertem Adapter, Binding folgt in `slice-037`. |
 | 2026-07-08 | `slice-037` in `open/` geplant: CLI-Binding fuer lokalen Approval-Adapter | Folgeslice zu `slice-036`: der CLI-Composition-Root bindet `approval-local` bewusst und beweist die Executor-Grenze im E2E. Audit-Persistenz und Remote-/UI-Kanalwahl bleiben separiert, damit Binding und Safety-Sensorik reviewbar bleiben. |
+| 2026-07-08 | `slice-037` **in `done/` abgeschlossen**: CLI-Binding fuer lokalen Approval-Adapter | `make gates` gruen; `make cli-demo` und `make cli-demo-scenarios` gruen; Code-/Safety-Review und Verification ohne Findings/DoD-Verletzung. `approval=local` ist explizit, Fake-Szenario-Defaults bleiben erhalten. |
 | 2026-07-08 | `slice-038` in `open/` geplant: Approval-Kanalwahl | Folgeslice zu `slice-037`: Kanalwahl wird als fail-closed Vertrag/Dispatcher geplant. Konkrete Remote-/UI-Kanaladapter und persistenter Approval-Audit bleiben eigene Slices, damit Kanalwahl nicht mit Kanalimplementierung vermischt wird. |
 | 2026-07-08 | `slice-039` in `open/` geplant: Remote/UI-Approval-Kanal | Folgeslice zu `slice-038`: ein konkreter Remote/UI-Kanal wird hinter die Kanalwahl gesetzt, aber hermetisch testbar gehalten. Produktive Authentisierung und persistenter Approval-Audit bleiben getrennt, weil sie eigene Failure-Modes und Verträge einfuehren. |
 | 2026-07-08 | `slice-040` in `open/` geplant: Approval-Audit-Persistenz | Folgeslice zu `slice-039`: Anfrage, Kanalwahl, Antwortentscheidung und Fehlergrund werden append-only auditierbar. Allgemeine Audit-Datenbank/Retention und Ausfuehrungsadapter bleiben getrennt, damit die Approval-Entscheidungsspur isoliert pruefbar bleibt. |
