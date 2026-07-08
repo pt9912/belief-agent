@@ -1,6 +1,6 @@
 # Slice slice-035: Human-Approval-Kontextvertrag
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -23,18 +23,18 @@ Adapter oder externe I/O einzufuehren.
 
 ## 2. Definition of Done
 
-- [ ] Port-Contract-Slice bleibt eng: `HumanApprovalPort` konsumiert eine
+- [x] Port-Contract-Slice bleibt eng: `HumanApprovalPort` konsumiert eine
   strukturierte Approval-Anfrage mit `Aktion` und aktuellem `BeliefState`;
   `AktionGaten` erzeugt diese Anfrage erst nach bestandener
   `KonfidenzGate`-Freigabe und nie fuer Gate-Ablehnung, Gate-Eskalation oder
   Resthypothese-Sperre. Bestehende Fake-/Static-Approvals werden nur soweit
   reconciled, wie es fuer Kompilierbarkeit und bestehende Tests noetig ist;
   keine neue Approval-I/O, kein Nonce-Speicher, keine Executor-Aenderung.
-- [ ] Safety-Verhalten bleibt fail-closed und ist getestet: fehlende oder
+- [x] Safety-Verhalten bleibt fail-closed und ist getestet: fehlende oder
   verweigerte Freigabe eskaliert weiter, Gate-Nichtfreigaben loesen keinen
   Approval-Call aus, und kein Pfad ermoeglicht Ausfuehrung ohne
   `Zyklusergebnis.Gehandelt.freigabe.aktion`.
-- [ ] Oeffentlicher Contract ist vollstaendig reconciled:
+- [x] Oeffentlicher Contract ist vollstaendig reconciled:
   `spec/architecture.md`, `docs/user/integration.md` und
   `docs/user/cli-entscheidungsnachweis.md` benennen die Kontextbindung als
   Voraussetzung fuer den folgenden echten Adapter; ein Design-Review als
@@ -100,7 +100,22 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-08. Der `HumanApprovalPort` konsumiert jetzt eine
+`ApprovalAnfrage` aus konkreter `Aktion` und aktuellem `BeliefState`;
+`AktionGaten` erzeugt diese Anfrage nur nach `KonfidenzGate.Freigabe` und nie
+bei Gate-Ablehnung, Gate-Eskalation oder Resthypothese-Sperre.
+
+Review/Verification: Architect-Handoff
+`docs/reviews/2026-07-08-slice-035-design-review.md`, Code-/Safety-Review
+`docs/reviews/2026-07-08-slice-035-code-safety-review.md` und Verification
+`docs/verifications/2026-07-08-slice-035-verification.md` liegen vor. Der
+LOW-Befund aus dem Code-/Safety-Review zum Slice-Kopfstatus wurde korrigiert.
+`make gates` lief gruen; nach der Closure-Verschiebung wurde `make doc-check`
+erneut gruen ausgefuehrt.
+
+Folgegrenze: Ein echter Approval-Adapter mit Nonce, Identitaet, Einmaligkeit
+und interaktiver I/O bleibt Folgeslice; dieser Slice liefert nur den
+kontextgebundenen Port-Vertrag.
 
 ## 8. Sub-Area-Modus-Begründung
 
