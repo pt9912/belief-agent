@@ -36,7 +36,7 @@ Single-Writer-Annahme unter der single-threaded Runtime nur implizit.
 
 ## 4. Trigger
 
-Aus [`slice-041`](slice-041-dauerhafte-audit-datenbank.md) §9 (IDR-4): fällig,
+Aus [`slice-041`](../in-progress/slice-041-dauerhafte-audit-datenbank.md) §9 (IDR-4): fällig,
 sobald die Runtime nebenläufig wird (Multi-Thread-/Multi-Prozess-Schreiber auf
 denselben Store). Unter der heutigen single-threaded, sequentiellen Runtime ist
 das latent; `slice-041` dokumentiert die Single-Writer-Annahme, dieser Slice

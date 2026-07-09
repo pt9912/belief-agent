@@ -1,6 +1,6 @@
 # Slice slice-041: Persistenter AuditPort-Adapter
 
-**Status:** open (siehe [Planning-README](../README.md)).
+**Status:** in-progress (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 

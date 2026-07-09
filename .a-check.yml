@@ -26,6 +26,7 @@ layers:
   outbound_observation_build_report: ["adapters/outbound/observation-build-report/**"]
   outbound_observation_git_local: ["adapters/outbound/observation-git-local/**"]
   outbound_audit_memory: ["adapters/outbound/audit-memory/**"]
+  outbound_audit_file: ["adapters/outbound/audit-file/**"]
   outbound_approval_fake: ["adapters/outbound/approval-fake/**"]
   outbound_approval_local: ["adapters/outbound/approval-local/**"]
   outbound_approval_remote_ui: ["adapters/outbound/approval-remote-ui/**"]
@@ -51,6 +52,8 @@ edges:
   - {from: outbound_observation_git_local, to: domain}
   - {from: outbound_audit_memory, to: application}
   - {from: outbound_audit_memory, to: domain}
+  - {from: outbound_audit_file, to: application}
+  - {from: outbound_audit_file, to: domain}
   - {from: outbound_approval_fake, to: application}
   - {from: outbound_approval_fake, to: domain}
   - {from: outbound_approval_local, to: application}
@@ -105,6 +108,7 @@ resolution:
       - "adapters/outbound/observation-build-report/src/main/kotlin/dev/beliefagent"
       - "adapters/outbound/observation-git-local/src/main/kotlin/dev/beliefagent"
       - "adapters/outbound/audit-memory/src/commonMain/kotlin/dev/beliefagent"
+      - "adapters/outbound/audit-file/src/main/kotlin/dev/beliefagent"
       - "adapters/outbound/approval-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/approval-local/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/approval-remote-ui/src/commonMain/kotlin/dev/beliefagent"

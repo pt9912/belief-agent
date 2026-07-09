@@ -46,6 +46,12 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   `approval=remote-ui` den Remote/UI-Kanal; unbekannte Kanaele, fehlende
   Kanalbindungen und Kanalfehler geben nicht frei. Ohne diesen Schalter gelten
   die je Szenario gesetzten Fake-Approval-Defaults.
+- Persistenter Nachweis (optional): Der CLI-Run nutzt per Default `MemoryAudit`
+  (In-Memory). Fuer eine dauerhafte, nach Neustart rekonstruierbare
+  Entscheidungsspur kann ein Integrator den persistenten Datei-Adapter
+  `dev.beliefagent.adapter.audit.file.DateiAudit` (slice-041) hinter denselben
+  `AuditPort` setzen; das aendert den CLI-Default **nicht** und schreibt die
+  Ereignisse append-only in ein inspizierbares, versioniertes Textformat.
 
 ## 2. Entscheidung je Szenario
 

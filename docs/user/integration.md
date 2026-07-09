@@ -522,7 +522,7 @@ Aktuelle konkrete Implementierungen im Repo (noch nicht alles produktiv):
 | `HypothesenPort` | `dev.beliefagent.adapter.llmhypothesen.FakeHypothesenPort` | Deterministischer Re-Hypothesen-Port |
 | `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval`; `dev.beliefagent.adapter.approvallocal.LocalApproval`; `dev.beliefagent.adapter.approvalremoteui.RemoteUiApproval` | Fake bleibt CLI-Default; lokale und Remote/UI-Kanaele binden `ApprovalAnfrage` an Nonce, Identitaet und Kontext-Digest |
 | `KonfidenzPort` | `dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort` | In-Memory, persistenznah (Replay) |
-| `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` | In-Memory, append-only |
+| `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` (CLI-Default); `dev.beliefagent.adapter.audit.file.DateiAudit` (persistent, slice-041) | `MemoryAudit` bleibt Default; `DateiAudit` speichert append-only in eine inspizierbare Datei und faellt bei Schreib-/Lese-/Formatfehlern fail-closed (wirft) |
 | `LlmPort` | `dev.beliefagent.adapter.llm.langchain4j.LangChain4jLlmPort` / `dev.beliefagent.adapter.llm.koog.KoogLlmPort` | echte LLM-Provider-Boundary für Likelihoods |
 
 Wichtig: Für produktive Ausführung sind `HumanApprovalPort`, persistente
@@ -589,6 +589,35 @@ ueberschreiben. `AktionGaten` nutzt denselben Port fuer Approval-Audit:
 `ApprovalFehler` enthalten Referenzen/Digests, keine UI-Tokens oder
 Klartext-Geheimnisse.
 
+**Persistenter Datei-Adapter (slice-041).**
+`dev.beliefagent.adapter.audit.file.DateiAudit` ist der erste nicht-Memory-Adapter
+hinter `AuditPort`: er speichert alle Ereignisse append-only in eine Datei
+(`java.nio`), laedt sie nach Prozess-Neustart ueber `AuditPort.lade()`
+rekonstruierbar und haelt ein deterministisches, versioniertes und
+inspizierbares Textformat (`LH-QA-06`).
+
+```kotlin
+import dev.beliefagent.adapter.audit.file.DateiAudit
+import java.nio.file.Path
+
+val audit = DateiAudit(Path.of("var/audit/entscheidungsspur.log"))
+update.ereignisse.forEach(audit::anhaengen) // append-only, ueberlebt Neustart
+val protokoll = audit.lade()                // geordnet rekonstruiert
+```
+
+Fehler sind **sichtbar**: bei Schreib-, Lese- oder Formatfehlern wirft der Adapter
+(`AuditSchreibFehler` / `AuditLeseFehler` / `AuditFormatFehler`), statt still ein
+leeres Protokoll zurueckzugeben (`LH-QA-02`). Ein abgeschnittener letzter Datensatz
+(Crash waehrend `anhaengen`) wird als N-1 rekonstruiert und ueber einen
+Warn-Kanal sichtbar gemeldet; ein Defekt im Inneren bleibt ein harter Fehler.
+Append-only ist gegen die Adapter-API garantiert — die zeitliche Ordnung erzwingt
+`EreignisProtokoll.von(...)` in der Domaene, nicht der Adapter. Der Adapter nimmt
+einen **Single-Writer** an; Retention, Backups, Compliance-Export, Tamper-Evidenz
+und nebenlaeufige Writer sind Folgearbeit. `DateiAudit` ist **nicht** als
+CLI-Default gebunden: `MemoryAudit` bleibt Default, weil ein werfender Adapter
+erst nach dem fail-closed-Nachziehen der Audit-Konsumenten (Vorschlags-/
+Konfidenzpfad) produktiv gebunden werden darf.
+
 ## 9. Noch Nicht Stabil
 
 Diese Punkte sind bewusst noch nicht als Nutzervertrag festgelegt:
@@ -597,7 +626,10 @@ Diese Punkte sind bewusst noch nicht als Nutzervertrag festgelegt:
 - Provider-spezifische LLM-Composition mit API-Key-/Modell-Konfiguration und
   echte externe Provider-Bindungen.
 - Produktive Remote-/UI-Authentisierung und Härtung der Bediengrenze.
-- Dauerhafte Audit-Persistenz.
+- Dauerhafte Audit-Persistenz als **Produktiv-Default**: der append-only
+  Datei-Adapter `DateiAudit` (slice-041) existiert und ist inspizierbar, aber
+  produktives CLI-Binding, Retention, Backups, Compliance-Export, Tamper-Evidenz
+  und nebenlaeufige Writer bleiben Folgearbeit.
 
 Die Spezifikation markiert externe Port-Vertraege derzeit als `v0 (intern)`.
 Integrationen sollten deshalb auf Modul-/Quellstand pinnen und API-Aenderungen

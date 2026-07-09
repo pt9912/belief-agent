@@ -39,7 +39,7 @@ einen Dateisystem-Akteur, nicht nur gegen die Adapter-API.
 
 ## 4. Trigger
 
-Aus [`slice-041`](slice-041-dauerhafte-audit-datenbank.md) §9 (IDR-3):
+Aus [`slice-041`](../in-progress/slice-041-dauerhafte-audit-datenbank.md) §9 (IDR-3):
 **Architect-Entscheidung** — fällig, wenn das Threat-Model dieses Safety/Control-
 Stores Widerstand gegen Dateisystem-Zugriff verlangt (typisch zusammen mit
 Compliance-Export/Retention/Pfadpolitik). Setzt den persistenten `audit-file`-

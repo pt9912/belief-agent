@@ -43,7 +43,7 @@ Teilzustand in `KonfidenzExternalisieren`.
 ## 4. Trigger
 
 Harte Vorbedingung aus
-[`slice-041`](slice-041-dauerhafte-audit-datenbank.md) §9 (IDR-1/IPR-1): fällig
+[`slice-041`](../in-progress/slice-041-dauerhafte-audit-datenbank.md) §9 (IDR-1/IPR-1): fällig
 **bevor** ein werfender (persistenter) `AuditPort`-Adapter produktiv in den
 Vorschlags-/Konfidenzpfad gebunden wird. Bis dahin bleibt `MemoryAudit` (wirft
 nie) der Default — die Lücke ist latent, aber benannt, nicht still.

@@ -19,6 +19,7 @@ include("adapters:outbound:observation-fake") // Fake-Beobachtungsquelle (slice-
 include("adapters:outbound:observation-build-report") // Lokaler Build-Beobachter (ARC-08)
 include("adapters:outbound:observation-git-local") // Lokaler Git-Beobachter (ARC-08)
 include("adapters:outbound:audit-memory") // In-Memory-Audit-Persistenz (slice-010)
+include("adapters:outbound:audit-file") // Persistenter Datei-Audit-Adapter (slice-041, ARC-08)
 include("adapters:outbound:approval-fake") // Fake-Human-Approval (slice-013)
 include("adapters:outbound:approval-local") // Lokaler Human-Approval-Adapter (ARC-08)
 include("adapters:outbound:approval-remote-ui") // Remote/UI-Human-Approval-Kanal (ARC-08)
