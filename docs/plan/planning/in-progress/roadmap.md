@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Keine aktive Welle (`slice-041` abgeschlossen). **Letzte Änderung:** 2026-07-09.
+**Status:** Keine aktive Welle (`slice-042` abgeschlossen). **Letzte Änderung:** 2026-07-09.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,11 +10,13 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-Keine aktive Welle. `slice-041` ist als erster persistenter, dateibasierter
-`AuditPort`-Adapter (append-only, nach Neustart rekonstruierbar) auf `done/`
+Keine aktive Welle. `slice-042` ist als erster echter LangChain4j-Adapter hinter
+`AktionsVorschlagsPort` (nur Rohvorschläge, keine Freigabe/Ausführung) auf `done/`
 abgeschlossen
+([`slice-042-llm-aktionsvorschlag-provider-adapter`](../done/slice-042-llm-aktionsvorschlag-provider-adapter.md)).
+`slice-041` ist als erster persistenter, dateibasierter `AuditPort`-Adapter auf
+`done/` abgeschlossen
 ([`slice-041-dauerhafte-audit-datenbank`](../done/slice-041-dauerhafte-audit-datenbank.md)).
-`slice-040` ist abgeschlossen.
 
 `slice-040` ist als Approval-Audit-Persistenz auf `done/` abgeschlossen
 ([`slice-040-approval-audit-persistenz`](../done/slice-040-approval-audit-persistenz.md)).

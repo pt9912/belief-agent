@@ -1,6 +1,6 @@
 # Slice slice-042: LLM-Aktionsvorschlag-Provider-Adapter
 
-**Status:** open (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -23,43 +23,46 @@ Wirkungsklassen und externalisierte Konfidenz validiert.
 
 ## 2. Definition of Done
 
-- [ ] Neues Outbound-Adaptermodul `adapters/outbound/llm-action-langchain4j`
+- [x] Neues Outbound-Adaptermodul `adapters/outbound/llm-action-langchain4j`
   (JVM, `src/main/kotlin`) implementiert `AktionsVorschlagsPort` hinter `ARC-08`;
   `hexagon:*` importiert keine Provider-/Framework-Pakete. Framework:
   **LangChain4j** (`dev.langchain4j:1.17.1`, bereits adoptiert → keine neue
   Toolchain-Fläche, kein Folge-ADR; §9 F-3). Koog-Parität ist `slice-043`.
-- [ ] **Schicht-Trennung (Adapter = Wire-Integrität, Use Case = Semantik; §9 F-1):**
+- [x] **Schicht-Trennung (Adapter = Wire-Integrität, Use Case = Semantik; §9 F-1):**
   Prompt, Response-DTO und Parser sind strikt schema-gebunden — der **Adapter**
   prüft nur Wire-/Deserialisierungs-Integrität: genau die erlaubten JSON-Felder
   `beschreibung`, `hypotheseId`, `wirkungsklasse`, `pSuccess`, `konfidenzReferenz`,
-  `stuetzendeEvidenz`; unbekannte/doppelte JSON-Felder, fehlende Pflichtfelder,
-  falscher Typ/Shape und nicht-endliche Zahlen werden fail-closed behandelt und
-  auf `AktionsVorschlag` (primitive Rohwerte) gemappt. Die **Semantik**
+  `stuetzendeEvidenz`. **Pro Vorschlag** werden unbekannte/fehlende Felder,
+  falscher Typ/Shape und nicht-endliche Zahlen fail-closed **verworfen** (valide
+  Geschwister bleiben), der Rest auf `AktionsVorschlag` (primitive Rohwerte) gemappt.
+  **Doppelte JSON-Felder** sind tokenizer-seitig ein Defekt der **Gesamtantwort** und
+  fallen unter „unparsebar → sichtbarer Wurf" (§9 Code-Review F-1), nicht unter den
+  Einzel-Verwurf. Die **Semantik**
   (unbekannte Hypothese, ungültige Wirkungsklasse, Evidenz-Auflösung/Nicht-Leere,
   Konfidenz-Bereich `[0,1]`) bleibt im Use Case `AktionsVorschlagen`
   (`:59/63/66/68/71`) — der Adapter dupliziert sie **nicht** und **kann** die
   Evidenzprüfung nicht leisten (`vorschlaege(belief)` trägt keinen Evidenz-Kontext;
   §8 hält den Port unverändert). Spiegelt slice-041 DR-F3.
-- [ ] **Fehler-Signalisierung je Klasse (§9 F-2):** leere Provider-Antwort →
+- [x] **Fehler-Signalisierung je Klasse (§9 F-2):** leere Provider-Antwort →
   `emptyList()` (legitim „kein Vorschlag", Fake-Parity `FakeAktionsVorschlagsPort.kt:38-40`);
   einzelner wire-defekter Vorschlag → dieser wird verworfen, valide bleiben;
   Provider-Ausfall/Transport-Fehler/komplett unparsebare Antwort → **sichtbarer**
   Adapterfehler (geworfen; propagiert außerhalb des per-Vorschlag-`runCatching`,
   `AktionsVorschlagen.kt:47`) — „Provider unreachable" bleibt unterscheidbar von
   „kein Vorschlag" (`LH-QA-02`).
-- [ ] Lokale Tests ohne Provider/API-Key decken ab: erfolgreiche Normalisierung,
+- [x] Lokale Tests ohne Provider/API-Key decken ab: erfolgreiche Normalisierung,
   Wire-Fehlerklassen (leere Antwort → leer; wire-defekter Einzelvorschlag →
   verworfen; Provider-Ausfall/unparsebar → sichtbarer Wurf), Prompt-Inhalt,
   Pass-Through semantisch offener Rohwerte an den Use-Case-Validierungsrand (der
   Adapter re-validiert Hypothese/Wirkungsklasse/Evidenz/Bereich nicht) und keine
   Gate-/Executor-Kopplung (`LH-QA-02`, `LH-QA-03`).
-- [ ] Build-/Arch-/Coverage-Integration ist vollstaendig:
+- [x] Build-/Arch-/Coverage-Integration ist vollstaendig:
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`, Modul-`build.gradle.kts`
   und Kover-Gate sind ergaenzt (`ADR-0003`, `ADR-0006`).
-- [ ] Nutzer-/Integrationsdoku und Verification-Artefakt beschreiben, dass der
+- [x] Nutzer-/Integrationsdoku und Verification-Artefakt beschreiben, dass der
   Adapter nur Vorschlaege liefert: keine Freigabe, keine Ausfuehrung, kein
   CLI-Default-Binding, keine Produktiv-Secrets in Tests oder Doku.
-- [ ] `make doc-check` und `make gates` sind gruen; Closure-Notiz benennt, ob
+- [x] `make doc-check` und `make gates` sind gruen; Closure-Notiz benennt, ob
   ein zweiter Provider-/Framework-Pfad als Folgeslice noetig ist.
 
 ## 3. Plan (vor Code)
@@ -115,7 +118,36 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-09. Implementiert wurde der erste echte (nicht-Fake)
+LangChain4j-Adapter hinter `AktionsVorschlagsPort`
+(`adapters/outbound/llm-action-langchain4j`, `LangChain4jAktionsVorschlagsPort`):
+er liefert ausschließlich **rohe** `AktionsVorschlag`-Werte, prüft nur Wire-/
+Deserialisierungs-Integrität (exakt 6 Felder, Typ/Shape, endliche Zahlen) und
+überlässt die Semantik (Hypothese/Wirkungsklasse/Evidenz/Bereich) dem Use Case
+`AktionsVorschlagen`. Kein Gate/Executor, keine Freigabe, kein CLI-Default-Binding,
+keine Secrets (Stub-Runner in Tests).
+
+**Lerneintrag.** Zwei Signale, beide aus der Rollentrennung (Modul 8): (1) Der
+**unabhängige Frischkontext-Code-Safety-Review** fand — wie schon bei slice-041 —
+einen MEDIUM, den der Same-Context-Code-Review übersah: `readTree` ignorierte Bytes
+hinter dem ersten JSON-Wert still (`[gültig]{leak}` → Trailing-Objekt verworfen,
+`[] Müll` → `emptyList`), was die Zusage „unparsebar → sichtbarer Wurf" aushebelte.
+Behoben durch expliziten `nextToken()==null`-Check + Negativtests. „Review≠Autor
+trägt real" bestätigt sich ein zweites Mal in Folge. (2) Der Code-Review-MEDIUM
+CR-F1 (Duplikat-Granularität) ließ sich **nicht** als per-Vorschlag-Verwurf
+umsetzen — Jacksons Duplikaterkennung ist Whole-Stream, nach einer Element-Exception
+ist die Parser-Position nicht wiederaufsetzbar. Statt eine fragile Lösung zu
+erzwingen, wurde der DoD-2-Wortlaut korrigiert (Rückkante Review→Plan): doppelte
+JSON-Felder sind ein Gesamtantwort-Defekt → Wurf. Zusätzlich fand `make arch-check`
+eine Paket-Kollision (`llmaction`, weil die Fake-Klasse keine eigene Datei hat),
+gelöst durch disjunktes Paket `adapter.action.langchain4j`.
+
+**Nachweis.** Review-/Verification-Artefakte: `2026-07-09-slice-042-code-review.md`,
+`2026-07-09-slice-042-code-safety-review.md`, `2026-07-09-slice-042-verification.md`
+(plus die Plan-/Design-Reviews gleichen Datums). Ausgeführte Sensoren: `make gates`
+(EXIT 0: doc-check · build · test 20 Tests · coverage-gate 90 %-Floor · arch-check).
+Keine Carveouts. **Zweiter Framework-Pfad (Koog neben LangChain4j) ist `slice-043`**
+(Parität), nicht Teil dieses Slice.
 
 ## 8. Sub-Area-Modus-Begründung
 
@@ -180,3 +212,18 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 | DR-F2 Fehler-Signalisierung | LOW | Je Fehlerklasse bestimmt: leere Antwort → `emptyList()` (Fake-Parity); wire-defekter Einzelvorschlag → verworfen, valide bleiben; Provider-Ausfall/unparsebar → sichtbarer Wurf (propagiert außerhalb `AktionsVorschlagen.kt:47`). „Provider unreachable" ≠ „kein Vorschlag". Kein Pflicht-Audit-Verlust wie slice-041. | §2 DoD 2/3 |
 | DR-F3 ADR-0002-Guard | INFO | LangChain4j/Koog bereits adoptiert → neuer `llm-action-langchain4j`-Adapter fügt keine Toolchain-Fläche hinzu (kein Folge-ADR). Nur bei einem **nicht** adoptierten Framework griffe der `ADR-0002`-Guard (Folge-ADR vor Code). `ADR-0002` in **Bezug** ergänzt. | Kopf **Bezug**, §2 DoD 1, §4, §6 |
 | PR-F1 Modul/Framework offen | INFO | Konvergiert: `adapters/outbound/llm-action-langchain4j` (LangChain4j), `.a-check`-Rolle `outbound_llm_action_langchain4j` + Root; nicht mehr disjunktiv. Koog-Parität = `slice-043`. | §2 DoD 1, §3, §4 |
+
+**Code-Review + Frischkontext-Code-Safety-Review** (Code-Review: 1× MEDIUM
+merge-blockierend, 1× LOW, 3× INFO; unabhängiger Safety-Review: 1× MEDIUM, 1× LOW,
+1× INFO — der Safety-MEDIUM war ein Fund, den der Same-Context-Code-Review übersah):
+
+| Finding | Kat. | Entscheidung | Verankert in |
+|---|---|---|---|
+| CR-F1 Duplikat-Feld-Granularität | MEDIUM | **Reklassifiziert:** doppelte JSON-Felder sind tokenizer-seitig ein Defekt der **Gesamtantwort** → „unparsebar → Wurf", **nicht** per-Vorschlag-Verwurf. Grund: Jacksons Duplikaterkennung ist Whole-Stream; nach einer Element-Exception ist die Parser-Position nicht wiederaufsetzbar. Beide Zweige fail-closed (kein Safety-Loch). DoD 2 entsprechend geschärft. | §2 DoD 2, Code (`parseJson`) |
+| CR-F2 KDoc-`[warnung]`-Link | LOW | Behoben: Port-KDoc verweist nicht mehr per Dokka-Link auf ein Parser-Member. | Code (Port-KDoc) |
+| CR-F3 Code-Safety-Review offen | INFO | Erledigt: unabhängiger Frischkontext-Durchgang, Artefakt `2026-07-09-slice-042-code-safety-review.md`. | docs/reviews |
+| CR-F4 Roher Transport-Fehlertyp | INFO | Bewusst plan-konform: der Adapter hüllt den Transport-Ausfall nicht in einen eigenen Typ (Plan lässt „die Transport-Exception" propagieren; fail-closed sichtbar). Typ-Unterscheidbarkeit „unreachable" ≠ intern ist Folgearbeit, sobald ein Slice die Vorschläge-Konsumenten geordnet eskalieren lässt. | §6 (Residuum) |
+| CR-F5 Diff untracked | INFO | Löst sich beim Commit; die berührten IDs stehen in der Commit-Message. | — (Commit) |
+| SR-F1 Trailing-Token-Nachsicht | MEDIUM | **Behoben** (Frischkontext-Fund): `readTree` ignorierte Bytes hinter dem ersten JSON-Wert still (`[] Müll` → `emptyList`, `[gültig]{…}` → Trailing verworfen). `parseJson` prüft jetzt `parser.nextToken() == null` → Trailing-Müll wirft sichtbar (`LH-QA-02`) statt „kein Vorschlag" vorzutäuschen. Negativtests ergänzt. | §2 DoD 2/3, Code (`parseJson`) |
+| SR-F2 null-Feldwert-Test | LOW | Behoben: Negativtest `json_null_feldwert_wird_verworfen` (JSON-`null` → verworfen). | Tests |
+| SR-F3 DoS-Grenzen nur Default | INFO | Akzeptiert: Jackson-`StreamReadConstraints`-Defaults (Tiefe 1000, String 20 MB) werfen fail-closed; explizites Pinnen ist Folgearbeit. | §6 (Residuum) |

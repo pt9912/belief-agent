@@ -334,6 +334,7 @@ Direkte JVM-Adapter sind als eigene Outbound-Module vorhanden:
 | `adapters:outbound:llm-langchain4j` | `LangChain4jLlmPort.fromChatModel(chatModel)` | `ChatModel` liefert strukturierte Likelihoods |
 | `adapters:outbound:llm-koog` | `KoogLlmPort.fromLlmClient(client, model)` | Koog `LLMClient` liefert strukturierte Likelihoods |
 | `adapters:outbound:llm-koog` | `KoogLlmPort.fromPromptExecutor(executor, model)` | Koog `PromptExecutor` liefert strukturierte Likelihoods |
+| `adapters:outbound:llm-action-langchain4j` | `LangChain4jAktionsVorschlagsPort.fromChatModel(chatModel)` | `ChatModel` liefert **rohe** Aktionsvorschläge (nur Vorschlag, keine Freigabe/Ausführung) |
 
 Alle drei Einstiegspunkte bleiben hinter `LlmPort`. Der Adapter erstellt den
 Prompt, liest JSON mit `proHypothese` und `resthypothese`, validiert exakt die
@@ -341,6 +342,18 @@ bekannten Hypothesen aus dem `BeliefState` und gibt nur `Likelihoods` an die
 Update-Pipeline weiter. Unvollstaendige, unbekannte oder nicht-endliche Werte
 werden zurueckgewiesen; dadurch entsteht keine Freigabe und kein
 Aktionsausfuehrungspfad.
+
+**Aktionsvorschlags-Adapter (slice-042).** `LangChain4jAktionsVorschlagsPort`
+(hinter `AktionsVorschlagsPort`) liefert ausschliesslich **rohe**
+`AktionsVorschlag`-Werte. Der Adapter prueft nur **Wire-/Deserialisierungs-
+Integritaet** (genau die erlaubten JSON-Felder, Typ/Shape, endliche Zahlen);
+wire-defekte Einzelvorschlaege werden verworfen (sichtbar), eine unparsebare
+Antwort oder ein Provider-Ausfall wird geworfen ("unreachable" bleibt von "kein
+Vorschlag" unterscheidbar). Die **Semantik** (unbekannte Hypothese, gueltige
+Wirkungsklasse, Evidenz-Aufloesung, Konfidenz-Bereich `[0,1]`) validiert weiterhin
+der Use Case `AktionsVorschlagen` — der Adapter dupliziert sie nicht. Er erzeugt
+keine `Aktionsfreigabe`, oeffnet keinen Executor-Pfad und ist **kein** CLI-Default;
+Provider-Modelle und API-Keys bleiben im Composition-Root.
 
 Der Integrationssatz bleibt:
 
