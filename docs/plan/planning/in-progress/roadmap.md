@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** `slice-041` in Arbeit (`in-progress/`). **Letzte Änderung:** 2026-07-09.
+**Status:** Keine aktive Welle (`slice-041` abgeschlossen). **Letzte Änderung:** 2026-07-09.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,9 +10,10 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-`slice-041` ist in Arbeit (`in-progress/`): der erste persistente, dateibasierte
-`AuditPort`-Adapter (append-only, nach Neustart rekonstruierbar)
-([`slice-041-dauerhafte-audit-datenbank`](slice-041-dauerhafte-audit-datenbank.md)).
+Keine aktive Welle. `slice-041` ist als erster persistenter, dateibasierter
+`AuditPort`-Adapter (append-only, nach Neustart rekonstruierbar) auf `done/`
+abgeschlossen
+([`slice-041-dauerhafte-audit-datenbank`](../done/slice-041-dauerhafte-audit-datenbank.md)).
 `slice-040` ist abgeschlossen.
 
 `slice-040` ist als Approval-Audit-Persistenz auf `done/` abgeschlossen

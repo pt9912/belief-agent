@@ -1,6 +1,6 @@
 # Slice slice-041: Persistenter AuditPort-Adapter
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -23,7 +23,7 @@ Retention, Migrationen, Backups und Compliance-Export bleiben Folgearbeit.
 
 ## 2. Definition of Done
 
-- [ ] Neues Outbound-Adaptermodul `adapters/outbound/audit-file` (JVM-Ziel,
+- [x] Neues Outbound-Adaptermodul `adapters/outbound/audit-file` (JVM-Ziel,
   `src/main/kotlin`, Datei-IO über `java.nio`) implementiert `AuditPort` hinter
   `ARC-08`; `hexagon:*` importiert keine Storage-/IO-Pakete und keinen Adapter.
   Source-Set und Abhängigkeitsfläche sind im Design-Review geklärt (§9 DR-F2):
@@ -32,7 +32,7 @@ Retention, Migrationen, Backups und Compliance-Export bleiben Folgearbeit.
   (kein Serialisierungs-Plugin) — konform zu `ADR-0002` (JVM-Ziel zuerst, Dep am
   Rand), ohne Folge-ADR. Die lokale Speicherform ist inspizierbar (`LH-QA-06`);
   Compliance-Export bleibt Folgearbeit.
-- [ ] Der Adapter speichert alle bestehenden `Ereignis`-Typen (inkl. der
+- [x] Der Adapter speichert alle bestehenden `Ereignis`-Typen (inkl. der
   slice-040-Approval-Ereignisse `ApprovalAngefragt`/`Erteilt`/`Verweigert`/
   `Fehler`, die bereits über denselben `AuditPort` laufen) append-only und
   geordnet; vorhandene Ereignisse werden nie überschrieben oder gelöscht.
@@ -44,7 +44,7 @@ Retention, Migrationen, Backups und Compliance-Export bleiben Folgearbeit.
   **Adapter-API** garantiert; ein Out-of-Band-Umschreiben der Datei
   (Tamper-Evidenz) und nebenläufige Writer sind **out of scope** dieses
   Single-Writer-Stores (§9 IDR-3/IDR-4).
-- [ ] Restart-/Replay-Verhalten ist deterministisch getestet (`LH-QA-03`):
+- [x] Restart-/Replay-Verhalten ist deterministisch getestet (`LH-QA-03`):
   Laden nach Neustart, leere Datenbank (legitim leer ≠ Fehler), abgeschnittener
   **Trailing**-Record (Crash-mid-write) → N-1 rekonstruiert + sichtbar markiert,
   **Interior**-Korruption → Wurf (§9 IDR-2), Schreibfehler, Reihenfolge und
@@ -70,7 +70,7 @@ Retention, Migrationen, Backups und Compliance-Export bleiben Folgearbeit.
   Read-Fail-Eskalation ist benannter Folgeslice, nicht slice-040-Parität). Der
   `AuditPort`-Vertrag wird **nicht** auf `Result` umgestellt (das berührte Kern,
   `MemoryAudit` und alle Konsumenten — außerhalb des kleinsten Adapters, §9 DR-F1).
-- [ ] Der Adapter prüft **Deserialisierungs-Integrität** vor der Rückgabe:
+- [x] Der Adapter prüft **Deserialisierungs-Integrität** vor der Rückgabe:
   unbekannter Typ-Tag, fehlendes Pflichtfeld oder ein defekter Datensatz **im
   Inneren** des Protokolls → sichtbarer (geworfener) Fehler statt gate-fähiger
   Teilhistorie. **Ausnahme Trailing-Truncation (§9 IDR-2):** ein einzelner
@@ -86,7 +86,7 @@ Retention, Migrationen, Backups und Compliance-Export bleiben Folgearbeit.
   (`IllegalArgumentException` bei Rückdatierung); Rekonstruierbarkeit bleibt
   Sache von `Rekonstruktion` (Domain). Keine Doppel-Quelle der append-only-Regel
   im Adapter (§9 DR-F3; `LH-FA-AUD-001`, `LH-FA-AUD-003`, `LH-FA-AUD-004`).
-- [ ] Build-/Arch-/Doku-Integration ist vollständig: Modul in
+- [x] Build-/Arch-/Doku-Integration ist vollständig: Modul in
   `settings.gradle.kts`, `.a-check.yml` und `Dockerfile` aufgenommen.
   **Coverage-Gate (`ADR-0004`/`ADR-0006`, §9 IPR-2):** das neue Modul trägt einen
   eigenen `build.gradle.kts` mit per-Modul-`kover { reports { verify { rule {
@@ -174,7 +174,40 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-09. Implementiert wurde der erste persistente
+(nicht-Memory) `AuditPort`-Adapter `adapters/outbound/audit-file` (`DateiAudit`):
+append-only Datei-IO über `java.nio`, deterministisches, versioniertes und
+inspizierbares Textformat (`beliefaudit/v1`, ein Ereignis pro Zeile), nach
+Neustart über `EreignisProtokoll.von(...)` rekonstruierbar, fail-closed an der
+Adapter-Grenze (wirft `AuditPersistenzFehler` statt stiller Leer-Rückgabe).
+`MemoryAudit` bleibt CLI-Default — der werfende Adapter wird bewusst **nicht**
+produktiv gebunden (harte Vorbedingung IDR-1).
+
+**Lerneintrag.** Der **unabhängige Frischkontext-Code-Safety-Review** (Modul 8)
+hat einen **HIGH** gefunden, den der Autor-Kontext als „bekannte Grenze"
+unterschätzt hatte: ein Folge-`anhaengen` nach einem tolerierten
+Trailing-Truncation-Record verklebte über die Record-Grenze und korrumpierte den
+Store dauerhaft (bzw. fabrizierte still einen nie angehängten Datensatz). Behoben
+durch Fragment-Heilung vor dem Append (Newline = Commit-Marker); ein zweiter
+Frischkontext-Lauf bestätigte die Behebung. Konkrete Konsequenz: die
+Rollentrennung Review≠Autor trägt hier real, nicht nur formal — derselbe Kontext
+hätte den Defekt nicht gesehen. Zweites Signal: die im Independent-Review
+gemeldete Write-Pfad-Ordnungs-Divergenz zu `MemoryAudit` (MEDIUM-1) steht in
+Spannung zur mehrfach reviewten §9-DR-F3-Entscheidung; sie wurde **nicht**
+stillschweigend im Adapter umcodiert, sondern als `ADR-0010` (Proposed) an den
+Architect gegeben (Rückkante Review→Plan).
+
+**Nachweis.** Review-/Verification-Artefakte:
+[`…-code-review.md`](../../../reviews/2026-07-09-slice-041-code-review.md),
+[`…-code-safety-review.md`](../../../reviews/2026-07-09-slice-041-code-safety-review.md)
+(+ [`-rerun`](../../../reviews/2026-07-09-slice-041-code-safety-review-rerun.md)),
+[`…-verification.md`](../../../verifications/2026-07-09-slice-041-verification.md).
+Ausgeführte Sensoren: `make gates` (EXIT 0: doc-check · build · test ·
+coverage-gate 90 %-Floor · arch-check) sowie `make doc-commits` und
+`make doc-immutable` (range-basiert, 0 Befunde). Keine Carveouts. Folgearbeit als
+benannte Slices: slice-051 (Write-Konsumenten fail-closed), slice-052 (Read-Fail),
+slice-053 (Tamper-Evidenz), slice-054 (Single-Writer); `ADR-0010` wartet auf die
+Architect-Entscheidung, bevor ein werfender Adapter produktiv gebunden wird.
 
 ## 8. Sub-Area-Modus-Begründung
 

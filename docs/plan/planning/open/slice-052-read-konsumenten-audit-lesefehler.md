@@ -37,7 +37,7 @@ auch auf dem Read-Pfad und nicht nur an der Adapter-Grenze.
 
 ## 4. Trigger
 
-Aus [`slice-041`](../in-progress/slice-041-dauerhafte-audit-datenbank.md) §9 (DR-R1): fällig,
+Aus [`slice-041`](../done/slice-041-dauerhafte-audit-datenbank.md) §9 (DR-R1): fällig,
 sobald ein persistenter (werfender) Adapter in einen `lade()`-Pfad gebunden wird
 **oder** ein Slice `lade()`/`Rekonstruktion` in einen Gate-/Entscheidungspfad
 führt. Unter heutigem observability-only-Konsum ist der uncaught-Wurf ein lauter
