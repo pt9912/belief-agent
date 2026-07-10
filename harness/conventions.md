@@ -339,6 +339,32 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   bewusst **nicht** im Scope (abgeschlossene Slices; bei Bedarf separat zu
   entscheiden).
 
+### MR-013 — `ids`-Scope auf `docs/user`; keine Slice-Referenzen in Nutzer-Doku
+
+- **Datum:** 2026-07-10
+- **Geltungsbereich:** `.d-check.yml` (`ids.scope.roots`),
+  `docs/user/integration.md`, `docs/user/cli-entscheidungsnachweis.md`. Baut auf
+  `MR-010`–`MR-012` auf.
+- **Adaption:** `ids.scope.roots` wird um `docs/user` erweitert (repo-interne
+  Nutzer-/Integrator-Doku, keine externe Auslieferung → Links auf
+  `spec/lastenheft.md` unbedenklich). **LH-Referenzen** in der Nutzer-Doku sind
+  zulässig und werden verlinkt (4 Links). **`slice`-Referenzen sind in
+  Nutzer-Doku unerwünscht und werden entfernt, nicht verlinkt**
+  (5 entfernt: 4× `slice-041`, 1× `slice-042`):
+  Slices sind implementierungsinterne Planungs-Increments ohne Belang für Leser
+  der Nutzer-Doku. Da `docs/user` **außerhalb** des Slice-Target-Baums
+  `docs/plan/planning/` liegt, greift die Self-Exemption nicht — d-check würde
+  eine Slice-Nennung dort als `id-unlinked` flaggen. Diese Meldung wirkt damit
+  als **Tripwire**: künftige Slice-Referenzen in `docs/user` werden erkannt und
+  sind zu **entfernen** (nicht zu verlinken).
+- **Begründung:** Nutzer-/Integrator-Dokumentation beschreibt beobachtbares
+  Verhalten und Verträge; interne Increment-IDs (Slices) gehören dort nicht hin.
+  Spec-Anforderungen (`LH-*`) sind hingegen legitime, navigierbare Verweise auf
+  die normative Quelle.
+- **Auflösungs-Trigger:** permanent, solange `docs/user` repo-intern geführt
+  wird. Würde die Nutzer-Doku je extern ausgeliefert, sind die
+  `spec/lastenheft.md`-Links neu zu bewerten (brechen außerhalb des Repos).
+
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 
 Über die vier kanonischen Bindung-Klassen (ADR, Carveout, Schwelle,

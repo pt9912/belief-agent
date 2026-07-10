@@ -49,7 +49,7 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
 - Persistenter Nachweis (optional): Der CLI-Run nutzt per Default `MemoryAudit`
   (In-Memory). Fuer eine dauerhafte, nach Neustart rekonstruierbare
   Entscheidungsspur kann ein Integrator den persistenten Datei-Adapter
-  `dev.beliefagent.adapter.audit.file.DateiAudit` (slice-041) hinter denselben
+  `dev.beliefagent.adapter.audit.file.DateiAudit` hinter denselben
   `AuditPort` setzen; das aendert den CLI-Default **nicht** und schreibt die
   Ereignisse append-only in ein inspizierbares, versioniertes Textformat.
 
@@ -93,7 +93,7 @@ Daten `belief-agent` im CLI-Run entscheidet und wann er nicht genug weiß.
   3. `p_success 0.95 >= 0.95` wäre gate-fähig, aber Aktion ist
      irreversibel und die kontextgebundene `ApprovalAnfrage` wird vom Fake
      nicht freigegeben.
-  4. `AktionGaten` wandelt auf `Eskalation` (LH-FA-POL-004).
+  4. `AktionGaten` wandelt auf `Eskalation` ([LH-FA-POL-004](../../spec/lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen)).
 - Ergebnis:
   - `terminal=eskaliert`
   - `executed=false`

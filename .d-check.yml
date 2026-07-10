@@ -55,7 +55,7 @@ ids:
     # MR-012: Scope zusätzlich auf docs/plan/planning/{in-progress,next,open}
     # (roadmap + open-Slices); Planning ist mutabel (kein vcs), slice-IDs dort
     # self-exempt (eigener Target-Baum). done/ bewusst NICHT im Scope.
-    roots: [spec, docs/plan/adr, docs/plan/planning/in-progress, docs/plan/planning/next, docs/plan/planning/open]
+    roots: [spec, docs/plan/adr, docs/plan/planning/in-progress, docs/plan/planning/next, docs/plan/planning/open, docs/user]
   patterns:
     - regex: 'ADR-\d{4}'
       target: docs/plan/adr/
