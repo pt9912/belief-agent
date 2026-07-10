@@ -1,6 +1,6 @@
 # Slice slice-043: Aktionsvorschlag Koog/LangChain4j-Paritaet
 
-**Status:** in-progress (siehe [Planning-README](../README.md)).
+**Status:** done (siehe [Planning-README](../README.md)).
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
@@ -131,7 +131,50 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 7. Closure-Notiz (nach `done/`)
 
-<!-- Erst nach Abschluss fuellen. -->
+Abgeschlossen am 2026-07-10. Implementiert wurde der zweite echte (nicht-Fake)
+Framework-Pfad hinter `AktionsVorschlagsPort`
+(`adapters/outbound/llm-action-koog`, `KoogAktionsVorschlagsPort`), symmetrisch zum
+LangChain4j-Adapter aus `slice-042`. Beide liefern ausschließlich **rohe**
+`AktionsVorschlag`-Werte, prüfen nur Wire-/Deserialisierungs-Integrität (exakt 6
+Felder, Typ/Shape, endliche Zahlen) und überlassen die Semantik dem Use Case
+`AktionsVorschlagen`. Kein Gate/Executor, keine Freigabe, kein CLI-Default-Binding,
+keine Secrets (Stub-Runner in Tests).
+
+**Paritäts-Contract.** Gleicher 6-Feld-Response-Contract (`beschreibung`,
+`hypotheseId`, `wirkungsklasse`, `pSuccess`, `konfidenzReferenz`,
+`stuetzendeEvidenz`) und gleiche Fehlerklassen-Äquivalenz über **beide** Runner
+(gültig → Vorschläge; leer/`[]` → `emptyList()`; unparsebar/Nicht-Array/
+**Trailing-Tokens**/doppelte Felder/Provider-Ausfall → sichtbarer Wurf; unbekannte/
+fehlende/falsch-getypte/nicht-endliche Felder → per-Vorschlag fail-closed
+verworfen). Parität entsteht durch **bewusste Duplikation** je Framework-Pfad
+(eigener strikter Parser + Prompt-Factory), **nicht** durch ein geteiltes
+Produktivmodul — keine `ARC-08`-Adapter→Adapter-Kante, kein Framework im Core
+(`ADR-0001`/`ADR-0003`); belegt über die geteilte Contract-Test-Matrix.
+
+**Verbleibende provider-spezifische Unterschiede.** Koog bindet über
+`LLMClient`/`PromptExecutor` plus die reflektive `fromLlmClient(clientClass)`-Fläche,
+LangChain4j über `ChatModel` — beide hinter demselben Port, ohne fachliche
+Divergenz. Residuen (Folgearbeit): roher Transport-Fehlertyp nicht adaptergehüllt
+(SR-F3, 3. Auftreten → Steering-Loop, Entscheidung **als INFO belassen**),
+Jackson-`StreamReadConstraints`-DoS-Grenzen nur über Defaults (SR-F2), reflektiver
+Static-Init vor Typ-Check (SR-F1, deployment-config-begrenzt).
+
+**Lerneintrag.** (1) Parität muss zur **gehärteten** Soll-Referenz gezogen werden,
+nicht zum älteren gleich-Framework-Code: Der Koog-Parser übernahm den
+Trailing-Token-Guard (`nextToken()==null`) aus `llm-action-langchain4j` (slice-042
+SR-F1) und spiegelte **nicht** die schwächere `readTree(raw.trim())`-Vorlage aus
+`KoogLlmPort.kt` — sonst wäre die in slice-042 geschlossene Trailing-Token-Nachsicht
+zurückgekehrt. (2) Rollentrennung (Modul 8) trägt erneut: der unabhängige
+Frischkontext-Code-Review fand mit F-1 (MEDIUM) eine **neue öffentliche Fläche**
+außerhalb der slice-042-Contract-Matrix — die reflektive `fromLlmClient(clientClass)`-
+Fabrik hatte 3 von 4 Ablehnungsästen ungetestet; geschlossen mit
+`KoogFabrikAblehnungsStubs.kt` + vier Negativtests. „Contract-Parität" heißt **nicht**
+„identische Fabrik-Fläche".
+
+**Nachweis.** Review-/Verification-Artefakte: `2026-07-10-slice-043-code-review.md`,
+`2026-07-10-slice-043-code-safety-review.md`, `2026-07-10-slice-043-verification.md`
+(plus Plan-/Design-Reviews gleichen Datums). Ausgeführte Sensoren: `make gates`
+(EXIT 0: doc-check · build · test 27 Tests · coverage-gate 90 %-Floor · arch-check).
 
 ## 8. Sub-Area-Modus-Begründung
 

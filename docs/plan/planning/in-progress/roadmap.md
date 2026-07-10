@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** `welle-05-llm-port` aktiv (`slice-043` in Arbeit). **Letzte Änderung:** 2026-07-10.
+**Status:** Keine aktive Welle (`slice-043` abgeschlossen). **Letzte Änderung:** 2026-07-10.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,11 +10,11 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-`welle-05-llm-port` ist aktiv. `slice-043` ergänzt den zweiten echten
-Aktionsvorschlags-Providerpfad (**Koog**, Parität zum LangChain4j-Adapter aus
-`slice-042`) hinter `AktionsVorschlagsPort` (nur Rohvorschläge, keine
-Freigabe/Ausführung) und liegt in `in-progress/`
-([`slice-043-aktionsvorschlag-koog-langchain4j-paritaet`](slice-043-aktionsvorschlag-koog-langchain4j-paritaet.md)).
+Keine aktive Welle. `slice-043` ist als zweiter echter Aktionsvorschlags-
+Providerpfad (**Koog**, Parität zum LangChain4j-Adapter aus `slice-042`) hinter
+`AktionsVorschlagsPort` (nur Rohvorschläge, keine Freigabe/Ausführung) auf `done/`
+abgeschlossen
+([`slice-043-aktionsvorschlag-koog-langchain4j-paritaet`](../done/slice-043-aktionsvorschlag-koog-langchain4j-paritaet.md)).
 `slice-042` ist als erster echter LangChain4j-Adapter hinter
 `AktionsVorschlagsPort` (nur Rohvorschläge, keine Freigabe/Ausführung) auf `done/`
 abgeschlossen
@@ -200,3 +200,4 @@ flowchart LR
 | 2026-07-09 | `slice-053` in `open/` geplant: Audit-Tamper-Evidenz (Hash-Chain/Signatur) | Deferred aus `slice-041` §9 (IDR-3): append-only gilt nur gegen die Adapter-API; ein ordnungserhaltendes Out-of-Band-Umschreiben lädt unentdeckt. Architect-/Threat-Model-Entscheidung, ggf. Folge-ADR. |
 | 2026-07-09 | `slice-054` in `open/` geplant: Audit Single-Writer-/Nebenläufigkeits-Absicherung | Deferred aus `slice-041` §9 (IDR-4): kein Nebenläufigkeitsmodell; parallele Writer könnten Records verschränken. Latent unter single-threaded Runtime; fällig bei nebenläufiger Runtime. |
 | 2026-07-10 | **welle-05 re-aktiviert**; `slice-043` `open → in-progress` (Koog-Aktionsvorschlag hinter `AktionsVorschlagsPort`, Parität zum LangChain4j-Sibling aus `slice-042`); Ruhe-Marker aufgelöst | Planner-Handoff (Modul 8): Trigger erfüllt (`slice-042` done, kein Slice in `in-progress/`, WIP-Limit 1 frei); Implementierung + Code-/Safety-Review liegen vor, Verification/Closure offen |
+| 2026-07-10 | `slice-043` **in `done/` abgeschlossen**: Koog-Aktionsvorschlag-Adapter hinter `AktionsVorschlagsPort`, Parität zum LangChain4j-Sibling (gleicher 6-Feld-Contract, gleiche Fehlerklassen über beide Runner, bewusste Duplikation statt geteiltem Modul); „Aktuelle Welle" → Ruhe-Marker | `make gates` grün (EXIT 0); Code-/Safety-Review + Verification ohne DoD-Verletzung; Closure-Notiz benennt Paritäts-Contract; Residuen SR-F1/F2/F3 als Folgearbeit (SR-F3 „als INFO belassen") |
