@@ -122,9 +122,11 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   (repo-bewusst) generiert statt von Hand. Das `ids`-Modul nutzt für die
   Lastenheft-Anforderungen die kanonische Regex `LH-(FA-[A-Z]+|QA)-\d+`
   (RTM-/suggest-config-kompatibel, `MR-002`); `link-policy: prose`
-  (Inline-Code-IDs bleiben befreit, Prosa-IDs sind linkpflichtig). Die
+  (Inline-Code-IDs bleiben befreit, Prosa-IDs sind linkpflichtig; **später auf
+  `always` umgestellt — siehe `MR-010`**). Die
   Constraint-/Non-Goal-/Open-Point-IDs (`LH-RB`/`LH-OUT`/`LH-OP`) tragen
-  bewusst keine Linkpflicht.
+  keine Linkpflicht (liegen außerhalb der FA/QA-Regex; für `LH-OP` fehlen zudem
+  Anker — Näheres in `MR-010`).
 - **Begründung:** Die aktuelle d-check-Version bringt eigene Generatoren
   (`--print-config`, `--print-mk`, `--suggest-config ai-harness`) und das
   offline-Gate (`--network none`) mit; die Config soll werkzeug-generiert
@@ -251,6 +253,36 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   „optional" weg).
 - **Auflösungs-Trigger:** permanent, solange Wellen inline in der Roadmap geführt
   werden.
+
+### MR-010 — `link-policy` überall auf `always` (jede ID-Nennung linkpflichtig)
+
+- **Datum:** 2026-07-10
+- **Geltungsbereich:** `.d-check.yml` (`ids`-Modul, alle vier Patterns:
+  `ADR-\d{4}`, `MR-\d{3}`, `LH-(FA-[A-Z]+|QA)-\d+`, `slice-\d{3}`) und der
+  Kopfkommentar von `.d-check.yml`. Supersedet die `link-policy`-Sub-Entscheidung
+  aus `MR-004`.
+- **Adaption:** Alle vier `ids`-Patterns tragen `link-policy: always` statt zuvor
+  `prose`. Damit ist **jede** Nennung einer erfassten ID linkpflichtig — auch IDs
+  in Inline-Code-Spans, die unter `prose` befreit waren. Die ID-*Existenz*-Prüfung
+  (Auflösung gegen `target`) war bereits unter `prose` aktiv; `always` ergänzt sie
+  um eine **flächendeckende Link-Pflicht**. `exempt-paths` (`CHANGELOG.md`,
+  `docs/reviews/**`) bleiben unverändert. `LH-RB`/`LH-OUT`/`LH-OP` bleiben
+  **außerhalb** der FA/QA-Regex (kein Pattern → weiterhin keine Linkpflicht);
+  ebenso wird bewusst **kein** `CO-\d{3}`-Pattern eingeführt, um Carveout-IDs nicht
+  linkpflichtig zu machen.
+- **Begründung:** Maximale Navigierbarkeit und maschinell erzwungene
+  Traceability — jede ID-Nennung wird ein klickbarer Verweis auf ihr Ziel
+  (ADR-Datei / Lastenheft-Anker / Slice-Plan). Die unter `MR-004` gewählte
+  `prose`-Politik war **trivial per Backtick umgehbar** und deckte real nur eine
+  Handvoll Fließtext-Nennungen ab (gemessen 7 ADR-, 17 slice-, 27 LH-Links bei
+  521/1251/1412 Gesamtnennungen); `always` schließt diese Lücke. Die damit
+  einhergehende hohe Link-Dichte — die vormals ~73–95 % Inline-Code-Nennungen je
+  ID-Familie werden linkpflichtig — wird **bewusst in Kauf genommen** als
+  Investition in Doku-Navigierbarkeit.
+- **Auflösungs-Trigger:** permanent, solange `always` gilt. Konsequenz:
+  `make doc-check` meldet jede noch nicht verlinkte ID-Nennung als Befund; diese
+  sind sukzessive in Markdown-Links zu überführen (ggf. via `make doc-repair`),
+  bis das Gate wieder grün ist.
 
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 

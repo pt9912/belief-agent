@@ -2,8 +2,10 @@
 # (repo-bewusst, Baseline v1.4.0 — Bump v1.3.0→v1.4.0, MR-007) und getunt gemäß
 # harness/conventions.md:
 #   MR-002: kanonisches FA/QA-Schema; LH-ids-Regex LH-(FA-<BEREICH>|QA).
-#   MR-004: link-policy prose (Inline-Code-IDs befreit); d-check v0.37.1;
-#           Modul-Auswahl erweitert (2026-07-04, MR-006):
+#   MR-004: d-check v0.37.1; link-policy zunächst prose (Inline-Code befreit).
+#   MR-010: link-policy überall auf 'always' — jede erfasste ID-Nennung ist
+#           linkpflichtig, auch in Inline-Code (2026-07-10).
+#   MR-006: Modul-Auswahl erweitert (2026-07-04):
 #           hermetisch aktiv + spans, hostpaths, tracked, planning.
 #           git-Range-Module (nur via doc-immutable/doc-commits, NICHT im
 #           Default-doc-check — inert ohne Range): vcs, commits.
@@ -25,22 +27,22 @@ ids:
   patterns:
     - regex: 'ADR-\d{4}'
       target: docs/plan/adr/
-      link-policy: prose
+      link-policy: always
       exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
     - regex: 'MR-\d{3}'
       target: harness/conventions.md
-      link-policy: prose
+      link-policy: always
       exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
     - regex: 'LH-(FA-[A-Z]+|QA)-\d+'
       target: spec/lastenheft.md
-      link-policy: prose
+      link-policy: always
       exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
     - regex: 'slice-\d{3}'
       target: docs/plan/planning/
-      link-policy: prose
+      link-policy: always
       exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
-    # Carveout-CO-IDs werden in Inline-Code zitiert (prose befreit); Pattern
-    # bleibt aus, um keine Prosa-Linkpflicht einzuführen.
+    # Carveout-CO-IDs werden in Inline-Code zitiert; ein Pattern bleibt aus, um
+    # unter `link-policy: always` keine Linkpflicht für sie einzuführen (MR-010).
 
 matrix:
   classes:

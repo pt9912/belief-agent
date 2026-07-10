@@ -16,7 +16,7 @@ Anforderungen** — diese stehen im Lastenheft (`LH-*`).
 (`hexagon`) ist von der Außenwelt entkoppelt; er ist nach fachlichen **Use
 Cases** als vertikale Slices organisiert. Das Sprachmodell und alle
 Beobachtungsquellen sind **Adapter hinter Ports** — austauschbar und nicht
-Teil des Kerns (`LH-FA-LLM-001`, `LH-QA-04`). Ports gehören dem Core und
+Teil des Kerns ([`LH-FA-LLM-001`](lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul), [`LH-QA-04`](lastenheft.md#lh-qa-04--erweiterbarkeit)). Ports gehören dem Core und
 liegen so lokal wie möglich beim Use Case, der sie braucht.
 
 ```mermaid
@@ -61,7 +61,7 @@ Die tragende Layering-Regel erzwingt, dass die **Entscheidungs- und
 Kontrolllogik außerhalb des Sprachmodells** liegt: Der Core definiert die
 Ports, die Adapter implementieren sie — der Core importiert **nie** einen
 Adapter. Damit ist das LLM ein austauschbares Modul, nicht der Agent
-(`LH-FA-LLM-001`). Die Abhängigkeitsrichtung zeigt **immer nach innen**
+([`LH-FA-LLM-001`](lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul)). Die Abhängigkeitsrichtung zeigt **immer nach innen**
 (`adapter → application → domain`).
 
 Verzeichnis-/Modulbaum (logisch, sprachfrei; die konkrete Toolchain-Abbildung
@@ -108,7 +108,7 @@ Rollen und erlaubte Importe (a-check-Rollen in Klammern):
 Verboten (Abhängigkeit nach außen): `domain → application`, `domain → adapter`,
 `application → adapter`, `application → Infrastruktur`.
 
-**Nicht-Umgehbarkeit des Gates (`LH-FA-POL-006`):** Das Konfidenz-Gate
+**Nicht-Umgehbarkeit des Gates ([`LH-FA-POL-006`](lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate)):** Das Konfidenz-Gate
 (`ARC-03`, Slice *aktion-gaten*) ist ein eigener Schritt im
 Entscheidungszyklus (`ARC-09`) *vor* jeder Aktionsausführung; eine Aktion
 erhält keinen Pfad, der das Gate auslässt.
@@ -125,22 +125,22 @@ keine Ausfuehrung; die Zyklus-Orchestrierung kann externalisierte
 Modell-Konfidenz über den Konfidenz-Port laden und vor dem Gate in eine
 gate-faehige Erfolgswahrscheinlichkeit übersetzen; *aktion-gaten* holt bei
 extern-wirksamen Aktionen die menschliche Freigabe über den Human-Approval-Port
-ein (`LH-FA-POL-004`) und bindet die Anfrage an die konkrete Aktion plus den
+ein ([`LH-FA-POL-004`](lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen)) und bindet die Anfrage an die konkrete Aktion plus den
 aktuellen `BeliefState`, bevor es freigibt; *beobachtung-waehlen* liest die
 Beobachtungs-Ports zur Aufzählung verfügbarer Kandidaten. Der Inbound-Adapter
 (`cli`) verdrahtet die Outbound-Adapter an die Ports (DI) und stößt den
 Entscheidungszyklus an. Ausführung bleibt am Rand an
 `Zyklusergebnis.Gehandelt` und die darin enthaltene
 `Aktionsfreigabe.Freigegeben` gebunden; `Eskaliert` und `Abgelehnt` haben
-keinen Executor-Pfad (`LH-FA-POL-006`, `LH-OUT-04`).
+keinen Executor-Pfad ([`LH-FA-POL-006`](lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate), `LH-OUT-04`).
 
 ## 3. Externe Abhängigkeiten
 
 | System | Rolle | Substituierbarkeit |
 |---|---|---|
-| Sprachmodell-Anbieter | Hypothesen erzeugen/verfeinern, Likelihoods schätzen, Aktionen vorschlagen (über getrennte, abgegrenzte LLM-Aufgaben-Ports) | austauschbar (Port); kein Anbieter-Lock-in (`LH-FA-LLM-004`) |
+| Sprachmodell-Anbieter | Hypothesen erzeugen/verfeinern, Likelihoods schätzen, Aktionen vorschlagen (über getrennte, abgegrenzte LLM-Aufgaben-Ports) | austauschbar (Port); kein Anbieter-Lock-in ([`LH-FA-LLM-004`](lastenheft.md#lh-fa-llm-004--anbieter-austauschbarkeit)) |
 | Versionskontrolle (Repo) | Beobachtungsquelle und Checkpoint-Substrat für Wirkungsklassen | vorausgesetzt (`LH-RB-02`) |
-| Beobachtungsquellen | Test-/Build-Ergebnisse, Logs, menschliches Feedback, Repo-Inspektion | austauschbar (Ports, `LH-FA-OBS-001`) |
+| Beobachtungsquellen | Test-/Build-Ergebnisse, Logs, menschliches Feedback, Repo-Inspektion | austauschbar (Ports, [`LH-FA-OBS-001`](lastenheft.md#lh-fa-obs-001--heterogene-beobachtungsquellen)) |
 
 ## 4. Sequenz-Diagramme
 
@@ -186,19 +186,19 @@ Das `alt` oben zeigt den Kern (freigeben | sammeln | eskalieren). Der vollständ
 `ARC-09`-Zyklus terminiert in **einem von drei** Zuständen (Sammeln ist der
 Zwischenschritt):
 
-- **handeln** — Gate frei (Konfidenz + ggf. menschliche Freigabe `LH-FA-POL-004`).
+- **handeln** — Gate frei (Konfidenz + ggf. menschliche Freigabe [`LH-FA-POL-004`](lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen)).
 - **eskalieren** — an den Menschen mit Kontext, aus drei Gründen: das Gate selbst
-  eskaliert (Resthypothese-Sperre `LH-FA-POL-005` **oder** fehlende Freigabe
-  `LH-FA-POL-004`), **oder** günstige Beobachtungen erschöpft bei hoher Resthypothese
-  (`LH-FA-ESK-001`), **oder** — davon unabhängig — Budget erschöpft (`LH-FA-ESK-004`).
+  eskaliert (Resthypothese-Sperre [`LH-FA-POL-005`](lastenheft.md#lh-fa-pol-005--sperre-extern-wirksamer-aktionen-bei-hoher-resthypothese) **oder** fehlende Freigabe
+  [`LH-FA-POL-004`](lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen)), **oder** günstige Beobachtungen erschöpft bei hoher Resthypothese
+  ([`LH-FA-ESK-001`](lastenheft.md#lh-fa-esk-001--eskalationsbedingung)), **oder** — davon unabhängig — Budget erschöpft ([`LH-FA-ESK-004`](lastenheft.md#lh-fa-esk-004--budget-gegen-endlosschleifen)).
 - **ablehnen** — Gate abgelehnt (niedrige Erfolgswahrscheinlichkeit), Beobachtungen
-  erschöpft und Resthypothese unter der Eskalations-Schwelle (`LH-FA-POL-002.a`):
+  erschöpft und Resthypothese unter der Eskalations-Schwelle ([`LH-FA-POL-002.a`](lastenheft.md#lh-fa-pol-002--gate-prüft-erfolgswahrscheinlichkeit)):
   weder handeln noch eskalieren.
 
-Das Budget garantiert die Terminierung des Sammel-Loops (`LH-QA-02`); jede günstige
-Beobachtung wird höchstens **einmal** gezählt (kein `LH-FA-OBS-004`-Scheingewissheit).
+Das Budget garantiert die Terminierung des Sammel-Loops ([`LH-QA-02`](lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)); jede günstige
+Beobachtung wird höchstens **einmal** gezählt (kein [`LH-FA-OBS-004`](lastenheft.md#lh-fa-obs-004--deduplizierung-korrelierter-beobachtungen)-Scheingewissheit).
 
-Externalisierte Modell-Konfidenz (`LH-FA-LLM-003`) ist dabei ein Mapping vor
+Externalisierte Modell-Konfidenz ([`LH-FA-LLM-003`](lastenheft.md#lh-fa-llm-003--externalisierung-der-modell-konfidenz)) ist dabei ein Mapping vor
 dem Gate, keine Gate-Entscheidung: Der Zyklus verwendet die neueste gueltige
 append-only Version als `Erfolgswahrscheinlichkeit` der Aktion. Fehlt eine
 gueltige Historie oder ist die Versionierung nicht append-only, entsteht keine
@@ -210,7 +210,7 @@ als neue Konfidenz-Versionen konsumiert; `aktion-gaten` und die Domain-Regel
 
 | Fehlerquelle | Behandlung-Schicht | Logging |
 |---|---|---|
-| Ungültiger Belief State (keine Resthypothese / nicht normiert) | `ARC-02` weist zurück (`LH-FA-BEL-004`) | Ereignis im Audit-Log |
-| Verrauschte / korrelierte Beobachtung | `ARC-02` Dedup gegen Scheingewissheit (`LH-FA-OBS-004`) | Ereignis "Beobachtung erfasst" mit Quelle |
-| Budget erschöpft (Schritte/Kosten/Zeit) | `ARC-09` → `ARC-05` Eskalation (`LH-FA-ESK-004`) | Ereignis "Eskalation angefordert" |
-| Adapter-/Port-Ausfall (LLM, Quelle) | `ARC-09` fail-safe: nicht handeln, sammeln oder eskalieren (`LH-QA-02`) | Ereignis mit Grund |
+| Ungültiger Belief State (keine Resthypothese / nicht normiert) | `ARC-02` weist zurück ([`LH-FA-BEL-004`](lastenheft.md#lh-fa-bel-004--zurückweisung-ungültiger-belief-states)) | Ereignis im Audit-Log |
+| Verrauschte / korrelierte Beobachtung | `ARC-02` Dedup gegen Scheingewissheit ([`LH-FA-OBS-004`](lastenheft.md#lh-fa-obs-004--deduplizierung-korrelierter-beobachtungen)) | Ereignis "Beobachtung erfasst" mit Quelle |
+| Budget erschöpft (Schritte/Kosten/Zeit) | `ARC-09` → `ARC-05` Eskalation ([`LH-FA-ESK-004`](lastenheft.md#lh-fa-esk-004--budget-gegen-endlosschleifen)) | Ereignis "Eskalation angefordert" |
+| Adapter-/Port-Ausfall (LLM, Quelle) | `ARC-09` fail-safe: nicht handeln, sammeln oder eskalieren ([`LH-QA-02`](lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)) | Ereignis mit Grund |

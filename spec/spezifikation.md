@@ -19,15 +19,15 @@ ADR-Schärfung anpassbar.
 
 **Eingabe:** Prior-Belief `b` (Hypothesen `h_i` mit `p_i`, inkl.
 Resthypothese `other`), Beobachtung `o` mit Likelihoods `L(o | h_i)` für
-**jede** Hypothese inkl. `other` (`LH-FA-OBS-005`). **Ausgabe:** Posterior `b'`.
+**jede** Hypothese inkl. `other` ([`LH-FA-OBS-005`](lastenheft.md#lh-fa-obs-005--likelihood-unter-der-resthypothese)). **Ausgabe:** Posterior `b'`.
 **Schritte:**
 
 1. Unnormierte Posterior je Hypothese: `q_i = p_i · L(o | h_i)`.
 2. Normierung: `p'_i = q_i / Σ_j q_j` (Posterior ∝ Prior × Likelihood).
 3. Resthypothese bleibt erhalten und wird mit-aktualisiert; der bisherige
-   Belief wird nicht verworfen (`LH-FA-OBS-003`).
+   Belief wird nicht verworfen ([`LH-FA-OBS-003`](lastenheft.md#lh-fa-obs-003--bayesianisches-nicht-überschreibendes-update)).
 4. Validierung: `| Σ p'_i − 1 | ≤ TOL_NORM`, `other` vorhanden — sonst
-   ungültig (`LH-FA-BEL-002`, `LH-FA-BEL-004`).
+   ungültig ([`LH-FA-BEL-002`](lastenheft.md#lh-fa-bel-002--normierung-der-hypothesen-wahrscheinlichkeiten), [`LH-FA-BEL-004`](lastenheft.md#lh-fa-bel-004--zurückweisung-ungültiger-belief-states)).
 
 **Komplexität:** O(n) über Hypothesen. **Fehlermodi:** `Σ q_j = 0` (keine
 Hypothese erklärt `o`) → Resthypothese trägt Masse, ggf. Re-Hypothesenbildung.
@@ -48,24 +48,24 @@ Startheuristik in §3.
 ### LH-FA-POL-002.a — Gate-Entscheidungsfunktion
 
 **Eingabe:** Aktion mit Erfolgswahrscheinlichkeit `P_success` (getrennt
-von der Diagnose-Wahrscheinlichkeit, `LH-FA-ACT-003`), Wirkungsklasse `k`,
+von der Diagnose-Wahrscheinlichkeit, [`LH-FA-ACT-003`](lastenheft.md#lh-fa-act-003--erfolgswahrscheinlichkeit-je-aktion)), Wirkungsklasse `k`,
 aktuelle Resthypothese `p_other`. **Ausgabe:** `frei | ab | eskaliere`.
 **Schritte:**
 
 1. Schwelle `θ_k` der Wirkungsklasse `k` nachschlagen (§3).
 2. Bei `k = extern-wirksam` und `p_other > θ_other_block`: **nie**
-   freigeben (`LH-FA-POL-005`), unabhängig von `P_success`.
+   freigeben ([`LH-FA-POL-005`](lastenheft.md#lh-fa-pol-005--sperre-extern-wirksamer-aktionen-bei-hoher-resthypothese)), unabhängig von `P_success`.
 3. Bei `P_success ≥ θ_k`: freigeben; `k = extern-wirksam` zusätzlich nur
-   mit menschlicher Freigabe (`LH-FA-POL-004`, `LH-OUT-04`).
+   mit menschlicher Freigabe ([`LH-FA-POL-004`](lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen), `LH-OUT-04`).
 4. Sonst: ablehnen; Eskalation, wenn günstige Beobachtungen erschöpft und
-   `p_other ≥ θ_esc` (`LH-FA-ESK-001`).
+   `p_other ≥ θ_esc` ([`LH-FA-ESK-001`](lastenheft.md#lh-fa-esk-001--eskalationsbedingung)).
 
 ### LH-FA-VOI-002.a — Auswahl der nächsten Beobachtung
 
 Bevorzugt die günstige Beobachtung mit der höchsten erwarteten
 **Diskriminierung** der zwei wahrscheinlichsten Hypothesen; optional
-gewichtet mit Gewinn/Kosten (`LH-FA-VOI-003`). Lokal/heuristisch zulässig
-(`LH-FA-VOI-004`); keine global optimale Policy (`LH-OUT-01`).
+gewichtet mit Gewinn/Kosten ([`LH-FA-VOI-003`](lastenheft.md#lh-fa-voi-003--gewinn-kosten-abwägung)). Lokal/heuristisch zulässig
+([`LH-FA-VOI-004`](lastenheft.md#lh-fa-voi-004--lokaleheuristische-voi-bewertung)); keine global optimale Policy (`LH-OUT-01`).
 
 ## 2. Datenstrukturen und Schemas
 
@@ -99,29 +99,29 @@ gewichtet mit Gewinn/Kosten (`LH-FA-VOI-003`). Lokal/heuristisch zulässig
 ## 3. Defaults und Konstanten
 
 Startwerte zu `LH-OP-01`/`LH-OP-02` — pro Wirkungsklasse die geforderte
-Mindest-Erfolgswahrscheinlichkeit (`LH-FA-POL-003`); konfigurierbar
-(`LH-QA-05`), schärfbar per ADR.
+Mindest-Erfolgswahrscheinlichkeit ([`LH-FA-POL-003`](lastenheft.md#lh-fa-pol-003--schwellen-je-wirkungsklasse)); konfigurierbar
+([`LH-QA-05`](lastenheft.md#lh-qa-05--konfigurierbarkeit)), schärfbar per ADR.
 
 | Name | Wert | Begründung |
 |---|---|---|
-| `θ_nur-lesend` | 0.0 | nur-lesend ohne Schwelle (`LH-FA-POL-003`) |
+| `θ_nur-lesend` | 0.0 | nur-lesend ohne Schwelle ([`LH-FA-POL-003`](lastenheft.md#lh-fa-pol-003--schwellen-je-wirkungsklasse)) |
 | `θ_arbeitsbereich-lokal` | 0.50 | niedrige Schwelle, reversibel im Arbeitsbereich |
-| `θ_repository-wirksam` | 0.80 | mittlere Schwelle; Commit = reversibler Checkpoint (`LH-FA-ACT-002`) |
-| `θ_extern-wirksam` | 0.95 | harte Schwelle; zusätzlich menschliche Freigabe (`LH-FA-POL-004`) |
-| `θ_other_block` | 0.10 | Resthypothese-Grenze, ab der extern-wirksame Aktionen blockiert sind (`LH-FA-POL-005`) |
-| `θ_rehyp` | 0.30 | Resthypothese-Grenze, ab der Re-Hypothesenbildung anstößt (`LH-FA-BEL-005`) |
-| `θ_esc` | 0.30 | Resthypothese-Grenze für Eskalation; Startwert = `θ_rehyp` (Eskalation greift, wenn Re-Hypothesenbildung indiziert wäre, aber günstige Beobachtungen erschöpft sind, `LH-FA-ESK-001`) |
-| `TOL_NORM` | 1e-9 | Normierungs-Toleranz (`LH-FA-BEL-002`, `LH-OP-05`) |
-| `BUDGET_STEPS` | 20 | Default-Budget Informationssammlung vor Eskalation (`LH-FA-ESK-004`) |
+| `θ_repository-wirksam` | 0.80 | mittlere Schwelle; Commit = reversibler Checkpoint ([`LH-FA-ACT-002`](lastenheft.md#lh-fa-act-002--einstufung-nach-seiteneffekt-reichweite)) |
+| `θ_extern-wirksam` | 0.95 | harte Schwelle; zusätzlich menschliche Freigabe ([`LH-FA-POL-004`](lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen)) |
+| `θ_other_block` | 0.10 | Resthypothese-Grenze, ab der extern-wirksame Aktionen blockiert sind ([`LH-FA-POL-005`](lastenheft.md#lh-fa-pol-005--sperre-extern-wirksamer-aktionen-bei-hoher-resthypothese)) |
+| `θ_rehyp` | 0.30 | Resthypothese-Grenze, ab der Re-Hypothesenbildung anstößt ([`LH-FA-BEL-005`](lastenheft.md#lh-fa-bel-005--re-hypothesenbildung-bei-hoher-resthypothese)) |
+| `θ_esc` | 0.30 | Resthypothese-Grenze für Eskalation; Startwert = `θ_rehyp` (Eskalation greift, wenn Re-Hypothesenbildung indiziert wäre, aber günstige Beobachtungen erschöpft sind, [`LH-FA-ESK-001`](lastenheft.md#lh-fa-esk-001--eskalationsbedingung)) |
+| `TOL_NORM` | 1e-9 | Normierungs-Toleranz ([`LH-FA-BEL-002`](lastenheft.md#lh-fa-bel-002--normierung-der-hypothesen-wahrscheinlichkeiten), `LH-OP-05`) |
+| `BUDGET_STEPS` | 20 | Default-Budget Informationssammlung vor Eskalation ([`LH-FA-ESK-004`](lastenheft.md#lh-fa-esk-004--budget-gegen-endlosschleifen)) |
 
 ## 4. Fehler-Codes und Logging-Felder
 
 | Code | Bedingung | Aktion |
 |---|---|---|
-| E-BEL-001 | Belief State ohne Resthypothese | zurückweisen (`LH-FA-BEL-004`) |
-| E-BEL-002 | `\| Σp − 1 \| > TOL_NORM` | zurückweisen (`LH-FA-BEL-002`) |
+| E-BEL-001 | Belief State ohne Resthypothese | zurückweisen ([`LH-FA-BEL-004`](lastenheft.md#lh-fa-bel-004--zurückweisung-ungültiger-belief-states)) |
+| E-BEL-002 | `\| Σp − 1 \| > TOL_NORM` | zurückweisen ([`LH-FA-BEL-002`](lastenheft.md#lh-fa-bel-002--normierung-der-hypothesen-wahrscheinlichkeiten)) |
 | E-POL-001 | extern-wirksame Aktion ohne menschliche Freigabe | ablehnen (`LH-OUT-04`) |
-| E-ESK-001 | Budget erschöpft | Eskalations-Zustand (kein Fehlerstatus, `LH-FA-ESK-002`) |
+| E-ESK-001 | Budget erschöpft | Eskalations-Zustand (kein Fehlerstatus, [`LH-FA-ESK-002`](lastenheft.md#lh-fa-esk-002--eskalation-als-definierter-zustand)) |
 
 ## 5. Metriken und Tracing-Felder
 
@@ -144,4 +144,4 @@ Mindest-Erfolgswahrscheinlichkeit (`LH-FA-POL-003`); konfigurierbar
 | Datum | Änderung | ADR |
 |---|---|---|
 | 2026-06-22 | Initiale Outline (Bootstrap) | — |
-| 2026-06-23 | Review-Fixes: Eskalations-Schwelle `θ_esc` ergänzt (`LH-FA-ESK-001`); Beispiel-Belief-State auf Σ=1 normiert; §5-Metrik-Quellen von ARC-IDs auf Funktionsnamen entkoppelt; Intro-Startwert-Bereich auf `LH-OP-05` erweitert | — |
+| 2026-06-23 | Review-Fixes: Eskalations-Schwelle `θ_esc` ergänzt ([`LH-FA-ESK-001`](lastenheft.md#lh-fa-esk-001--eskalationsbedingung)); Beispiel-Belief-State auf Σ=1 normiert; §5-Metrik-Quellen von ARC-IDs auf Funktionsnamen entkoppelt; Intro-Startwert-Bereich auf `LH-OP-05` erweitert | — |
