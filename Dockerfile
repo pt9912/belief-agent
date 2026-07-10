@@ -30,11 +30,12 @@ COPY adapters/outbound/llm-hypothesen-fake/build.gradle.kts ./adapters/outbound/
 COPY adapters/outbound/konfidenz-memory/build.gradle.kts ./adapters/outbound/konfidenz-memory/build.gradle.kts
 COPY adapters/outbound/llm-action-fake/build.gradle.kts ./adapters/outbound/llm-action-fake/build.gradle.kts
 COPY adapters/outbound/llm-action-langchain4j/build.gradle.kts ./adapters/outbound/llm-action-langchain4j/build.gradle.kts
+COPY adapters/outbound/llm-action-koog/build.gradle.kts ./adapters/outbound/llm-action-koog/build.gradle.kts
 COPY adapters/inbound/cli/build.gradle.kts ./adapters/inbound/cli/build.gradle.kts
 COPY example/langchain/build.gradle.kts ./example/langchain/build.gradle.kts
 COPY example/koog/build.gradle.kts ./example/koog/build.gradle.kts
 COPY example/code-agent/build.gradle.kts ./example/code-agent/build.gradle.kts
-RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:llm-langchain4j:dependencies :adapters:outbound:llm-koog:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:observation-build-report:dependencies :adapters:outbound:observation-git-local:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:audit-file:dependencies :adapters:outbound:approval-fake:dependencies :adapters:outbound:approval-local:dependencies :adapters:outbound:approval-remote-ui:dependencies :adapters:outbound:voi-fake:dependencies :adapters:outbound:llm-hypothesen-fake:dependencies :adapters:outbound:konfidenz-memory:dependencies :adapters:outbound:llm-action-fake:dependencies :adapters:outbound:llm-action-langchain4j:dependencies :adapters:inbound:cli:dependencies :example:langchain:dependencies :example:koog:dependencies :example:code-agent:dependencies
+RUN gradle --no-daemon --console=plain :hexagon:domain:dependencies :hexagon:application:dependencies :adapters:outbound:llm-fake:dependencies :adapters:outbound:llm-langchain4j:dependencies :adapters:outbound:llm-koog:dependencies :adapters:outbound:observation-fake:dependencies :adapters:outbound:observation-build-report:dependencies :adapters:outbound:observation-git-local:dependencies :adapters:outbound:audit-memory:dependencies :adapters:outbound:audit-file:dependencies :adapters:outbound:approval-fake:dependencies :adapters:outbound:approval-local:dependencies :adapters:outbound:approval-remote-ui:dependencies :adapters:outbound:voi-fake:dependencies :adapters:outbound:llm-hypothesen-fake:dependencies :adapters:outbound:konfidenz-memory:dependencies :adapters:outbound:llm-action-fake:dependencies :adapters:outbound:llm-action-langchain4j:dependencies :adapters:outbound:llm-action-koog:dependencies :adapters:inbound:cli:dependencies :example:langchain:dependencies :example:koog:dependencies :example:code-agent:dependencies
 
 # --- build: Quellcode kompilieren (alle Module) ----------------------------
 FROM deps AS build
@@ -50,6 +51,7 @@ RUN gradle --no-daemon --console=plain --max-workers=1 \
     :adapters:inbound:cli:test \
     :adapters:outbound:llm-langchain4j:test \
     :adapters:outbound:llm-action-langchain4j:test \
+    :adapters:outbound:llm-action-koog:test \
     :adapters:outbound:llm-koog:test \
     :adapters:outbound:observation-build-report:test \
     :adapters:outbound:observation-git-local:test \
@@ -70,6 +72,7 @@ RUN gradle --no-daemon --console=plain \
     :adapters:outbound:voi-fake:koverLog :adapters:outbound:llm-hypothesen-fake:koverLog \
     :adapters:outbound:konfidenz-memory:koverLog :adapters:outbound:llm-action-fake:koverLog \
     :adapters:outbound:llm-action-langchain4j:koverLog \
+    :adapters:outbound:llm-action-koog:koverLog \
     :adapters:inbound:cli:koverLog
 
 # --- coverage-gate: Kover Schwellen-Verifikation (ADR-0004/ADR-0006) --------
@@ -86,6 +89,7 @@ RUN gradle --no-daemon --console=plain --max-workers=1 \
     :adapters:outbound:voi-fake:koverVerify :adapters:outbound:llm-hypothesen-fake:koverVerify \
     :adapters:outbound:konfidenz-memory:koverVerify :adapters:outbound:llm-action-fake:koverVerify \
     :adapters:outbound:llm-action-langchain4j:koverVerify \
+    :adapters:outbound:llm-action-koog:koverVerify \
     :adapters:inbound:cli:koverVerify
 
 # --- cli-demo: produktiver Composition-Root, netzfrei gegen Fakes -----------

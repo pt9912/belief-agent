@@ -35,6 +35,7 @@ layers:
   outbound_konfidenz_memory: ["adapters/outbound/konfidenz-memory/**"]
   outbound_llm_action_fake: ["adapters/outbound/llm-action-fake/**"]
   outbound_llm_action_langchain4j: ["adapters/outbound/llm-action-langchain4j/**"]
+  outbound_llm_action_koog: ["adapters/outbound/llm-action-koog/**"]
   examples: ["example/**"]
 
 edges:
@@ -70,6 +71,8 @@ edges:
   - {from: outbound_llm_action_fake, to: domain}
   - {from: outbound_llm_action_langchain4j, to: application}
   - {from: outbound_llm_action_langchain4j, to: domain}
+  - {from: outbound_llm_action_koog, to: application}
+  - {from: outbound_llm_action_koog, to: domain}
   - {from: inbound_cli, to: application} # Composition Root ruft Use Cases auf
   - {from: inbound_cli, to: domain}      # CLI baut deterministische Szenario-Werte
   - {from: inbound_cli, to: outbound_llm_fake}
@@ -120,6 +123,7 @@ resolution:
       - "adapters/outbound/konfidenz-memory/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/llm-action-fake/src/commonMain/kotlin/dev/beliefagent"
       - "adapters/outbound/llm-action-langchain4j/src/main/kotlin/dev/beliefagent"
+      - "adapters/outbound/llm-action-koog/src/main/kotlin/dev/beliefagent"
       - "adapters/inbound/cli/src/main/kotlin/dev/beliefagent"
       - "example/langchain/src/main/kotlin/dev/beliefagent"
       - "example/koog/src/main/kotlin/dev/beliefagent"

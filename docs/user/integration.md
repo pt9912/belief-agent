@@ -185,7 +185,7 @@ deterministisch ueber den Domain-Selektor. LLM-beeinflusste Werte muessen
 explizit als Zahlen im Kandidaten stehen und duerfen keine stillen Defaults
 verwenden.
 
-`KonfidenzPort` ist der Contract fuer `LH-FA-LLM-003`: Modell-Konfidenz wird
+`KonfidenzPort` ist der Contract fuer [`LH-FA-LLM-003`](../../spec/lastenheft.md#lh-fa-llm-003--externalisierung-der-modell-konfidenz): Modell-Konfidenz wird
 als expliziter Zahlenwert mit Referenz, Quelle und Version externalisiert.
 Overrides ueberschreiben keine alten Werte, sondern erscheinen als neue
 append-only Versionen mit Begruendung. Ein Adapter muss beim Laden eine
@@ -335,25 +335,34 @@ Direkte JVM-Adapter sind als eigene Outbound-Module vorhanden:
 | `adapters:outbound:llm-koog` | `KoogLlmPort.fromLlmClient(client, model)` | Koog `LLMClient` liefert strukturierte Likelihoods |
 | `adapters:outbound:llm-koog` | `KoogLlmPort.fromPromptExecutor(executor, model)` | Koog `PromptExecutor` liefert strukturierte Likelihoods |
 | `adapters:outbound:llm-action-langchain4j` | `LangChain4jAktionsVorschlagsPort.fromChatModel(chatModel)` | `ChatModel` liefert **rohe** Aktionsvorschläge (nur Vorschlag, keine Freigabe/Ausführung) |
+| `adapters:outbound:llm-action-koog` | `KoogAktionsVorschlagsPort.fromLlmClient(client, model)` | Koog `LLMClient` liefert **rohe** Aktionsvorschläge (nur Vorschlag, keine Freigabe/Ausführung) |
+| `adapters:outbound:llm-action-koog` | `KoogAktionsVorschlagsPort.fromPromptExecutor(executor, model)` | Koog `PromptExecutor` liefert **rohe** Aktionsvorschläge (nur Vorschlag, keine Freigabe/Ausführung) |
 
-Alle drei Einstiegspunkte bleiben hinter `LlmPort`. Der Adapter erstellt den
+Die ersten drei Einstiegspunkte bleiben hinter `LlmPort`. Der Adapter erstellt den
 Prompt, liest JSON mit `proHypothese` und `resthypothese`, validiert exakt die
 bekannten Hypothesen aus dem `BeliefState` und gibt nur `Likelihoods` an die
 Update-Pipeline weiter. Unvollstaendige, unbekannte oder nicht-endliche Werte
 werden zurueckgewiesen; dadurch entsteht keine Freigabe und kein
 Aktionsausfuehrungspfad.
 
-**Aktionsvorschlags-Adapter (slice-042).** `LangChain4jAktionsVorschlagsPort`
-(hinter `AktionsVorschlagsPort`) liefert ausschliesslich **rohe**
-`AktionsVorschlag`-Werte. Der Adapter prueft nur **Wire-/Deserialisierungs-
+**Aktionsvorschlags-Adapter (Koog/LangChain4j-Paritaet).**
+Beide Framework-Pfade — `LangChain4jAktionsVorschlagsPort` und
+`KoogAktionsVorschlagsPort` — stehen hinter demselben
+`AktionsVorschlagsPort` und liefern ausschliesslich **rohe**
+`AktionsVorschlag`-Werte. Beide pruefen nur **Wire-/Deserialisierungs-
 Integritaet** (genau die erlaubten JSON-Felder, Typ/Shape, endliche Zahlen);
 wire-defekte Einzelvorschlaege werden verworfen (sichtbar), eine unparsebare
-Antwort oder ein Provider-Ausfall wird geworfen ("unreachable" bleibt von "kein
-Vorschlag" unterscheidbar). Die **Semantik** (unbekannte Hypothese, gueltige
-Wirkungsklasse, Evidenz-Aufloesung, Konfidenz-Bereich `[0,1]`) validiert weiterhin
-der Use Case `AktionsVorschlagen` — der Adapter dupliziert sie nicht. Er erzeugt
-keine `Aktionsfreigabe`, oeffnet keinen Executor-Pfad und ist **kein** CLI-Default;
-Provider-Modelle und API-Keys bleiben im Composition-Root.
+Antwort, **Tokens hinter dem ersten JSON-Wert** oder ein Provider-Ausfall werden
+geworfen ("unreachable" bleibt von "kein Vorschlag" unterscheidbar). Die
+**Semantik** (unbekannte Hypothese, gueltige Wirkungsklasse, Evidenz-Aufloesung,
+Konfidenz-Bereich `[0,1]`) validiert weiterhin der Use Case `AktionsVorschlagen` —
+kein Adapter dupliziert sie. Die Paritaet entsteht durch **bewusste Duplikation**
+je Pfad (eigene Prompt-Factory und eigener strikter Parser, **kein** geteiltes
+Produktivmodul) und ist ueber eine gemeinsame Contract-Test-Matrix je Runner
+belegt. Kein Adapter erzeugt eine `Aktionsfreigabe`, oeffnet einen Executor-Pfad
+oder ist CLI-Default; Provider-Modelle und API-Keys bleiben im Composition-Root.
+Es gibt **keine** Live-Provider-Tests und **keine** Secrets in Doku oder Tests;
+Gate, Approval und Ausfuehrung bleiben unveraendert.
 
 Der Integrationssatz bleibt:
 
@@ -535,7 +544,7 @@ Aktuelle konkrete Implementierungen im Repo (noch nicht alles produktiv):
 | `HypothesenPort` | `dev.beliefagent.adapter.llmhypothesen.FakeHypothesenPort` | Deterministischer Re-Hypothesen-Port |
 | `HumanApprovalPort` | `dev.beliefagent.adapter.approval.FakeApproval`; `dev.beliefagent.adapter.approvallocal.LocalApproval`; `dev.beliefagent.adapter.approvalremoteui.RemoteUiApproval` | Fake bleibt CLI-Default; lokale und Remote/UI-Kanaele binden `ApprovalAnfrage` an Nonce, Identitaet und Kontext-Digest |
 | `KonfidenzPort` | `dev.beliefagent.adapter.konfidenz.MemoryKonfidenzPort` | In-Memory, persistenznah (Replay) |
-| `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` (CLI-Default); `dev.beliefagent.adapter.audit.file.DateiAudit` (persistent, slice-041) | `MemoryAudit` bleibt Default; `DateiAudit` speichert append-only in eine inspizierbare Datei und faellt bei Schreib-/Lese-/Formatfehlern fail-closed (wirft) |
+| `AuditPort` | `dev.beliefagent.adapter.audit.MemoryAudit` (CLI-Default); `dev.beliefagent.adapter.audit.file.DateiAudit` (persistent) | `MemoryAudit` bleibt Default; `DateiAudit` speichert append-only in eine inspizierbare Datei und faellt bei Schreib-/Lese-/Formatfehlern fail-closed (wirft) |
 | `LlmPort` | `dev.beliefagent.adapter.llm.langchain4j.LangChain4jLlmPort` / `dev.beliefagent.adapter.llm.koog.KoogLlmPort` | echte LLM-Provider-Boundary für Likelihoods |
 
 Wichtig: Für produktive Ausführung sind `HumanApprovalPort`, persistente
@@ -602,12 +611,12 @@ ueberschreiben. `AktionGaten` nutzt denselben Port fuer Approval-Audit:
 `ApprovalFehler` enthalten Referenzen/Digests, keine UI-Tokens oder
 Klartext-Geheimnisse.
 
-**Persistenter Datei-Adapter (slice-041).**
+**Persistenter Datei-Adapter.**
 `dev.beliefagent.adapter.audit.file.DateiAudit` ist der erste nicht-Memory-Adapter
 hinter `AuditPort`: er speichert alle Ereignisse append-only in eine Datei
 (`java.nio`), laedt sie nach Prozess-Neustart ueber `AuditPort.lade()`
 rekonstruierbar und haelt ein deterministisches, versioniertes und
-inspizierbares Textformat (`LH-QA-06`).
+inspizierbares Textformat ([`LH-QA-06`](../../spec/lastenheft.md#lh-qa-06--beobachtbarkeit)).
 
 ```kotlin
 import dev.beliefagent.adapter.audit.file.DateiAudit
@@ -620,7 +629,7 @@ val protokoll = audit.lade()                // geordnet rekonstruiert
 
 Fehler sind **sichtbar**: bei Schreib-, Lese- oder Formatfehlern wirft der Adapter
 (`AuditSchreibFehler` / `AuditLeseFehler` / `AuditFormatFehler`), statt still ein
-leeres Protokoll zurueckzugeben (`LH-QA-02`). Ein abgeschnittener letzter Datensatz
+leeres Protokoll zurueckzugeben ([`LH-QA-02`](../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)). Ein abgeschnittener letzter Datensatz
 (Crash waehrend `anhaengen`) wird als N-1 rekonstruiert und ueber einen
 Warn-Kanal sichtbar gemeldet; ein Defekt im Inneren bleibt ein harter Fehler.
 Append-only ist gegen die Adapter-API garantiert — die zeitliche Ordnung erzwingt
@@ -640,7 +649,7 @@ Diese Punkte sind bewusst noch nicht als Nutzervertrag festgelegt:
   echte externe Provider-Bindungen.
 - Produktive Remote-/UI-Authentisierung und Härtung der Bediengrenze.
 - Dauerhafte Audit-Persistenz als **Produktiv-Default**: der append-only
-  Datei-Adapter `DateiAudit` (slice-041) existiert und ist inspizierbar, aber
+  Datei-Adapter `DateiAudit` existiert und ist inspizierbar, aber
   produktives CLI-Binding, Retention, Backups, Compliance-Export, Tamper-Evidenz
   und nebenlaeufige Writer bleiben Folgearbeit.
 
