@@ -4,9 +4,9 @@
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
-**Bezug:** `LH-FA-LLM-001`, `LH-FA-LLM-002`, `LH-FA-LLM-003`,
-`LH-FA-LLM-004`, `LH-FA-BEL-005`, `LH-FA-BEL-006`, `LH-FA-BEL-007`,
-`LH-QA-02`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`, `ADR-0003`, `ADR-0006`,
+**Bezug:** [`LH-FA-LLM-001`](../../../../spec/lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul), [`LH-FA-LLM-002`](../../../../spec/lastenheft.md#lh-fa-llm-002--abgegrenzte-modell-aufgaben), [`LH-FA-LLM-003`](../../../../spec/lastenheft.md#lh-fa-llm-003--externalisierung-der-modell-konfidenz),
+[`LH-FA-LLM-004`](../../../../spec/lastenheft.md#lh-fa-llm-004--anbieter-austauschbarkeit), [`LH-FA-BEL-005`](../../../../spec/lastenheft.md#lh-fa-bel-005--re-hypothesenbildung-bei-hoher-resthypothese), [`LH-FA-BEL-006`](../../../../spec/lastenheft.md#lh-fa-bel-006--dynamischer-hypothesenraum), [`LH-FA-BEL-007`](../../../../spec/lastenheft.md#lh-fa-bel-007--rückverfolgbarkeit-hypothese--evidenz),
+[`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit); [`ADR-0001`](../../adr/0001-hexagonal-llm-port.md), [`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md),
 `ARC-02`, `ARC-07`, `ARC-08`, `ARC-09`.
 
 **Autor:** Codex. **Datum:** 2026-07-08.
@@ -25,8 +25,8 @@ dasselbe fail-closed Schema und dieselbe lokale Contract-Matrix tragen.
 - [ ] Der nach `slice-044` fehlende Framework-Adapter
   (`llm-hypothesen-koog` oder `llm-hypothesen-langchain4j`) implementiert
   `HypothesenPort` hinter `ARC-08`; beide Framework-Pfade bleiben austauschbar
-  und `hexagon:*` bleibt frei von Provider-/Framework-Imports (`LH-FA-LLM-001`,
-  `LH-FA-LLM-004`).
+  und `hexagon:*` bleibt frei von Provider-/Framework-Imports ([`LH-FA-LLM-001`](../../../../spec/lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul),
+  [`LH-FA-LLM-004`](../../../../spec/lastenheft.md#lh-fa-llm-004--anbieter-austauschbarkeit)).
 - [ ] Beide Adapter nutzen denselben fachlichen Response-Contract fuer
   Hypothesen-Kandidaten: Kandidaten-ID, `score` und `stuetzendeEvidenz`.
   Unterschiede in Framework-Runnern duerfen nicht zu unterschiedlichen
@@ -34,15 +34,15 @@ dasselbe fail-closed Schema und dieselbe lokale Contract-Matrix tragen.
 - [ ] Gemeinsame oder bewusst duplizierte Contract-Tests belegen Paritaet fuer
   gueltige Antwort, leere Antwort, kaputtes JSON, doppelte Felder, unbekannte
   Felder, leere IDs, nicht-endliche Scores, Scores ausserhalb `(0,1]`, fehlende
-  Evidenz und Trennung zu `LlmPort`/`AktionsVorschlagsPort` (`LH-QA-02`,
-  `LH-QA-03`).
+  Evidenz und Trennung zu `LlmPort`/`AktionsVorschlagsPort` ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe),
+  [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)).
 - [ ] Prompt- und Parser-Paritaet ist dokumentiert: beide Framework-Pfade
-  beschreiben dieselbe abgegrenzte Modellaufgabe aus `LH-FA-LLM-002` und liefern
+  beschreiben dieselbe abgegrenzte Modellaufgabe aus [`LH-FA-LLM-002`](../../../../spec/lastenheft.md#lh-fa-llm-002--abgegrenzte-modell-aufgaben) und liefern
   nur `HypothesenKandidat`en, keine Likelihoods, Aktionsvorschlaege, Gate-
   Entscheidungen, Belief-Mutationen oder Konfidenz-Gate-Werte.
 - [ ] Build-/Arch-/Coverage-Integration ist fuer beide Adapter vollstaendig:
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`, Modul-`build.gradle.kts`
-  und Kover-Gates enthalten den neuen Paritaetspfad (`ADR-0003`, `ADR-0006`).
+  und Kover-Gates enthalten den neuen Paritaetspfad ([`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md)).
 - [ ] Integrationsdoku beschreibt beide Hypothesen-Providerpfade symmetrisch und
   nennt klar: keine CLI-Default-Umbindung, keine Live-Provider-Tests, keine
   Secrets in Doku/Tests und keine produktive Provider-Konfiguration.
@@ -104,7 +104,7 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 - **Modus:** Hybrid
 - **Konventionen-Dichte:** hoch fuer Outbound-Adapter nach `ARC-08` und
-  Build-/Coverage-Einbindung nach `ADR-0003`/`ADR-0006`; mittel fuer
+  Build-/Coverage-Einbindung nach [`ADR-0003`](../../adr/0003-hexslice-architektur.md)/[`ADR-0006`](../../adr/0006-coverage-gate-scope.md); mittel fuer
   Paritaetsregeln zwischen zwei echten Framework-Pfaden, weil `slice-044`
   zunaechst nur einen Pfad liefert.
 - **Phase-Reife:** Phase 3 fuer den ersten Provider-Adapter aus `slice-044`,

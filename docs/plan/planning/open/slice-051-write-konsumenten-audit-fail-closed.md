@@ -4,8 +4,8 @@
 
 **Welle:** welle-05-llm-port Stabilisierung (Audit-Persistenz-Folgeslices).
 
-**Bezug:** `LH-FA-AUD-001`, `LH-QA-02`, `LH-QA-03`, `LH-FA-POL-004`;
-`ADR-0001`, `ADR-0003`; `ARC-06`.
+**Bezug:** [`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll), [`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-FA-POL-004`](../../../../spec/lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen);
+[`ADR-0001`](../../adr/0001-hexagonal-llm-port.md), [`ADR-0003`](../../adr/0003-hexslice-architektur.md); `ARC-06`.
 
 **Autor:** Claude. **Datum:** 2026-07-09.
 
@@ -25,10 +25,10 @@ Teilzustand in `KonfidenzExternalisieren`.
 - [ ] `AktionsVorschlagen` unterscheidet Validierungsabweisung (drop, wie bisher)
   von einem Audit-Schreibfehler (`audit.anhaengen`): Letzterer wird nicht
   verschluckt, sondern sichtbar/fail-closed signalisiert; das Pflicht-Ereignis
-  `AktionVorgeschlagen` geht nicht still verloren (`LH-FA-AUD-001`, `LH-QA-02`).
+  `AktionVorgeschlagen` geht nicht still verloren ([`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll), [`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)).
 - [ ] `KonfidenzExternalisieren` hinterlässt bei Audit-Schreibfehler keinen
   Teilzustand (KonfidenzPort geschrieben, Audit nicht) ohne sichtbare Spur.
-- [ ] Deterministische Tests (`LH-QA-03`) mit werfendem Audit-Adapter zeigen
+- [ ] Deterministische Tests ([`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)) mit werfendem Audit-Adapter zeigen
   Eskalation/Sichtbarkeit statt stillem `Abgelehnt`; `make gates` grün.
 
 ## 3. Plan (vor Code)
@@ -74,5 +74,5 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 - **Phase-Reife:** Phase 3-4. Port stabil; die per-Konsument-Fehlerbehandlung ist
   fachlich neu zu vereinheitlichen.
 - **Evidenz-/Diskrepanz-Risiko:** hoch. Ein still verschluckter Audit-Schreibfehler
-  verletzt die Entscheidungsspur (`LH-FA-AUD-001`).
+  verletzt die Entscheidungsspur ([`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll)).
 - **Reconciliation-Aufwand:** ein Slice für die drei Konsumenten + Tests.

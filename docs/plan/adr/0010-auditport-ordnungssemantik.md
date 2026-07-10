@@ -14,7 +14,7 @@
 
 ## Kontext
 
-Die Append-only-Ordnung des Ereignisprotokolls (kein Rück-Datieren, `LH-FA-AUD-001`)
+Die Append-only-Ordnung des Ereignisprotokolls (kein Rück-Datieren, [`LH-FA-AUD-001`](../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll))
 ist als **Domänen-Invariante** in `EreignisProtokoll.append` verankert: der Aufruf
 wirft `IllegalArgumentException`, wenn ein Ereignis zeitlich vor dem letzten liegt.
 Zwei `AuditPort`-Implementierungen konsumieren diese Invariante jedoch **an
@@ -49,7 +49,7 @@ Write auszulösen.
 Empfohlen wird **Option A**: **DR-F3 bleibt gültig — die Ordnung wird am Load
 erzwungen, nicht am Write reimplementiert.** Die Cross-Impl-Divergenz und der
 Poison-Store-auf-Rückdatierung werden als **dokumentiertes Residuum** akzeptiert,
-weil (1) der Load-Pfad fail-closed und **sichtbar** wirft (`LH-QA-02` erfüllt — kein
+weil (1) der Load-Pfad fail-closed und **sichtbar** wirft ([`LH-QA-02`](../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe) erfüllt — kein
 stiller Datenschaden), (2) Rückdatierung einen Aufrufer-Vertragsbruch voraussetzt,
 den monotone Uhr-Zeitstempel ausschließen, und (3) der Adapter unverdrahtet ist.
 **Re-Evaluierung** wird an einen harten Trigger gebunden (siehe unten): **bevor** ein
@@ -86,7 +86,7 @@ ist auf **Option B** umzustellen.
 ## Konsequenzen
 
 - Positiv (bei A): keine Änderung an Kern/Adaptern nötig; DR-F3 bleibt konsistent;
-  der Poison-Store ist ein **lauter**, kein stiller Fehler (`LH-QA-02`).
+  der Poison-Store ist ein **lauter**, kein stiller Fehler ([`LH-QA-02`](../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)).
 - Negativ (bei A): die Divergenz zu `MemoryAudit` bleibt bestehen und muss vor jeder
   produktiven Bindung eines persistenten Adapters erneut bewertet werden.
 - Folgepflicht: Wird **Option B** gewählt, ist eine Folgearbeit nötig (Write-Zeit-
@@ -99,7 +99,7 @@ ist auf **Option B** umzustellen.
 
 | Tooling | Regel | Make-Target |
 |---|---|---|
-| Test (`LH-QA-03`) | Bei **Option A**: ein rückdatierter Store wirft am `lade()` sichtbar (`ordnungsverletzung_im_store_wirft`). Bei **Option B**: `anhaengen` einer Rückdatierung wirft **sofort**, paritätisch zu `MemoryAudit` | `make test` |
+| Test ([`LH-QA-03`](../../../spec/lastenheft.md#lh-qa-03--testbarkeit)) | Bei **Option A**: ein rückdatierter Store wirft am `lade()` sichtbar (`ordnungsverletzung_im_store_wirft`). Bei **Option B**: `anhaengen` einer Rückdatierung wirft **sofort**, paritätisch zu `MemoryAudit` | `make test` |
 | a-check | Der Adapter importiert weiterhin nur `domain`/`application`; die Ordnungsregel bleibt in `EreignisProtokoll` (kein Framework/Kern-Leak) | `make arch-check` |
 
 ## Re-Evaluierungs-Trigger

@@ -4,7 +4,7 @@
 
 **Welle:** welle-05-llm-port Stabilisierung (Audit-Persistenz-Folgeslices).
 
-**Bezug:** `LH-QA-02`, `LH-QA-03`, `LH-QA-06`, `LH-FA-AUD-002`; `ARC-06`.
+**Bezug:** [`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-06`](../../../../spec/lastenheft.md#lh-qa-06--beobachtbarkeit), [`LH-FA-AUD-002`](../../../../spec/lastenheft.md#lh-fa-aud-002--rekonstruierbarkeit-des-belief-states); `ARC-06`.
 
 **Autor:** Claude. **Datum:** 2026-07-09.
 
@@ -15,16 +15,16 @@
 Die heute observability-only `AuditPort.lade()`-Konsumenten
 (`Runtime.auditEreignisse()`, code-agent-Beispiel) behandeln einen geworfenen
 Audit-Lesefehler **geordnet** (diagnostizierte Meldung/Eskalation), statt den
-Prozess uncaught abzubrechen. Damit gilt die fail-safe-Sichtbarkeit (`LH-QA-02`)
+Prozess uncaught abzubrechen. Damit gilt die fail-safe-Sichtbarkeit ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe))
 auch auf dem Read-Pfad und nicht nur an der Adapter-Grenze.
 
 ## 2. Definition of Done
 
 - [ ] `Runtime.auditEreignisse()` und das code-agent-Beispiel fangen einen
   `lade()`-Lesefehler und melden ihn geordnet (Diagnose/Eskalation), statt
-  uncaught abzubrechen (`LH-QA-02`); die Inspizierbarkeit (`LH-QA-06`) bleibt
+  uncaught abzubrechen ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)); die Inspizierbarkeit ([`LH-QA-06`](../../../../spec/lastenheft.md#lh-qa-06--beobachtbarkeit)) bleibt
   gewahrt.
-- [ ] Deterministischer Test (`LH-QA-03`) mit korruptem-Store-Fixture zeigt die
+- [ ] Deterministischer Test ([`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)) mit korruptem-Store-Fixture zeigt die
   geordnete Behandlung; `make gates` grün.
 
 ## 3. Plan (vor Code)

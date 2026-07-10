@@ -33,11 +33,11 @@ ist konservativ" testbar und nirgends als Menge zulässiger Presets dokumentiert
 
 Der naheliegende Reflex — eine `DecisionPolicy` als **Strategie im
 Ausführungspfad** (`BeliefState → DecisionPolicy → Decision → Gate`) — kollidiert
-mit einer Kern-Zusicherung: das Gate ist **nicht umgehbar** (`LH-FA-POL-006`).
+mit einer Kern-Zusicherung: das Gate ist **nicht umgehbar** ([`LH-FA-POL-006`](../../../spec/lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate)).
 `Aktionsfreigabe.Freigegeben` ist ausschließlich in `AktionGaten` konstruierbar
 (`internal`); die Schwellen-Monotonie ist fail-closed erzwungen
 (`GateSchwellen.init`, `ADR-0008`); irreversible Aktionen brauchen zusätzlich
-menschliche Freigabe (`LH-FA-POL-004`). Eine Policy, die *im Pfad* freigeben
+menschliche Freigabe ([`LH-FA-POL-004`](../../../spec/lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen)). Eine Policy, die *im Pfad* freigeben
 könnte, wäre ein **zweiter Freigabe-Pfad** und damit ein Loch in genau der
 Eigenschaft, die das Framework ausmacht.
 
@@ -54,9 +54,9 @@ unverändert und konsumieren wie bisher konkrete Schwellen/Budget.
 **Grenze (nicht verhandelbar):** Die Policy **konfiguriert nur Knöpfe, die Gate
 und Zyklus ohnehin exponieren** — sie ist **kein** Akteur im Ausführungspfad und
 kann die harten Invarianten nicht überschreiben: Nicht-Umgehbarkeit
-(`LH-FA-POL-006`), Schwellen-Monotonie (`ADR-0008`), Resthypothese-Sperre
-(`LH-FA-POL-005`), menschliche Freigabe für Irreversibles (`LH-FA-POL-004`),
-fail-closed (`LH-QA-02`). „explorativ" darf ein Deploy nicht auto-freigeben. Ein
+([`LH-FA-POL-006`](../../../spec/lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate)), Schwellen-Monotonie (`ADR-0008`), Resthypothese-Sperre
+([`LH-FA-POL-005`](../../../spec/lastenheft.md#lh-fa-pol-005--sperre-extern-wirksamer-aktionen-bei-hoher-resthypothese)), menschliche Freigabe für Irreversibles ([`LH-FA-POL-004`](../../../spec/lastenheft.md#lh-fa-pol-004--menschliche-freigabe-für-extern-wirksame-aktionen)),
+fail-closed ([`LH-QA-02`](../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)). „explorativ" darf ein Deploy nicht auto-freigeben. Ein
 Preset, das die `GateSchwellen`-Invarianten verletzt, **scheitert fail-closed
 beim Bau** (bestehende `require`s), nicht zur Laufzeit.
 
@@ -83,18 +83,18 @@ BeliefState ─► Entscheidungszyklus ─► { Gate ⇄ VoI } ─► Zykluserge
 
 - Pro: maximale Ausdruckskraft; eine Policy könnte beliebige, auch
   zustandsabhängige Entscheidungslogik tragen.
-- Contra: durchbricht `LH-FA-POL-006` — eine freigebende Policy *im Pfad* ist ein
+- Contra: durchbricht [`LH-FA-POL-006`](../../../spec/lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate) — eine freigebende Policy *im Pfad* ist ein
   zweiter Freigabe-Pfad neben `AktionGaten`; dupliziert die bereits im Kern
   liegende Entscheidungslogik (`ADR-0001`/`ADR-0003`); erhöht das Risiko, dass
   „explorativ" versehentlich Sicherheit aufweicht (Fail-open-Richtung, gegen
-  `LH-QA-02`).
+  [`LH-QA-02`](../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)).
 
 ### Option C — DecisionPolicy als reines Konfigurations-Bündel (gewählt)
 
 - Pro: kleiner, realer Gap statt neuer Pfad; harte Invarianten bleiben im Gate
   und sind policy-fest; jedes Preset ist ein deterministisch testbares Tripel
-  (`LH-QA-03`); respektiert `ADR-0003` (Wertobjekt im Kern) und
-  `LH-FA-POL-006/007`; genau die gewünschte Austauschbarkeit „Policy tauschen,
+  ([`LH-QA-03`](../../../spec/lastenheft.md#lh-qa-03--testbarkeit)); respektiert `ADR-0003` (Wertobjekt im Kern) und
+  [`LH-FA-POL-006/007`](../../../spec/lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate); genau die gewünschte Austauschbarkeit „Policy tauschen,
   Rest unangetastet".
 - Contra: Presets sind nur so gut wie ihre Werte (Kalibrierung offen, wie θ in
   `ADR-0007`); nicht jede denkbare Haltung ist durch vier Knöpfe ausdrückbar
@@ -121,8 +121,8 @@ BeliefState ─► Entscheidungszyklus ─► { Gate ⇄ VoI } ─► Zykluserge
 | Tooling | Regel | Make-Target |
 |---|---|---|
 | a-check | `DecisionPolicy` lebt im Kern (`hexagon/domain` bzw. `application`) und importiert **kein** Adapter/Framework (`ADR-0001`/`ADR-0003`) | `make arch-check` |
-| Kotlin `internal` + Test | Es bleibt **genau ein** Konstruktionsort für `Aktionsfreigabe.Freigegeben` (`AktionGaten`); die Policy fügt keinen zweiten Freigabe-Pfad hinzu (`LH-FA-POL-006`) | `make test` |
-| Test (`LH-QA-03`) | Gleiches Preset + gleiche Ports + gleicher Prior ⇒ gleiches `Zyklusergebnis`; ein invariantenverletzendes Preset wirft fail-closed beim Bau | `make test` |
+| Kotlin `internal` + Test | Es bleibt **genau ein** Konstruktionsort für `Aktionsfreigabe.Freigegeben` (`AktionGaten`); die Policy fügt keinen zweiten Freigabe-Pfad hinzu ([`LH-FA-POL-006`](../../../spec/lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate)) | `make test` |
+| Test ([`LH-QA-03`](../../../spec/lastenheft.md#lh-qa-03--testbarkeit)) | Gleiches Preset + gleiche Ports + gleicher Prior ⇒ gleiches `Zyklusergebnis`; ein invariantenverletzendes Preset wirft fail-closed beim Bau | `make test` |
 
 ## Re-Evaluierungs-Trigger
 

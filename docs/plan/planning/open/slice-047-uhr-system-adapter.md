@@ -4,8 +4,8 @@
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
-**Bezug:** `LH-FA-OBS-006`, `LH-FA-AUD-004`, `LH-QA-02`, `LH-QA-03`,
-`LH-QA-04`; `ADR-0001`, `ADR-0003`, `ADR-0006`, `ARC-07`, `ARC-08`,
+**Bezug:** [`LH-FA-OBS-006`](../../../../spec/lastenheft.md#lh-fa-obs-006--zeitstempel-und-quelle-je-beobachtung), [`LH-FA-AUD-004`](../../../../spec/lastenheft.md#lh-fa-aud-004--zeitstempel-und-quelle-je-ereignis), [`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit),
+[`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit); [`ADR-0001`](../../adr/0001-hexagonal-llm-port.md), [`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md), `ARC-07`, `ARC-08`,
 `ARC-09`.
 
 **Autor:** Codex. **Datum:** 2026-07-08.
@@ -28,16 +28,16 @@ deterministischen CLI-Default nebenbei umzubinden.
   erfuellt den bestehenden Vertrag monoton nicht-fallend: wiederholte
   `jetzt()`-Aufrufe duerfen nie rueckwaerts laufen, auch wenn die zugrunde
   liegende Wanduhr kleinere Werte liefert.
-- [ ] Tests sind hermetisch und deterministisch (`LH-QA-03`): injizierbare
+- [ ] Tests sind hermetisch und deterministisch ([`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)): injizierbare
   Rohzeitquelle, steigende Zeit, gleiche Zeit, Ruecksprung der Rohzeit,
   negativer/ungueltiger Rohwert und lange Aufrufserie sind abgedeckt.
-- [ ] Fail-closed-/Fehlerverhalten ist sichtbar (`LH-QA-02`): ungueltige
+- [ ] Fail-closed-/Fehlerverhalten ist sichtbar ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe)): ungueltige
   Rohzeitwerte duerfen keinen validen Ereignis- oder Beobachtungszeitstempel
   erzeugen; Fehler werden nicht still auf `0` oder den letzten Wert repariert,
   falls dadurch die Ursache unsichtbar wuerde.
 - [ ] Build-/Arch-/Coverage-Integration ist vollstaendig:
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`, Modul-`build.gradle.kts`
-  und Kover-Gate sind ergaenzt (`ADR-0003`, `ADR-0006`).
+  und Kover-Gate sind ergaenzt ([`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md)).
 - [ ] Nutzer-/Integrationsdoku und Verification-Artefakt beschreiben den
   Adapter, seine Monotonie-Garantie und die Abgrenzung zu Fake-/Testuhren; kein
   CLI-/Runtime-Default-Binding wird in diesem Slice geaendert.

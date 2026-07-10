@@ -4,10 +4,10 @@
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
-**Bezug:** `LH-FA-OBS-001`, `LH-FA-OBS-004`, `LH-FA-OBS-006`,
-`LH-FA-VOI-001`, `LH-FA-VOI-002`, `LH-FA-VOI-003`, `LH-FA-VOI-004`,
-`LH-FA-ESK-001`, `LH-QA-02`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`,
-`ADR-0003`, `ADR-0006`, `ARC-04`, `ARC-07`, `ARC-08`, `ARC-09`.
+**Bezug:** [`LH-FA-OBS-001`](../../../../spec/lastenheft.md#lh-fa-obs-001--heterogene-beobachtungsquellen), [`LH-FA-OBS-004`](../../../../spec/lastenheft.md#lh-fa-obs-004--deduplizierung-korrelierter-beobachtungen), [`LH-FA-OBS-006`](../../../../spec/lastenheft.md#lh-fa-obs-006--zeitstempel-und-quelle-je-beobachtung),
+[`LH-FA-VOI-001`](../../../../spec/lastenheft.md#lh-fa-voi-001--information-vor-handlung-bei-unsicherheit), [`LH-FA-VOI-002`](../../../../spec/lastenheft.md#lh-fa-voi-002--diskriminierung-der-zwei-wahrscheinlichsten-hypothesen), [`LH-FA-VOI-003`](../../../../spec/lastenheft.md#lh-fa-voi-003--gewinn-kosten-abwägung), [`LH-FA-VOI-004`](../../../../spec/lastenheft.md#lh-fa-voi-004--lokaleheuristische-voi-bewertung),
+[`LH-FA-ESK-001`](../../../../spec/lastenheft.md#lh-fa-esk-001--eskalationsbedingung), [`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit); [`ADR-0001`](../../adr/0001-hexagonal-llm-port.md),
+[`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md), `ARC-04`, `ARC-07`, `ARC-08`, `ARC-09`.
 
 **Autor:** Codex. **Datum:** 2026-07-08.
 
@@ -33,7 +33,7 @@ zu veraendern.
 - [ ] Der CLI-Default ist fail-closed: fehlende, leere, kaputte oder semantisch
   ungueltige Kandidatenquelle erzeugt eine sichtbare Diagnose und keinen stillen
   Fallback auf `FakeKandidatenquelle` oder "keine guenstige Beobachtung"
-  (`LH-QA-02`, `LH-QA-03`).
+  ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)).
 - [ ] E2E-/CLI-Sensoren zeigen drei Pfade: gueltiger echter Kandidatenkatalog
   kann einen Sammelschritt ausloesen, legitime leere Kandidaten fuehren zur
   bestehenden Erschoepfungs-/Eskalationslogik, Format-/IO-Fehler bleiben

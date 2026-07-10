@@ -4,10 +4,10 @@
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
-**Bezug:** `LH-FA-LLM-001`, `LH-FA-LLM-002`, `LH-FA-LLM-003`,
-`LH-FA-LLM-004`, `LH-FA-ACT-001`, `LH-FA-ACT-002`, `LH-FA-ACT-003`,
-`LH-FA-ACT-004`, `LH-FA-POL-006`, `LH-QA-02`, `LH-QA-03`, `LH-QA-04`;
-`ADR-0001`, `ADR-0003`, `ADR-0006`, `ARC-07`, `ARC-08`, `ARC-09`.
+**Bezug:** [`LH-FA-LLM-001`](../../../../spec/lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul), [`LH-FA-LLM-002`](../../../../spec/lastenheft.md#lh-fa-llm-002--abgegrenzte-modell-aufgaben), [`LH-FA-LLM-003`](../../../../spec/lastenheft.md#lh-fa-llm-003--externalisierung-der-modell-konfidenz),
+[`LH-FA-LLM-004`](../../../../spec/lastenheft.md#lh-fa-llm-004--anbieter-austauschbarkeit), [`LH-FA-ACT-001`](../../../../spec/lastenheft.md#lh-fa-act-001--vier-wirkungsklassen), [`LH-FA-ACT-002`](../../../../spec/lastenheft.md#lh-fa-act-002--einstufung-nach-seiteneffekt-reichweite), [`LH-FA-ACT-003`](../../../../spec/lastenheft.md#lh-fa-act-003--erfolgswahrscheinlichkeit-je-aktion),
+[`LH-FA-ACT-004`](../../../../spec/lastenheft.md#lh-fa-act-004--rückverfolgbarkeit-aktion--evidenz), [`LH-FA-POL-006`](../../../../spec/lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate), [`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit);
+[`ADR-0001`](../../adr/0001-hexagonal-llm-port.md), [`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md), `ARC-07`, `ARC-08`, `ARC-09`.
 
 **Autor:** Codex. **Datum:** 2026-07-08.
 
@@ -25,7 +25,7 @@ fail-closed Schema und dieselben lokalen Contract-Tests tragen.
 - [ ] Der nach `slice-042` fehlende Framework-Adapter (`llm-action-koog` oder
   `llm-action-langchain4j`) implementiert `AktionsVorschlagsPort` hinter
   `ARC-08`; beide Framework-Pfade bleiben austauschbar und core-frei von
-  Provider-/Framework-Imports (`LH-FA-LLM-001`, `LH-FA-LLM-004`).
+  Provider-/Framework-Imports ([`LH-FA-LLM-001`](../../../../spec/lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul), [`LH-FA-LLM-004`](../../../../spec/lastenheft.md#lh-fa-llm-004--anbieter-austauschbarkeit)).
 - [ ] Beide Adapter nutzen denselben fachlichen Response-Contract fuer
   Aktionsvorschlaege: `beschreibung`, `hypotheseId`, `wirkungsklasse`,
   `pSuccess`, `konfidenzReferenz`, `stuetzendeEvidenz`. Unterschiede in
@@ -34,11 +34,11 @@ fail-closed Schema und dieselben lokalen Contract-Tests tragen.
 - [ ] Gemeinsame oder duplizierte Contract-Tests belegen Paritaet fuer
   gueltige Antwort, leere Antwort, kaputtes JSON, doppelte Felder, unbekannte
   Felder, unbekannte Hypothese, ungueltige Wirkungsklasse, fehlende Evidenz,
-  ungueltiges `pSuccess` und fehlende Konfidenzreferenz (`LH-QA-02`,
-  `LH-QA-03`).
+  ungueltiges `pSuccess` und fehlende Konfidenzreferenz ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe),
+  [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)).
 - [ ] Build-/Arch-/Coverage-Integration ist fuer beide Adapter vollstaendig:
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`, Modul-`build.gradle.kts`
-  und Kover-Gates enthalten den neuen Paritaetspfad (`ADR-0003`, `ADR-0006`).
+  und Kover-Gates enthalten den neuen Paritaetspfad ([`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md)).
 - [ ] Integrationsdoku beschreibt beide Aktionsvorschlags-Providerpfade
   symmetrisch und nennt klar: keine CLI-Default-Umbindung, keine Live-Provider-
   Tests, keine Secrets in Doku/Tests, keine Gate-/Approval-/Executor-Aenderung.
@@ -97,7 +97,7 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 - **Modus:** Hybrid
 - **Konventionen-Dichte:** hoch fuer Outbound-Adapter nach `ARC-08` und
-  Build-/Coverage-Einbindung nach `ADR-0003`/`ADR-0006`; mittel fuer
+  Build-/Coverage-Einbindung nach [`ADR-0003`](../../adr/0003-hexslice-architektur.md)/[`ADR-0006`](../../adr/0006-coverage-gate-scope.md); mittel fuer
   Paritaetsregeln zwischen zwei echten Framework-Pfaden, weil `slice-042`
   zunaechst nur einen Pfad liefert.
 - **Phase-Reife:** Phase 3 fuer den ersten Provider-Adapter aus `slice-042`,

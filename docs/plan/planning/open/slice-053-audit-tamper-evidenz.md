@@ -4,8 +4,8 @@
 
 **Welle:** welle-05-llm-port Stabilisierung (Audit-Persistenz-Folgeslices).
 
-**Bezug:** `LH-FA-AUD-001`, `LH-FA-AUD-003`, `LH-QA-03`, `LH-QA-06`;
-`ADR-0002`, `ADR-0003`; `ARC-06`.
+**Bezug:** [`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll), [`LH-FA-AUD-003`](../../../../spec/lastenheft.md#lh-fa-aud-003--auditierbare-entscheidungsspur), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-06`](../../../../spec/lastenheft.md#lh-qa-06--beobachtbarkeit);
+[`ADR-0002`](../../adr/0002-implementierungssprache-jvm-java.md), [`ADR-0003`](../../adr/0003-hexslice-architektur.md); `ARC-06`.
 
 **Autor:** Claude. **Datum:** 2026-07-09.
 
@@ -16,17 +16,17 @@
 Der persistente Audit-Store erhält **Tamper-Evidenz** (Hash-Chain je Record über
 den Vorgänger oder Signatur), sodass ein **ordnungserhaltendes** Out-of-Band-
 Umschreiben (inneren Record löschen/ändern, Rest gültig geordnet neu schreiben)
-erkennbar wird. Damit gilt die `LH-FA-AUD-001`-Unveränderlichkeit auch gegen
+erkennbar wird. Damit gilt die [`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll)-Unveränderlichkeit auch gegen
 einen Dateisystem-Akteur, nicht nur gegen die Adapter-API.
 
 ## 2. Definition of Done
 
 - [ ] Der Store trägt eine verkettete Integritätssicherung (Hash-Chain über den
   Vorgänger-Record oder Signatur); `lade()` erkennt und meldet eine gebrochene
-  Kette (Out-of-Band-Manipulation) sichtbar (`LH-FA-AUD-001`/`003`).
-- [ ] Inspizierbarkeit (`LH-QA-06`) bleibt gewahrt oder wird bewusst gegen die
-  Tamper-Evidenz abgewogen — Format-Entscheidung, ggf. Folge-ADR (`ADR-0002`).
-- [ ] Deterministische Tests (`LH-QA-03`): intakte Kette lädt; manipulierter
+  Kette (Out-of-Band-Manipulation) sichtbar ([`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll)/`003`).
+- [ ] Inspizierbarkeit ([`LH-QA-06`](../../../../spec/lastenheft.md#lh-qa-06--beobachtbarkeit)) bleibt gewahrt oder wird bewusst gegen die
+  Tamper-Evidenz abgewogen — Format-Entscheidung, ggf. Folge-ADR ([`ADR-0002`](../../adr/0002-implementierungssprache-jvm-java.md)).
+- [ ] Deterministische Tests ([`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)): intakte Kette lädt; manipulierter
   innerer Record wird erkannt; `make gates` grün.
 
 ## 3. Plan (vor Code)
@@ -34,7 +34,7 @@ einen Dateisystem-Akteur, nicht nur gegen die Adapter-API.
 | Datei / Komponente | Aenderungs-Art | Begruendung |
 |---|---|---|
 | `adapters/outbound/audit-file/**` | update | Record-Format um Hash-Chain/Signatur erweitern; Kettenprüfung beim Laden. |
-| `docs/plan/adr/*` | ggf. neu | Falls Format-/Krypto-Abhängigkeit die Toolchain berührt (`ADR-0002`). |
+| `docs/plan/adr/*` | ggf. neu | Falls Format-/Krypto-Abhängigkeit die Toolchain berührt ([`ADR-0002`](../../adr/0002-implementierungssprache-jvm-java.md)). |
 | `.../src/test/**` | neu | Ketten-intakt/-gebrochen-Matrix. |
 
 ## 4. Trigger
@@ -52,11 +52,11 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 ## 6. Risiken und offene Punkte
 
-- Tamper-Evidenz steht in Spannung zur Klartext-Inspizierbarkeit (`LH-QA-06`):
+- Tamper-Evidenz steht in Spannung zur Klartext-Inspizierbarkeit ([`LH-QA-06`](../../../../spec/lastenheft.md#lh-qa-06--beobachtbarkeit)):
   ein signiertes/verkettetes Format ist weniger trivial per Editor lesbar — die
   Abwägung gehört in den Slice (ggf. Folge-ADR).
 - Schlüssel-/Signaturverwaltung kann eine neue Abhängigkeit/Pfadpolitik einführen
-  (`ADR-0002`-Guard) und ist selbst Folgearbeit, falls sie über lokale
+  ([`ADR-0002`](../../adr/0002-implementierungssprache-jvm-java.md)-Guard) und ist selbst Folgearbeit, falls sie über lokale
   Hash-Ketten hinausgeht.
 
 ## 7. Closure-Notiz (nach `done/`)

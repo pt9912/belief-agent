@@ -5,6 +5,9 @@
 #   MR-004: d-check v0.37.1; link-policy zunächst prose (Inline-Code befreit).
 #   MR-010: link-policy überall auf 'always' — jede erfasste ID-Nennung ist
 #           linkpflichtig, auch in Inline-Code (2026-07-10).
+#   MR-011/MR-012: ids-Scope erweitert auf docs/plan/adr (Accepted-ADRs
+#           grandfathered) + docs/plan/planning/{in-progress,next,open}
+#           (2026-07-10).
 #   MR-006: Modul-Auswahl erweitert (2026-07-04):
 #           hermetisch aktiv + spans, hostpaths, tracked, planning.
 #           git-Range-Module (nur via doc-immutable/doc-commits, NICHT im
@@ -17,44 +20,77 @@
 # mit hunderten Upstream-Links → aus dem Scan genommen (sonst Fehlzündungen).
 scan:
   roots: ["."]
-  ignore: ["**/*.template.md", ".tmp/**", "**/build/**", "**/.gradle/**", ".harness/baseline/**", ".harness/cache/**"]
+  ignore:
+    [
+      "**/*.template.md",
+      ".tmp/**",
+      "**/build/**",
+      "**/.gradle/**",
+      ".harness/baseline/**",
+      ".harness/cache/**",
+    ]
 
-modules: [links, anchors, ids, matrix, codepaths, spans, hostpaths, tracked, planning, versions]
+modules:
+  [
+    links,
+    anchors,
+    ids,
+    matrix,
+    codepaths,
+    spans,
+    hostpaths,
+    tracked,
+    planning,
+    versions,
+  ]
 
 ids:
   scope:
-    roots: [spec]
+    # MR-011: Scope auf docs/plan/adr erweitert (ADR-Körper linkpflichtig).
+    # Accepted-ADRs 0001-0008 sind aber immutabel (Modul vcs / Hard Rule 3.5) —
+    # Links nachzurüsten löst `core-drift-vcs` aus (empirisch verifiziert). Daher
+    # via exempt-paths unten grandfathered (Glob `000[1-8]-*.md`); künftige ADRs
+    # werden im `Proposed`-Zustand (mutabel) verlinkt und sind bei `Accepted`
+    # bereits konform.
+    # MR-012: Scope zusätzlich auf docs/plan/planning/{in-progress,next,open}
+    # (roadmap + open-Slices); Planning ist mutabel (kein vcs), slice-IDs dort
+    # self-exempt (eigener Target-Baum). done/ bewusst NICHT im Scope.
+    roots: [spec, docs/plan/adr, docs/plan/planning/in-progress, docs/plan/planning/next, docs/plan/planning/open]
   patterns:
     - regex: 'ADR-\d{4}'
       target: docs/plan/adr/
       link-policy: always
-      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**", "docs/plan/adr/000[1-8]-*.md"]
     - regex: 'MR-\d{3}'
       target: harness/conventions.md
       link-policy: always
-      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**", "docs/plan/adr/000[1-8]-*.md"]
     - regex: 'LH-(FA-[A-Z]+|QA)-\d+'
       target: spec/lastenheft.md
       link-policy: always
-      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**", "docs/plan/adr/000[1-8]-*.md"]
     - regex: 'slice-\d{3}'
       target: docs/plan/planning/
       link-policy: always
-      exempt-paths: [CHANGELOG.md, "docs/reviews/**"]
+      exempt-paths: [CHANGELOG.md, "docs/reviews/**", "docs/plan/adr/000[1-8]-*.md"]
     # Carveout-CO-IDs werden in Inline-Code zitiert; ein Pattern bleibt aus, um
     # unter `link-policy: always` keine Linkpflicht für sie einzuführen (MR-010).
 
 matrix:
   classes:
-    - {name: spec-straten, paths: [spec/lastenheft.md, spec/spezifikation.md, spec/architecture.md]}
-    - {name: adr, paths: ["docs/plan/adr/[0-9]*.md"]}
+    - {
+        name: spec-straten,
+        paths:
+          [spec/lastenheft.md, spec/spezifikation.md, spec/architecture.md],
+      }
+    - { name: adr, paths: ["docs/plan/adr/[0-9]*.md"] }
     - name: slice
       paths: ["docs/plan/planning/**/slice-*.md"]
-      token: 'slice-\d{3}'   # Slice-Kennung im ADR-/Spec-Körper = Token-Referenz → matrix-forbidden
+      token: 'slice-\d{3}' # Slice-Kennung im ADR-/Spec-Körper = Token-Referenz → matrix-forbidden
   rules:
-    - {from: spec-straten, to: adr, allow: false}
-    - {from: spec-straten, to: slice, allow: false}
-    - {from: adr, to: slice, allow: false}   # ADRs sind stabiler als Slices; kein Abwärtsverweis (Hard Rule 3.4-Geist)
+    - { from: spec-straten, to: adr, allow: false }
+    - { from: spec-straten, to: slice, allow: false }
+    - { from: adr, to: slice, allow: false } # ADRs sind stabiler als Slices; kein Abwärtsverweis (Hard Rule 3.4-Geist)
   status:
     forbidden: [superseded, deprecated]
   exclude-sections: [Historie, "7. Historie", Geschichte]
@@ -83,7 +119,13 @@ planning:
 versions:
   pin-pattern: 'ghcr\.io/pt9912/belief-agent:(v[0-9]+\.[0-9]+\.[0-9]+)'
   current-from: version.md#aktuell
-  exempt-paths: [CHANGELOG.md, "docs/plan/planning/done/**", spec/lastenheft.md, "docs/reviews/**"]
+  exempt-paths:
+    [
+      CHANGELOG.md,
+      "docs/plan/planning/done/**",
+      spec/lastenheft.md,
+      "docs/reviews/**",
+    ]
 
 # --- git-Range-Module (opt-in, NICHT in modules; via doc-immutable/doc-commits) ---
 
@@ -104,4 +146,4 @@ commits:
     - 'MR-\d{3}'
     - 'CO-\d{3}'
     - 'slice-\d+'
-  exempt-pattern: '^(Merge |Revert )'
+  exempt-pattern: "^(Merge |Revert )"

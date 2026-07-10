@@ -4,9 +4,9 @@
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
-**Bezug:** `LH-FA-LLM-001`, `LH-FA-LLM-002`, `LH-FA-LLM-003`,
-`LH-FA-LLM-004`, `LH-FA-BEL-005`, `LH-FA-BEL-006`, `LH-FA-BEL-007`,
-`LH-QA-02`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`, `ADR-0003`, `ADR-0006`,
+**Bezug:** [`LH-FA-LLM-001`](../../../../spec/lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul), [`LH-FA-LLM-002`](../../../../spec/lastenheft.md#lh-fa-llm-002--abgegrenzte-modell-aufgaben), [`LH-FA-LLM-003`](../../../../spec/lastenheft.md#lh-fa-llm-003--externalisierung-der-modell-konfidenz),
+[`LH-FA-LLM-004`](../../../../spec/lastenheft.md#lh-fa-llm-004--anbieter-austauschbarkeit), [`LH-FA-BEL-005`](../../../../spec/lastenheft.md#lh-fa-bel-005--re-hypothesenbildung-bei-hoher-resthypothese), [`LH-FA-BEL-006`](../../../../spec/lastenheft.md#lh-fa-bel-006--dynamischer-hypothesenraum), [`LH-FA-BEL-007`](../../../../spec/lastenheft.md#lh-fa-bel-007--rückverfolgbarkeit-hypothese--evidenz),
+[`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit); [`ADR-0001`](../../adr/0001-hexagonal-llm-port.md), [`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md),
 `ARC-02`, `ARC-07`, `ARC-08`, `ARC-09`.
 
 **Autor:** Codex. **Datum:** 2026-07-08.
@@ -24,24 +24,24 @@ application-lokalen `HypothesenPort` fuer die abgegrenzte Modellaufgabe
 
 - [ ] Neues Outbound-Adaptermodul (z. B. `llm-hypothesen-langchain4j` oder nach
   Design-Review gleichwertig) implementiert `HypothesenPort` hinter `ARC-08`;
-  `hexagon:*` importiert keine Provider-/Framework-Pakete (`LH-FA-LLM-001`,
-  `LH-FA-LLM-004`).
+  `hexagon:*` importiert keine Provider-/Framework-Pakete ([`LH-FA-LLM-001`](../../../../spec/lastenheft.md#lh-fa-llm-001--sprachmodell-als-austauschbares-modul),
+  [`LH-FA-LLM-004`](../../../../spec/lastenheft.md#lh-fa-llm-004--anbieter-austauschbarkeit)).
 - [ ] Prompt, Response-DTO und Parser sind strikt schema-gebunden: genau die
   erlaubten Felder fuer Kandidaten-ID, `score` und `stuetzendeEvidenz`; kaputtes
   JSON, doppelte Felder, unbekannte Felder, leere IDs, nicht-endliche Scores,
   Scores ausserhalb `(0,1]` und fehlende Evidenz werden fail-closed verworfen
   oder als Adapterfehler sichtbar.
-- [ ] Der Adapter bleibt auf `LH-FA-LLM-002` beschraenkt: keine Likelihoods,
+- [ ] Der Adapter bleibt auf [`LH-FA-LLM-002`](../../../../spec/lastenheft.md#lh-fa-llm-002--abgegrenzte-modell-aufgaben) beschraenkt: keine Likelihoods,
   keine Aktionsvorschlaege, kein Gate, kein Approval, keine Ausfuehrung und
   keine Mutation des `BeliefState`; die Uebernahme bleibt im bestehenden
   `BeliefAktualisieren`-/Domain-Pfad.
 - [ ] Lokale Tests ohne Provider/API-Key decken erfolgreiche Normalisierung,
   leere Antwort, kaputtes JSON, Schema-Abweichungen, Prompt-Inhalt, ungueltige
   Scores, fehlende Evidenz und Trennung zu `LlmPort`/`AktionsVorschlagsPort` ab
-  (`LH-QA-02`, `LH-QA-03`).
+  ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)).
 - [ ] Build-/Arch-/Coverage-Integration ist vollstaendig:
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`, Modul-`build.gradle.kts`
-  und Kover-Gate sind ergaenzt (`ADR-0003`, `ADR-0006`).
+  und Kover-Gate sind ergaenzt ([`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md)).
 - [ ] Nutzer-/Integrationsdoku und Verification-Artefakt beschreiben den echten
   Hypothesen-Providerpfad, aber kein CLI-Default-Binding, keine Live-Provider-
   Tests und keine Secrets in Tests oder Doku.
@@ -99,7 +99,7 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 ### Sub-Area: `adapters/outbound/llm-hypothesen-*`
 
 - **Modus:** GF
-- **Konventionen-Dichte:** hoch. `ARC-08`, `ADR-0003` und `ADR-0006` fuehren
+- **Konventionen-Dichte:** hoch. `ARC-08`, [`ADR-0003`](../../adr/0003-hexslice-architektur.md) und [`ADR-0006`](../../adr/0006-coverage-gate-scope.md) fuehren
   Outbound-Adapter, Build-/Arch-Gate-Einbindung und per-Modul-Coverage; echte
   `LlmPort`-Adapter in `llm-langchain4j`/`llm-koog` liefern das lokale Muster
   fuer Runner, Prompt-Factory, Parser und Stub-Tests.

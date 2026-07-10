@@ -284,6 +284,61 @@ bringend für *Form*-Fragen, nicht autoritativ über Inhalt.
   sind sukzessive in Markdown-Links zu überführen (ggf. via `make doc-repair`),
   bis das Gate wieder grün ist.
 
+### MR-011 — `ids`-Scope auf `docs/plan/adr`; Accepted-ADRs grandfathered
+
+- **Datum:** 2026-07-10
+- **Geltungsbereich:** `.d-check.yml` (`ids.scope.roots`, `exempt-paths` aller
+  vier Patterns), `docs/plan/adr/0009`, `docs/plan/adr/0010`,
+  `docs/plan/adr/README.md`. Baut auf `MR-010` auf.
+- **Adaption:** `ids.scope.roots` wird von `[spec]` auf
+  `[spec, docs/plan/adr]` erweitert — ID-Nennungen in ADR-Dateien sind unter
+  `link-policy: always` (`MR-010`) damit ebenfalls linkpflichtig. Da die
+  **Accepted-ADRs `0001`–`0008` immutabel** sind (Modul `vcs` / Hard Rule 3.5:
+  Core ohne `Geschichte` unveränderlich), können dort **keine** Links nachgerüstet
+  werden. Diese acht Dateien werden daher per `exempt-paths`-Glob
+  `docs/plan/adr/000[1-8]-*.md` in allen vier Patterns **grandfathered**. Die
+  **mutablen** ADR-Dateien (`0009`/`0010` mit Status `Proposed`, `README.md`)
+  werden verlinkt (25 LH-Links + `slice-041`).
+- **Begründung:** Empirisch verifiziert (Docker-Experiment, `make doc-immutable
+  STAGED=1`): schon **ein** additiver Link im Core einer Accepted-ADR erzeugt
+  `core-drift-vcs` — das `vcs`-Gate vergleicht **textuell**, nicht semantisch, und
+  kann „nur ein Link" nicht von einer Inhaltsänderung unterscheiden. Link-Pflicht
+  (`ids`/`always`) und Immutabilität (`vcs`) sind für Bestands-Accepted-ADRs also
+  unvereinbar; der Grandfather-Glob hält **beide** Gates grün. Der Glob ist
+  **eingefroren** auf `0001`–`0008` (der Pre-`MR-011`-Accepted-Bestand) und wächst
+  bewusst **nicht** mit: künftige ADRs werden im `Proposed`-Zustand verlinkt und
+  sind beim Übergang auf `Accepted` bereits konform — kein neuer Grandfather nötig.
+- **Auflösungs-Trigger:** permanent für den `0001`–`0008`-Bestand. Wird eine dieser
+  ADRs je auf `Superseded` gesetzt und inhaltlich überarbeitet, ist sie bei der
+  Gelegenheit zu verlinken und aus dem Glob zu nehmen.
+
+### MR-012 — `ids`-Scope auf die Planning-Lifecycle-Verzeichnisse
+
+- **Datum:** 2026-07-10
+- **Geltungsbereich:** `.d-check.yml` (`ids.scope.roots`),
+  `docs/plan/planning/in-progress/roadmap.md`, `docs/plan/planning/open/slice-*.md`
+  (12 Dateien). Baut auf `MR-010`/`MR-011` auf.
+- **Adaption:** `ids.scope.roots` wird um die Planning-Lifecycle-Verzeichnisse
+  `docs/plan/planning/{in-progress, next, open}` erweitert (jetzt `[spec,
+  docs/plan/adr, docs/plan/planning/in-progress, docs/plan/planning/next,
+  docs/plan/planning/open]`). Damit sind Fremd-ID-Nennungen dort linkpflichtig:
+  `roadmap.md` 32 Links (16 LH, 11 ADR, 5 MR); die 12 `open/`-Slices 186 Links
+  (132 LH, 54 ADR). `next/` ist derzeit leer (nur `.gitkeep`) — vorsorglich im
+  Scope, damit dort landende Slices sofort erfasst werden. **Keine**
+  Immutabilitäts-Kollision: Modul `vcs` deckt nur `docs/plan/adr/[0-9]*.md`,
+  Planning-Dateien sind mutabel.
+- **Begründung:** Die Planning-Lifecycle-Dokumente (Roadmap + Slice-Pläne) sind
+  die zentralen Verweisknoten und referenzieren Anforderungen/ADRs/MRs quer —
+  navigierbare Links erhöhen dort den Nutzen am stärksten. `slice-*`-Nennungen
+  bleiben unberührt: d-check exemptiert IDs, die **innerhalb ihres eigenen
+  Target-Baums** genannt werden (Slice-Target `docs/plan/planning/` umfasst diese
+  Verzeichnisse), daher sind sie nicht linkpflichtig — im Gegensatz zu LH/ADR/MR
+  mit Zielen außerhalb.
+- **Auflösungs-Trigger:** permanent, solange die Slice-Pläne unter
+  `docs/plan/planning/{in-progress,next,open}` geführt werden. `done/` ist
+  bewusst **nicht** im Scope (abgeschlossene Slices; bei Bedarf separat zu
+  entscheiden).
+
 ## Zusatzklassen-Deklaration für Sensors-Bindung
 
 Über die vier kanonischen Bindung-Klassen (ADR, Carveout, Schwelle,

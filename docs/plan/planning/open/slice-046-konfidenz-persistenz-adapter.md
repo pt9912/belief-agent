@@ -4,9 +4,9 @@
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
-**Bezug:** `LH-FA-LLM-003`, `LH-FA-AUD-001`, `LH-FA-AUD-003`,
-`LH-FA-POL-006`, `LH-QA-02`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`,
-`ADR-0003`, `ADR-0006`, `ARC-06`, `ARC-07`, `ARC-08`, `ARC-09`.
+**Bezug:** [`LH-FA-LLM-003`](../../../../spec/lastenheft.md#lh-fa-llm-003--externalisierung-der-modell-konfidenz), [`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll), [`LH-FA-AUD-003`](../../../../spec/lastenheft.md#lh-fa-aud-003--auditierbare-entscheidungsspur),
+[`LH-FA-POL-006`](../../../../spec/lastenheft.md#lh-fa-pol-006--nicht-umgehbares-gate), [`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit); [`ADR-0001`](../../adr/0001-hexagonal-llm-port.md),
+[`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md), `ARC-06`, `ARC-07`, `ARC-08`, `ARC-09`.
 
 **Autor:** Codex. **Datum:** 2026-07-08.
 
@@ -30,15 +30,15 @@ Audit- oder Runtime-Binding-Scope zu vermischen.
 - [ ] Restart-/Replay-Verhalten ist lokal und deterministisch getestet:
   leerer Store, Laden nach Neustart, mehrere Referenzen, Overrides, Versionen
   ausser Reihenfolge, doppelte Versionen und sortierte Historie in
-  Einfuege-/Persistenzreihenfolge (`LH-QA-03`).
+  Einfuege-/Persistenzreihenfolge ([`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)).
 - [ ] Fehlerfaelle sind fail-closed sichtbar getestet: kaputtes Format,
   teilgeschriebener Eintrag, nicht-endliche oder ausserhalb `[0,1]` liegende
   Werte, leere Referenz/Quelle, leere Override-Begruendung, IO-/Schreibfehler
   und unlesbarer Store duerfen keine gate-faehige Teilhistorie erzeugen
-  (`LH-QA-02`, `LH-FA-LLM-003`).
+  ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-FA-LLM-003`](../../../../spec/lastenheft.md#lh-fa-llm-003--externalisierung-der-modell-konfidenz)).
 - [ ] Build-/Arch-/Coverage-Integration ist vollstaendig:
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`, Modul-`build.gradle.kts`
-  und Kover-Gate sind ergaenzt (`ADR-0003`, `ADR-0006`).
+  und Kover-Gate sind ergaenzt ([`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md)).
 - [ ] Nutzer-/Integrationsdoku und Verification-Artefakt beschreiben den
   persistenten Adapter, seine lokale Speicherform und Fehlerpolitik; kein
   CLI-Default-Binding, keine produktive Pfad-/Secret-Policy und keine allgemeine
@@ -96,7 +96,7 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 
 - **Modus:** Hybrid
 - **Konventionen-Dichte:** hoch fuer `KonfidenzPort`, append-only Versionierung
-  und Adapterrolle (`slice-022`, `slice-027`, `ARC-08`, `ADR-0003`), mittel fuer
+  und Adapterrolle (`slice-022`, `slice-027`, `ARC-08`, [`ADR-0003`](../../adr/0003-hexslice-architektur.md)), mittel fuer
   die neue nicht-Memory-Speicherform.
 - **Phase-Reife:** Phase 4 fuer Contract und Memory-/Replay-Adapter, Phase 2-3
   fuer persistente lokale Speicherung.

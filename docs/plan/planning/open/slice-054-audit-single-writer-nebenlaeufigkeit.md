@@ -4,7 +4,7 @@
 
 **Welle:** welle-05-llm-port Stabilisierung (Audit-Persistenz-Folgeslices).
 
-**Bezug:** `LH-FA-AUD-001`, `LH-QA-03`, `LH-QA-04`; `ADR-0003`; `ARC-06`.
+**Bezug:** [`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit); [`ADR-0003`](../../adr/0003-hexslice-architektur.md); `ARC-06`.
 
 **Autor:** Claude. **Datum:** 2026-07-09.
 
@@ -22,8 +22,8 @@ Single-Writer-Annahme unter der single-threaded Runtime nur implizit.
 
 - [ ] Der Adapter erzwingt Single-Writer (exklusives Lock) **oder** erkennt
   konkurrierenden Zugriff und schlägt fail-closed fehl, statt Records zu
-  verschränken (`LH-FA-AUD-001`).
-- [ ] Deterministischer Test (`LH-QA-03`) mit simuliertem parallelem Writer zeigt
+  verschränken ([`LH-FA-AUD-001`](../../../../spec/lastenheft.md#lh-fa-aud-001--unveränderliches-ereignisprotokoll)).
+- [ ] Deterministischer Test ([`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)) mit simuliertem parallelem Writer zeigt
   entweder Serialisierung oder sauberen fail-closed; `make gates` grün.
 
 ## 3. Plan (vor Code)
@@ -50,7 +50,7 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 ## 6. Risiken und offene Punkte
 
 - File-Locking-Semantik ist plattformabhängig; die Lösung muss zur JVM-Zielplattform
-  (`ADR-0002`) passen und hermetisch testbar bleiben (`LH-QA-03`).
+  ([`ADR-0002`](../../adr/0002-implementierungssprache-jvm-java.md)) passen und hermetisch testbar bleiben ([`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)).
 - Multi-Prozess-Absicherung kann über reines In-Prozess-Locking hinausgehen; falls
   ein verteiltes Szenario nötig wird, ist das eigene Folgearbeit.
 

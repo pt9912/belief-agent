@@ -4,9 +4,9 @@
 
 **Welle:** welle-05-llm-port Stabilisierung.
 
-**Bezug:** `LH-FA-OBS-001`, `LH-FA-OBS-004`, `LH-FA-OBS-006`,
-`LH-FA-VOI-002`, `LH-FA-VOI-003`, `LH-FA-VOI-004`, `LH-FA-ESK-001`,
-`LH-QA-02`, `LH-QA-03`, `LH-QA-04`; `ADR-0001`, `ADR-0003`, `ADR-0006`,
+**Bezug:** [`LH-FA-OBS-001`](../../../../spec/lastenheft.md#lh-fa-obs-001--heterogene-beobachtungsquellen), [`LH-FA-OBS-004`](../../../../spec/lastenheft.md#lh-fa-obs-004--deduplizierung-korrelierter-beobachtungen), [`LH-FA-OBS-006`](../../../../spec/lastenheft.md#lh-fa-obs-006--zeitstempel-und-quelle-je-beobachtung),
+[`LH-FA-VOI-002`](../../../../spec/lastenheft.md#lh-fa-voi-002--diskriminierung-der-zwei-wahrscheinlichsten-hypothesen), [`LH-FA-VOI-003`](../../../../spec/lastenheft.md#lh-fa-voi-003--gewinn-kosten-abwägung), [`LH-FA-VOI-004`](../../../../spec/lastenheft.md#lh-fa-voi-004--lokaleheuristische-voi-bewertung), [`LH-FA-ESK-001`](../../../../spec/lastenheft.md#lh-fa-esk-001--eskalationsbedingung),
+[`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit), [`LH-QA-04`](../../../../spec/lastenheft.md#lh-qa-04--erweiterbarkeit); [`ADR-0001`](../../adr/0001-hexagonal-llm-port.md), [`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md),
 `ARC-04`, `ARC-07`, `ARC-08`, `ARC-09`.
 
 **Autor:** Codex. **Datum:** 2026-07-08.
@@ -33,7 +33,7 @@ VoI-Selektionslogik, Eskalationslogik oder Runtime-Composition zu veraendern.
   fehlende Evidenz, nicht-monotone oder ungueltige Zeitstempel, negative/NaN-
   Diskriminierung, nicht-positive/NaN-Kosten und leere Kandidaten werden
   sichtbar abgelehnt oder liefern bewusst keine guenstige Beobachtung
-  (`LH-QA-02`, `LH-QA-03`).
+  ([`LH-QA-02`](../../../../spec/lastenheft.md#lh-qa-02--konservatives-standardverhalten-fail-safe), [`LH-QA-03`](../../../../spec/lastenheft.md#lh-qa-03--testbarkeit)).
 - [ ] Der Adapter bleibt belief-aware, aber enthaelt keine Auswahlentscheidung:
   er darf Kandidaten nach Top-2-Hypothesen oder aehnlichem lokalem Kontext
   anbieten; `VoiSelektor` bleibt die einzige Auswahlregel fuer Gewinn/Kosten.
@@ -43,7 +43,7 @@ VoI-Selektionslogik, Eskalationslogik oder Runtime-Composition zu veraendern.
   oder einen spaeteren Composition-Slice.
 - [ ] Build-/Arch-/Coverage-Integration ist vollstaendig:
   `settings.gradle.kts`, `.a-check.yml`, `Dockerfile`, Modul-`build.gradle.kts`
-  und Kover-Gate sind ergaenzt (`ADR-0003`, `ADR-0006`).
+  und Kover-Gate sind ergaenzt ([`ADR-0003`](../../adr/0003-hexslice-architektur.md), [`ADR-0006`](../../adr/0006-coverage-gate-scope.md)).
 - [ ] Nutzer-/Integrationsdoku und Verification-Artefakt beschreiben den
   Adapter, aber kein CLI-Default-Binding, keine Live-Provider- oder
   Shell-Ausfuehrung und keine Aenderung an Eskalation/Gate/Executor.
@@ -103,7 +103,7 @@ Closure-Notiz geschrieben + Slice nach `done/` verschoben.
 ### Sub-Area: `adapters/outbound/observation-voi-*`
 
 - **Modus:** GF
-- **Konventionen-Dichte:** hoch. `ARC-08`, `ADR-0003` und `ADR-0006` fuehren
+- **Konventionen-Dichte:** hoch. `ARC-08`, [`ADR-0003`](../../adr/0003-hexslice-architektur.md) und [`ADR-0006`](../../adr/0006-coverage-gate-scope.md) fuehren
   Outbound-Adapter, Build-/Arch-Gate-Einbindung und per-Modul-Coverage; `voi-fake`
   und die realistischen Beobachtungsadapter aus `slice-031` liefern lokale
   Strukturmuster.
