@@ -1,6 +1,6 @@
 # Roadmap — belief-agent
 
-**Status:** Keine aktive Welle (`slice-042` abgeschlossen). **Letzte Änderung:** 2026-07-09.
+**Status:** `welle-05-llm-port` aktiv (`slice-043` in Arbeit). **Letzte Änderung:** 2026-07-10.
 
 **Format-Regel:** Die Roadmap ist eine Reihenfolge von **Wellen**, keine
 Reihenfolge von Terminen. Termine — falls überhaupt — sind Konsequenz der
@@ -10,7 +10,12 @@ Wellen-Schätzung, nicht Treiber.
 
 ## Aktuelle Welle
 
-Keine aktive Welle. `slice-042` ist als erster echter LangChain4j-Adapter hinter
+`welle-05-llm-port` ist aktiv. `slice-043` ergänzt den zweiten echten
+Aktionsvorschlags-Providerpfad (**Koog**, Parität zum LangChain4j-Adapter aus
+`slice-042`) hinter `AktionsVorschlagsPort` (nur Rohvorschläge, keine
+Freigabe/Ausführung) und liegt in `in-progress/`
+([`slice-043-aktionsvorschlag-koog-langchain4j-paritaet`](slice-043-aktionsvorschlag-koog-langchain4j-paritaet.md)).
+`slice-042` ist als erster echter LangChain4j-Adapter hinter
 `AktionsVorschlagsPort` (nur Rohvorschläge, keine Freigabe/Ausführung) auf `done/`
 abgeschlossen
 ([`slice-042-llm-aktionsvorschlag-provider-adapter`](../done/slice-042-llm-aktionsvorschlag-provider-adapter.md)).
@@ -194,3 +199,4 @@ flowchart LR
 | 2026-07-09 | `slice-052` in `open/` geplant: Read-Konsumenten geordnete Audit-Lesefehler-Behandlung | Deferred aus `slice-041` §9 (DR-R1): `Runtime.auditEreignisse()`/code-agent konsumieren `lade()` observability-only ungeschützt. Fällig, sobald ein werfender Adapter in einen `lade()`-Pfad oder `lade()`/`Rekonstruktion` in einen Gate-Pfad gebunden wird. |
 | 2026-07-09 | `slice-053` in `open/` geplant: Audit-Tamper-Evidenz (Hash-Chain/Signatur) | Deferred aus `slice-041` §9 (IDR-3): append-only gilt nur gegen die Adapter-API; ein ordnungserhaltendes Out-of-Band-Umschreiben lädt unentdeckt. Architect-/Threat-Model-Entscheidung, ggf. Folge-ADR. |
 | 2026-07-09 | `slice-054` in `open/` geplant: Audit Single-Writer-/Nebenläufigkeits-Absicherung | Deferred aus `slice-041` §9 (IDR-4): kein Nebenläufigkeitsmodell; parallele Writer könnten Records verschränken. Latent unter single-threaded Runtime; fällig bei nebenläufiger Runtime. |
+| 2026-07-10 | **welle-05 re-aktiviert**; `slice-043` `open → in-progress` (Koog-Aktionsvorschlag hinter `AktionsVorschlagsPort`, Parität zum LangChain4j-Sibling aus `slice-042`); Ruhe-Marker aufgelöst | Planner-Handoff (Modul 8): Trigger erfüllt (`slice-042` done, kein Slice in `in-progress/`, WIP-Limit 1 frei); Implementierung + Code-/Safety-Review liegen vor, Verification/Closure offen |
